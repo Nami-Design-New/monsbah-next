@@ -38,7 +38,6 @@ export default async function page({ params }) {
     fetchUserProfile(Number(id)),
     getAllProducts(Number(id)),
   ]);
-  console.log(profile);
 
   return (
     <section className="company_profile_section">

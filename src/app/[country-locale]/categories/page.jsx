@@ -35,7 +35,6 @@ export async function generateMetadata({ searchParams }) {
 export default async function Categories({ searchParams }) {
   const selectedCategory = (await searchParams).category ?? null;
   const categories = await getCategories();
-  console.log(categories);
 
   return (
     <section className="categories-page explore_ads">

@@ -3,10 +3,10 @@
 import { useMemo, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { Dropdown } from "react-bootstrap";
 import Select from "react-select";
 import CountrySwitcher from "./CountrySwitcher";
 import useGetCities from "@/hooks/queries/settings/useGetCities";
+import { Dropdown } from "react-bootstrap";
 
 export default function AdvancedFilter({ countries, selectedCategory }) {
   const t = useTranslations();
@@ -61,12 +61,11 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
 
         {(selectedCategory === "dress" || selectedCategory === "فساتين") && (
           <Select
-            instanceId="product-type-select"
-            aria-label="Product Type"
+            instanceId="country-select"
+            aria-label="Country"
             className="basic-single"
             classNamePrefix="select"
             isSearchable={false}
-            isRtl={lang === "ar"}
             placeholder={t("productType")}
             options={productTypeOptions}
             value={productTypeOptions.find((opt) => opt.value === productType)}
@@ -77,7 +76,7 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
 
       <div className="grid_view">
         <Dropdown>
-          <Dropdown.Toggle aria-label="Sort Filter">
+          <Dropdown.Toggle id="sort-filter-toggle" aria-label="Sort Filter">
             <i className="fa-regular fa-arrow-up-wide-short"></i>
           </Dropdown.Toggle>
 
@@ -112,7 +111,10 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
         </Dropdown>
 
         <Dropdown>
-          <Dropdown.Toggle aria-label="Filter Country">
+          <Dropdown.Toggle
+            id="country-filter-toggle"
+            aria-label="Filter Country"
+          >
             <i className="fa-sharp fa-light fa-filter"></i>
           </Dropdown.Toggle>
 
