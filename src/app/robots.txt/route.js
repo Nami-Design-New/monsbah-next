@@ -4,7 +4,7 @@ export async function GET() {
   const lines = [
     "User-agent: *",
     "Allow: /",
-    "Sitemap: https://monsbah.com/sitemap-index.xml",
+    "Sitemap: https://monsbah.com/sitemap.xml",
   ];
 
   return new Response(lines.join("\n"), {
