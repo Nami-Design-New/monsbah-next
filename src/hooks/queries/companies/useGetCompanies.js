@@ -19,6 +19,8 @@ function useGetCompanies() {
       : null;
   const search = searchParams.get("search");
  
+  const pageParamFromUrl = Number(searchParams.get("page")) || 1;
+
   const {
     isLoading,
     data,
@@ -29,7 +31,7 @@ function useGetCompanies() {
   } = useInfiniteQuery({
     queryKey: ["companies", country_slug, city_id, category_slug, lang, search],
 
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam = pageParamFromUrl }) => {
       const res = await clientAxios.get("/client/companies", {
         params: {
           page: pageParam,
@@ -46,6 +48,8 @@ function useGetCompanies() {
       }
     },
 
+    initialPageParam: pageParamFromUrl,
+
     getNextPageParam: (lastPage, pages) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
@@ -53,10 +57,20 @@ function useGetCompanies() {
     retry: false,
   });
 
+  const firstPage = data?.pages?.[0];
+  const meta = firstPage?.data?.meta || firstPage?.meta || {};
+  const perPage = meta.per_page || firstPage?.per_page || 50;
+  const currentPageMeta = meta.current_page || meta.page || 1;
+  const total = meta.total || firstPage?.total || 0;
+  const lastPageMeta = meta.last_page || Math.ceil(total / perPage) || 1;
+
   return {
     isLoading,
     data,
-    total: data?.pages?.[0]?.total || 0,
+    total,
+    perPage,
+    currentPage: Number(currentPageMeta),
+    lastPage: Number(lastPageMeta),
     error,
     hasNextPage,
     fetchNextPage,

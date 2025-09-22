@@ -5,6 +5,7 @@ import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale, getTranslations } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
+import Pagination from "@/components/shared/Pagination";
 
 export async function generateMetadata({ searchParams }) {
   const t = await getTranslations("meta");
@@ -55,6 +56,19 @@ export default async function Companies({ searchParams, params }) {
   const category_slug = paramsObj?.category || null;
   const sub_category_slug = paramsObj?.sub_category || null;
   const search = paramsObj?.search || null;
+  const pageParamUrl = Number(paramsObj?.page) || 1;
+
+  // Fetch first page to get meta for fallback pagination when JS disabled
+  const firstPageData = await getCompanyProducts({
+    pageParam: pageParamUrl,
+    lang,
+    country_slug,
+    type,
+    sort,
+    city_id,
+    category_slug,
+    sub_category_slug,
+  });
 
   await queryClient.prefetchInfiniteQuery({
     queryKey: [
@@ -69,7 +83,7 @@ export default async function Companies({ searchParams, params }) {
       search,
       lang,
     ],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam = pageParamUrl }) =>
       getCompanyProducts({
         pageParam,
         lang,
@@ -80,7 +94,7 @@ export default async function Companies({ searchParams, params }) {
         category_slug,
         sub_category_slug,
       }),
-    initialPageParam: 1,
+    initialPageParam: pageParamUrl,
     getNextPageParam: (lastPage) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
@@ -93,6 +107,50 @@ export default async function Companies({ searchParams, params }) {
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductList />
       </HydrationBoundary>
+
+      {/* Fallback pagination for no-JS environments */}
+      {/* {(() => {
+        const meta = firstPageData?.data?.meta || firstPageData?.meta || {};
+        const lastPage = meta.last_page || 1;
+        if (lastPage <= 1) return null;
+        return (
+          <nav aria-label="Pagination" className="pagination-wrapper text-center my-4">
+            <ul className="list-unstyled m-0 p-0 d-inline-flex gap-2">
+              {pageParamUrl > 1 && (
+                <li>
+                  <a href={`?page=${pageParamUrl - 1}`} rel="prev" className="px-3 py-1 border rounded">
+                    « Prev
+                  </a>
+                </li>
+              )}
+              {Array.from({ length: lastPage }, (_, i) => i + 1).map((p) => (
+                <li key={p}>
+                  <a
+                    href={p === 1 ? "" : `?page=${p}`}
+                    aria-current={p === pageParamUrl ? "page" : undefined}
+                    className={`px-3 py-1 border rounded ${p === pageParamUrl ? "active" : ""}`}
+                  >
+                    {p}
+                  </a>
+                </li>
+              ))}
+              {pageParamUrl < lastPage && (
+                <li>
+                  <a href={`?page=${pageParamUrl + 1}`} rel="next" className="px-3 py-1 border rounded">
+                    Next »
+                  </a>
+                </li>
+              )}
+            </ul>
+          </nav>
+        );
+      })()} */}
+
+      {/* Fallback pagination for no-JS environments */}
+      <Pagination
+        currentPage={pageParamUrl}
+        totalPages={firstPageData?.data?.meta?.last_page || 1}
+      />
     </div>
   );
 }

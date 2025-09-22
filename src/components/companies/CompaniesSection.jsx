@@ -4,6 +4,7 @@ import { useRef, useEffect } from "react";
 import CompanyCard from "../shared/cards/CompanyCard";
 import CompanyLoader from "@/components/shared/loaders/CompanyLoader";
 import useGetCompanies from "@/hooks/queries/companies/useGetCompanies";
+import Pagination from "@/components/shared/Pagination";
 
 export default function CompaniesSection() {
   const sectionRef = useRef(null);
@@ -14,11 +15,12 @@ export default function CompaniesSection() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    currentPage,
+    lastPage,
   } = useGetCompanies();
 
   const allCompanies =
     companies?.pages?.flatMap((page) => page?.data?.data) ?? [];
-
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
@@ -58,6 +60,9 @@ export default function CompaniesSection() {
                 </div>
               ))}
         </div>
+        {lastPage > 1 && (
+          <Pagination currentPage={currentPage} totalPages={lastPage} />
+        )}
       </div>
     </section>
   );

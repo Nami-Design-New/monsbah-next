@@ -1,4 +1,5 @@
 import CompaniesSection from "@/components/companies/CompaniesSection";
+import Pagination from "@/components/shared/Pagination";
 import FilterCompanySection from "@/components/home/FilterCompanySection";
 import { getCompanies } from "@/services/ads/getCompanies";
 import { getUserType } from "@/services/auth/getUserType";
@@ -51,6 +52,7 @@ export default async function page({ params, searchParams }) {
   const category_slug = categoryDecoded || null;
   const sub_category_slug = subCategoryDecoded || null;
   const search = paramsObj?.search || null;
+  const pageParamUrl = Number(paramsObj?.page) || 1;
 
   // Prefetch products with ALL parameters including search
   await queryClient.prefetchInfiniteQuery({
@@ -66,7 +68,7 @@ export default async function page({ params, searchParams }) {
       search,
       user,
     ],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam = pageParamUrl }) =>
       getProducts({
         pageParam,
         lang,
@@ -84,6 +86,16 @@ export default async function page({ params, searchParams }) {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
     },
+  });
+
+  // Fetch first page of companies to get meta for fallback pagination
+  const firstPageData = await getCompanies({
+    pageParam: pageParamUrl,
+    city_id,
+    country_slug,
+    category_slug,
+    lang,
+    search,
   });
 
   // Prefetch companies
@@ -112,6 +124,9 @@ export default async function page({ params, searchParams }) {
         <HydrationBoundary state={dehydrate(queryClient)}>
           <CompaniesSection />
         </HydrationBoundary>
+
+        {/* Fallback pagination for no-JS environments */}
+        <Pagination currentPage={pageParamUrl} totalPages={firstPageData?.meta?.last_page || 1} />
       </div>
     </>
   );
