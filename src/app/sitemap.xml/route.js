@@ -2,7 +2,7 @@ import { LOCALES } from "@/i18n/routing";
 import getProducts from "@/services/products/getProducts";
 import { BASE_URL } from "@/utils/constants";
 
-const CHUNK_SIZE = 100;
+const CHUNK_SIZE = 50000;
 
 export const dynamic = "force-dynamic";
 
@@ -98,14 +98,17 @@ export async function GET() {
       }
     });
 
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapPaths
-      .map((loc) => `  <sitemap>\n    <loc>${loc}</loc>\n  </sitemap>`)
-      .join("\n")}\n</sitemapindex>`;
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapPaths
+  .map((loc) => `  <sitemap>\n    <loc>${loc}</loc>\n  </sitemap>`)
+  .join("\n")}
+</sitemapindex>`;
 
     return new Response(xml, {
       status: 200,
       headers: {
-        "Content-Type": "text/xml",
+        "Content-Type": "application/xml; charset=UTF-8",
         "Cache-Control": "s-maxage=86400, stale-while-revalidate",
       },
     });
