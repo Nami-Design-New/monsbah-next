@@ -53,6 +53,7 @@ export default async function page({ params, searchParams }) {
       : null;
 
   const paramsObj = await searchParams;
+  const pageParamFromUrl = Number(paramsObj?.page) || 1;
   const user = await getUserType();
   const locale = await getLocale();
 
@@ -95,7 +96,7 @@ export default async function page({ params, searchParams }) {
         search,
         user,
       }),
-    initialPageParam: 1,
+    initialPageParam: pageParamFromUrl,
     getNextPageParam: (lastPage) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
@@ -105,7 +106,7 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <HeroSection />
-      <FilterSection selectedCategory={selectedCategory} />{" "}
+      <FilterSection selectedCategory={selectedCategory} selectedSubCategory={subCategoryDecoded} />{" "}
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />
       </HydrationBoundary>

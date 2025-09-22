@@ -97,7 +97,7 @@ export default async function page({ params, searchParams }) {
         search,
         user,
       }),
-    initialPageParam: 1,
+    initialPageParam: pageParamUrl,
     getNextPageParam: (lastPage) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
@@ -126,7 +126,7 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <HeroSection />
-      <FilterSection selectedCategory={selectedCategory} />
+      <FilterSection selectedCategory={selectedCategory} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         {showCompanies ? (
           <CompaniesList />

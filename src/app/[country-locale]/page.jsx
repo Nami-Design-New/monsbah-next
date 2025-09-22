@@ -22,6 +22,7 @@ export async function generateMetadata() {
 
 export default async function Home({ searchParams }) {
   const paramsObj = await searchParams;
+  const pageParamUrl = Number(paramsObj?.page) || 1;
   const user = await getUserType();
   const locale = await getLocale();
 
@@ -37,7 +38,6 @@ export default async function Home({ searchParams }) {
   const category_slug = paramsObj?.category || null;
   const sub_category_slug = paramsObj?.sub_category || null;
   const search = paramsObj?.search || null;
-  const pageParamUrl = Number(paramsObj?.page) || 1;
 
   await queryClient.prefetchInfiniteQuery({
     queryKey: [
@@ -75,7 +75,7 @@ export default async function Home({ searchParams }) {
   return (
     <>
       <HeroSection />
-      <FilterSection />
+      <FilterSection selectedCategory={null} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />
       </HydrationBoundary>
