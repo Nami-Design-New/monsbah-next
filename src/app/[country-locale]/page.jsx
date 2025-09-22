@@ -37,6 +37,7 @@ export default async function Home({ searchParams }) {
   const category_slug = paramsObj?.category || null;
   const sub_category_slug = paramsObj?.sub_category || null;
   const search = paramsObj?.search || null;
+  const pageParamUrl = Number(paramsObj?.page) || 1;
 
   await queryClient.prefetchInfiniteQuery({
     queryKey: [
@@ -51,7 +52,7 @@ export default async function Home({ searchParams }) {
       search,
       user,
     ],
-    queryFn: ({ pageParam = 1 }) =>
+    queryFn: ({ pageParam = pageParamUrl }) =>
       getProducts({
         pageParam,
         lang,
@@ -64,7 +65,7 @@ export default async function Home({ searchParams }) {
         search,
         user,
       }),
-    initialPageParam: 1,
+    initialPageParam: pageParamUrl,
     getNextPageParam: (lastPage) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;

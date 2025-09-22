@@ -55,6 +55,7 @@ export default async function page({ params, searchParams }) {
   const category_slug = categoryDecoded || null;
   const sub_category_slug = subCategoryDecoded || null;
   const search = paramsObj?.search || null;
+  const pageParamUrl = Number(paramsObj?.page) || 1;
 
   // render check
   const hasCategory = Boolean(

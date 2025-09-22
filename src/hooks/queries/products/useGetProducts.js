@@ -11,6 +11,7 @@ function useGetProducts(userType) {
   const lang = useLocale().split("-")[1];
   const country_slug = useLocale().split("-")[0];
   const type = searchParams.get("type") || null;
+  const pageParamFromUrl = Number(searchParams.get("page")) || 1;
   const sort = searchParams.get("sort");
   const city_id = searchParams.get("city");
 
@@ -33,6 +34,7 @@ function useGetProducts(userType) {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
+    initialPageParam: pageParamFromUrl,
     queryKey: [
       "products",
       lang,
@@ -46,7 +48,7 @@ function useGetProducts(userType) {
       userType,
     ],
 
-    queryFn: async ({ pageParam = 1 }) => {
+    queryFn: async ({ pageParam = pageParamFromUrl }) => {
       const res = await clientAxios.get(`/${userType}/products`, {
         params: {
           page: pageParam,
@@ -72,11 +74,21 @@ function useGetProducts(userType) {
     },
   });
 
+  const firstPage = data?.pages?.[0];
+  const meta = firstPage?.data?.meta || firstPage?.meta || {};
+  const perPage = meta.per_page || firstPage?.per_page || 50;
+  const currentPageMeta = meta.current_page || meta.page || 1;
+  const total = meta.total || firstPage?.total || 0;
+  const lastPageMeta = meta.last_page || Math.ceil(total / perPage) || 1;
+
   return {
     isLoading,
     data,
     error,
-    total: data?.pages?.[0]?.total || 0,
+    total,
+    perPage,
+    currentPage: Number(currentPageMeta),
+    lastPage: Number(lastPageMeta),
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,

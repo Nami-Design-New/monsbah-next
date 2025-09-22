@@ -5,6 +5,7 @@ import ProductLoader from "@/components/shared/loaders/ProductLoader";
 import ProductVertical from "../shared/cards/ProductVertical";
 import ProductVerticalCompany from "../shared/cards/ProductVerticalCompany";
 import useGetProducts from "@/hooks/queries/products/useGetProducts";
+import Pagination from "@/components/shared/Pagination";
 
 export default function ProductsSection({ userType }) {
   const sectionRef = useRef(null);
@@ -15,6 +16,8 @@ export default function ProductsSection({ userType }) {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
+    currentPage,
+    lastPage,
   } = useGetProducts(userType);
   console.log(productsData);
 
@@ -72,6 +75,8 @@ export default function ProductsSection({ userType }) {
               ))}
         </div>
       </div>
+      {/* Pagination links (SEO-friendly, work without JS) */}
+      <Pagination currentPage={currentPage} totalPages={lastPage} />
     </section>
   );
 }
