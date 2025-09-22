@@ -357,6 +357,7 @@ function ProductVertical({
 
             <li style={{ flex: 1 }}>
               <div
+                className="d-flex align-items-center justify-content-center gap-1"
                 role="button"
                 aria-label="Profile"
                 onClick={(e) => {
