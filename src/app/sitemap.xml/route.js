@@ -94,7 +94,7 @@ export async function GET() {
       // Products sitemaps (dynamic chunk count, 100 items per chunk)
       const chunks = chunkCounts[idx] || 10;
       for (let id = 0; id < chunks; id++) {
-        sitemapPaths.push(`${BASE_URL}/${locale}/products/sitemap?id=${id}`);
+        sitemapPaths.push(`${BASE_URL}/${locale}/products/sitemap${id}.xml`);
       }
     });
 

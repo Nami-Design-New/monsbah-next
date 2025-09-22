@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import getProducts from "@/services/products/getProducts";
 
@@ -63,10 +62,17 @@ export async function GET(request, { params }) {
       if (product?.slug && product?.id) {
         // Determine last modification date prioritising product update then newest image update
         let lastmodSource = product?.updated_at;
-        if (!lastmodSource && Array.isArray(product?.images) && product.images.length) {
+        if (
+          !lastmodSource &&
+          Array.isArray(product?.images) &&
+          product.images.length
+        ) {
           // Pick the most recent updated_at among images
           lastmodSource = product.images.reduce((latest, img) => {
-            if (img?.updated_at && (!latest || new Date(img.updated_at) > new Date(latest))) {
+            if (
+              img?.updated_at &&
+              (!latest || new Date(img.updated_at) > new Date(latest))
+            ) {
               return img.updated_at;
             }
             return latest;
