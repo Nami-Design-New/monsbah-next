@@ -118,8 +118,5 @@ export async function middleware(req) {
 
 // ✅ وسّع الاستثناء في الـ matcher ليشمل مجلداتك العامة
 export const config = {
-  matcher: [
-    // استبعد API و _next وكل ما له امتداد و أيضًا icons/branding/images
-    '/((?!api|trpc|_next|_vercel|icons|branding|images|.*\\..*).*)',
-  ],
-}
+  matcher: ["/((?!api|trpc|_next|_vercel|icons|branding|.*\\..*).*)"],
+};
