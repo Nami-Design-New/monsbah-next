@@ -1,0 +1,220 @@
+footer {
+  border-top: 1px solid $inputStroke;
+  padding: 40px 0 0;
+  .btns {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    a {
+      flex: 1 0;
+    }
+    img {
+      height: 42px;
+      width: 142px;
+    }
+  }
+  .about_company {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    .logo {
+      img {
+        height: 86px;
+      }
+    }
+    .text {
+      p {
+        color: $text;
+        line-height: 26px;
+        padding-inline-end: 42px;
+        @media screen and (max-width: 576px) {
+          padding-inline-end: 0;
+        }
+      }
+    }
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 30px;
+    @media screen and (max-width: 576px) {
+      padding: 0;
+    }
+    &:last-child {
+      padding-left: 0;
+    }
+    h3 {
+      color: $dark;
+      font-weight: 600;
+      margin: 0;
+      font-size: 18px !important;
+    }
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      li {
+        a {
+          display: flex;
+          gap: 4px;
+          color: $text;
+          transition: 0.2s ease-in-out;
+          &:hover {
+            color: $main;
+            span {
+              width: 16px;
+            }
+          }
+          span {
+            transition: $transition;
+            width: 0;
+            overflow: hidden;
+          }
+        }
+      }
+    }
+  }
+  .copy_rights {
+    border-top: 1px solid $inputStroke;
+    padding: 28px 0 20px;
+    @include space-between();
+    @media screen and (max-width: 576px) {
+      flex-direction: column-reverse;
+      gap: 12px;
+      padding-bottom: 100px;
+    }
+    p a {
+      color: $main;
+    }
+    p {
+      text-align: center;
+      @media screen and (max-width: 576px) {
+        font-size: 12px;
+      }
+    }
+    .social_media {
+      ul {
+        display: flex;
+        gap: 8px;
+        a {
+          border: 1px solid $inputStroke;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          transition: 0.2s ease-in-out;
+          color: $inputHint;
+          @include centerFlex();
+          i {
+            font-size: 14px;
+          }
+          &:hover {
+            background: $main;
+            border-color: $main;
+            transform: translateY(-2px);
+            i {
+              color: $white;
+            }
+            svg {
+              path {
+                fill: $white;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.download-app {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  @media (max-width: 992px) {
+    flex-direction: row !important;
+  }
+  li {
+    width: 150px;
+    background: $inputBg;
+    border-radius: 50px;
+    transition: all 0.3s ease-in-out;
+    &:hover {
+      background: $main;
+      a,
+      span {
+        .icon i,
+        p {
+          color: #fff;
+        }
+      }
+    }
+    a,
+    span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      cursor: pointer;
+      .icon {
+        width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        i {
+          font-size: 18px;
+          color: $dark;
+        }
+      }
+      p {
+        font-size: 14px;
+        text-align: end;
+        color: $dark;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.small_menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 99;
+  background: $white;
+  align-items: center;
+  box-shadow: $shadow;
+  display: none;
+  @media screen and (max-width: 991px) {
+    display: flex;
+  }
+  .menu_item {
+    @include centerFlex();
+    flex-direction: column;
+    flex: 1;
+    padding: 16px 12px;
+    gap: 8px;
+    color: $dark;
+    font-size: 14px;
+    i {
+      font-size: 16px;
+      color: $main;
+    }
+    .center {
+      width: 42px;
+      height: 42px;
+      background: $main;
+      font-size: 24px;
+      color: $white;
+      @include centerFlex();
+      border-radius: 50%;
+      i {
+        color: $white;
+      }
+    }
+  }
+}

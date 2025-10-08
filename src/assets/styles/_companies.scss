@@ -1,0 +1,305 @@
+.companies_section {
+  padding: 16px 0;
+}
+
+.campany_card {
+  width: 100%;
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  background: $inputBg;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 3px 5px;
+  .img {
+    width: 180px;
+    aspect-ratio: 1 / 1;
+    background: $white;
+    @include centerFlex();
+    position: relative;
+    img {
+      transition: $transition;
+      width: 85%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+    @media screen and (max-width: 576px) {
+      min-height: 160px;
+    }
+    &::after {
+      position: absolute;
+      top: 0;
+      left: -80%;
+      z-index: 2;
+      display: block;
+      content: "";
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 100%
+      );
+      transform: skewX(-25deg);
+      z-index: 1;
+    }
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    padding: 16px;
+    .title {
+      @include space-between();
+      gap: 16px;
+      h3 {
+        font-size: 18px;
+        font-weight: 500;
+        margin: 0;
+        color: $dark;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+    }
+
+    ul {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      li {
+        font-size: 14px;
+        color: $text;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        i {
+          width: 16px;
+          @include centerFlex();
+          aspect-ratio: 1/1;
+        }
+      }
+    }
+  }
+  &:hover {
+    .img {
+      img {
+        transform: scale(1.1);
+      }
+      &::after {
+        animation: shine 1s;
+      }
+    }
+  }
+  &.skeleton {
+    height: 100%;
+    .skeleton-img {
+      width: 140px;
+      border-radius: 8px;
+      background: #e0e0e0;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .skeleton-text {
+      background: #e0e0e0;
+      height: 16px;
+      border-radius: 4px;
+      width: calc(50% - 4px);
+      animation: pulse 1.5s ease-in-out infinite;
+      &:first-child {
+        width: 100%;
+      }
+    }
+    .skeleton-title {
+      width: 60%;
+      height: 24px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .skeleton-price {
+      width: 40%;
+      height: 20px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+  }
+}
+
+.company_profile_section {
+  .banner {
+    height: 35vh;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+  .company_header {
+    display: flex;
+    gap: 42px;
+    align-items: center;
+    @media screen and (max-width: 576px) {
+      flex-direction: column;
+      gap: 24px;
+      align-items: flex-start;
+    }
+    .add_product {
+      padding: 8px 12px;
+      background: $main;
+      color: $white;
+      border-radius: 50px;
+    }
+    .img {
+      width: 130px;
+      height: 130px;
+      aspect-ratio: 1/1;
+      background: $white;
+      @include centerFlex();
+      position: relative;
+      border: 4px solid $white;
+      border-radius: 50%;
+      margin-top: -100px;
+      @media screen and (max-width: 768px) {
+        margin-top: -97px;
+      }
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+        object-position: center;
+      }
+      .follow_btn {
+        position: absolute;
+        bottom: -4px;
+        left: 10px;
+        background: $main;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 4px solid $white;
+        @include centerFlex();
+        color: $white;
+        font-size: 14px;
+        i {
+          font-size: 13px;
+        }
+      }
+    }
+    .content {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      @media screen and (max-width: 576px) {
+        gap: 20px;
+      }
+      .title {
+        @include space-between();
+        h3 {
+          color: $dark;
+          margin: 0;
+          font-size: 22px;
+        }
+        .actions {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          @media screen and (max-width: 576px) {
+            gap: 12px;
+          }
+        }
+        .share_btn,
+        .follow_btn {
+          width: 40px;
+          height: 40px;
+          cursor: pointer;
+          color: $main;
+          @include centerFlex();
+          border-radius: 50%;
+          border: 1px solid $main;
+          img {
+            height: 24px;
+          }
+          @media screen and (max-width: 576px) {
+            width: 34px;
+            height: 34px;
+          }
+        }
+      }
+      .stats {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+        @media screen and (max-width: 576px) {
+          gap: 8px;
+        }
+        .f_badge {
+          gap: 4px;
+          display: flex;
+          align-items: center;
+          i {
+            color: $main;
+          }
+          span {
+            font-size: 16px;
+            color: $dark;
+          }
+        }
+      }
+      p {
+        color: $gray;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin: 0;
+        i {
+          width: 24px;
+          @include centerFlex();
+          aspect-ratio: 1/1;
+        }
+      }
+    }
+    .share_link {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      color: $gray;
+      width: fit-content;
+      justify-content: flex-start;
+    }
+  }
+  .about_company {
+    padding: 24px 0 0;
+    p {
+      margin: 0;
+    }
+  }
+  .categories {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+    .swiper-slide {
+      width: fit-content !important;
+      white-space: nowrap;
+    }
+    button {
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: $inputBg;
+      color: $text;
+      font-size: 14px;
+      cursor: pointer;
+      transition: $transition;
+      &:hover,
+      &.active {
+        background: $main;
+        color: $white;
+      }
+    }
+  }
+}

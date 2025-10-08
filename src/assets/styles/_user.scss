@@ -1,0 +1,124 @@
+.verification-page {
+  padding: 40px 0;
+
+  .field-header {
+    .title {
+      font-weight: 400;
+    }
+    .subTitle {
+      color: #f4f4f4;
+    }
+  }
+}
+
+.dropdown {
+  &.share-dropdown {
+    .dropdown-toggle {
+      background-color: $main !important;
+      color: $white !important;
+      border: none !important;
+      outline: none !important;
+      aspect-ratio: 1 / 1 !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px !important;
+    }
+    .dropdown-menu {
+      background: $white;
+      border: 1px solid #f5f5f5;
+      padding: 24px;
+      @media (max-width: 576px) {
+        padding: 16px 12px;
+      }
+      h5 {
+        text-align: start;
+        margin-bottom: 20px;
+        font-weight: 600;
+        font-size: 16px;
+      }
+      p {
+        color: #777;
+
+        margin: 16px 0;
+      }
+      .link {
+        width: 100%;
+        padding: 14px;
+        background-color: #f4f4f4;
+        @include space-between();
+        gap: 12px;
+        border-radius: 16px;
+        position: relative;
+        button {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          @include centerFlex();
+          @include clearInput();
+          i {
+            color: $main;
+          }
+          &:hover {
+            background: $main;
+            i {
+              color: #fff;
+            }
+          }
+        }
+        span {
+          cursor: pointer;
+          color: $text;
+          font-size: 12px;
+          position: relative;
+          .alert {
+            position: absolute;
+            background: $inputBg;
+            padding: 4px 8px;
+            margin: 0;
+            bottom: -42px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: $transition;
+            opacity: 0;
+            &::after {
+              clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+              width: 16px;
+              height: 10px;
+              background: $inputBg;
+              content: "";
+              position: absolute;
+              left: 50%;
+              transform: translateX(-50%);
+              top: -10px;
+            }
+          }
+        }
+      }
+      .social {
+        display: flex;
+        gap: 20px;
+        @media (max-width: 576px) {
+          gap: 16px;
+        }
+        li {
+          @include centerFlex();
+          flex-direction: column;
+          gap: 8px;
+          font-size: 14px;
+          white-space: nowrap;
+          a {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: $main10;
+            @include centerFlex();
+            i {
+              color: $main;
+            }
+          }
+        }
+      }
+    }
+  }
+}

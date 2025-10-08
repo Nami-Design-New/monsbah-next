@@ -1,0 +1,46 @@
+{
+  "name": "monsbah",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "build-start": "npm run build && npm run start"
+  },
+  "dependencies": {
+    "@fancyapps/ui": "^6.0.7",
+    "@hookform/devtools": "^4.4.0",
+    "@hookform/resolvers": "^5.1.1",
+    "@react-google-maps/api": "^2.20.7",
+    "@tanstack/react-query": "^5.80.7",
+    "@tanstack/react-query-devtools": "^5.80.7",
+    "axios": "^1.10.0",
+    "bootstrap": "^5.3.6",
+    "next": "^15.5.2",
+    "next-intl": "^4.1.0",
+    "nextjs-toploader": "^3.8.16",
+    "pusher": "^5.2.0",
+    "pusher-js": "^8.4.0",
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.58.1",
+    "react-icons": "^5.5.0",
+    "react-lottie": "^1.2.10",
+    "react-media-recorder": "^1.7.1",
+    "react-select": "^5.10.1",
+    "sonner": "^2.0.5",
+    "swiper": "^11.2.8",
+    "zod": "^3.25.67",
+    "zustand": "^5.0.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "24.0.3",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "15.3.3",
+    "eslint-plugin-react": "^7.37.5"
+  }
+}

@@ -1,0 +1,140 @@
+.blogs_section {
+  width: 100%;
+  padding: 40px 0;
+  h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: $main;
+  }
+  p {
+    font-size: 16px;
+    color: $gray;
+    margin-bottom: 20px;
+  }
+  .blog_card {
+    background: #fff;
+    height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    .blog_image {
+      img {
+        width: 100%;
+        aspect-ratio: 3 / 2;
+        object-fit: cover;
+      }
+    }
+    .blog_content {
+      padding: 20px;
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      gap: 12px;
+      span {
+        font-size: 12px;
+        color: $gray;
+      }
+      h3 {
+        font-size: 1rem;
+        color: $dark;
+        margin-bottom: 10px;
+      }
+      p {
+        font-size: 18rem;
+        margin-bottom: 15px;
+      }
+      .read_more {
+        color: $main;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+    }
+  }
+}
+
+.blog_details {
+  padding: 2.25rem 0;
+  .blog_header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: $main;
+    padding: 16px 24px;
+    border-radius: 8px 8px 0 0;
+    border-bottom: 1px solid $main;
+    .blog_header_actions {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      .share {
+        cursor: pointer;
+        color: $white;
+        display: flex;
+      }
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: $white;
+      margin: 0;
+      font-weight: 700;
+    }
+    span {
+      font-size: 12px;
+      color: $white;
+    }
+  }
+  .blog_content {
+    background: $inputBg;
+    padding: 1rem;
+    border-radius: 0 0 8px 8px;
+    .img {
+      margin-bottom: 1.5rem;
+      img {
+        border-radius: 8px;
+        width: 100%;
+        object-fit: cover;
+      }
+    }
+    ol {
+      padding-inline-start: 1rem !important;
+    }
+  }
+  .recent_blogs {
+    padding: 0 16px;
+    position: sticky;
+    top: 120px;
+    h3 {
+      font-size: 1.5rem;
+      color: $dark;
+      margin-bottom: 1.5rem;
+    }
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      list-style: disc;
+      padding-inline-start: 16px;
+      li {
+        padding: 6px 0;
+        color: $dark;
+        border-bottom: 1px solid $main;
+        a {
+          h4 {
+            color: $dark;
+            font-size: 14px;
+            transition: color 0.3s ease;
+          }
+          &:hover {
+            h4 {
+              color: $main;
+            }
+          }
+        }
+      }
+    }
+  }
+}

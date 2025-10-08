@@ -1,0 +1,224 @@
+@import "./config";
+
+body {
+  position: relative;
+  overflow-x: hidden;
+  direction: rtl;
+  font-family: "Baloo Bhaijaan 2", sans-serif;
+
+  @import "./about";
+  @import "./header";
+  @import "./footer";
+  @import "./form-ui";
+  @import "./product";
+  @import "./comments";
+  @import "./auth_section";
+  @import "./profile_section";
+  @import "./articles_section";
+
+  main {
+    min-height: calc(100vh - 426px);
+    @media screen and (max-width: 992px) {
+      min-height: calc(100vh - 100px);
+    }
+
+    @import "./ads";
+    @import "./home";
+    @import "./user";
+    @import "./chat";
+    @import "./blogs";
+    @import "./search";
+    @import "./contact";
+    @import "./companies";
+    @import "./categories";
+    @import "./profile_section";
+    @import "./product_details";
+    @import "./articles_section";
+  }
+}
+
+html[lang="en"] {
+  body {
+    direction: ltr !important;
+    .section-head {
+      .arrow_icon {
+        transform: rotate(180deg);
+      }
+    }
+    .back-to-top {
+      right: unset;
+      left: 8px;
+    }
+    .back_btn {
+      i {
+        transform: rotate(180deg);
+      }
+    }
+    input,
+    select,
+    textarea {
+      direction: ltr !important;
+    }
+    .pass-group {
+      .show-pass {
+        border-radius: 0 12px 12px 0 !important;
+      }
+      input {
+        border-radius: 12px 0 0 12px !important;
+      }
+    }
+    .form .image-change-wrapper .img-wrap {
+      .dropdown {
+        left: unset !important;
+        right: 0 !important;
+      }
+      .upload-btn {
+        left: unset !important;
+        right: -4px !important;
+      }
+    }
+    .image-change-wrapper .cover-wrap {
+      .dropdown {
+        left: unset !important;
+        right: 16px !important;
+      }
+    }
+    .aboutus_section {
+      .container {
+        .how-it-works .steps-wrapper .step .step-header .header-line::before {
+          left: unset !important;
+          right: -5px !important;
+        }
+        .how-it-works .steps-wrapper .step .step-header .header-line::after {
+          left: unset !important;
+          right: -10px !important;
+        }
+        .heading-section {
+          .info-wrapper {
+            left: unset !important;
+            right: 50px;
+            @media screen and (max-width: 768px) {
+              left: unset !important;
+              right: 0;
+            }
+          }
+        }
+      }
+    }
+    header .mainLinks .moreActions .dropdown .dropdown-menu.show {
+      inset: 26px auto auto -26px !important;
+    }
+    main .explore_ads .categories_slider .swiper-slide .category {
+      padding: 4px 26px 4px 4px;
+      &.sub {
+        padding: 10px 18px;
+      }
+    }
+    .form .phone_field {
+      label {
+        direction: ltr !important;
+      }
+      .countriesMenu {
+        right: 0;
+        left: unset;
+      }
+    }
+    .closeModal {
+      right: 16px;
+      left: unset;
+    }
+    .Arrow_icon {
+      transform: scale(-1);
+    }
+    .form .phone_field {
+      direction: ltr !important;
+    }
+    .form .phone_field .dropdown button {
+      border-radius: 0 12px 12px 0;
+    }
+    .form .phone_field input {
+      border-radius: 12px 0 0 12px;
+    }
+  }
+}
+
+.viewRates {
+  color: $main;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.company_products_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 4px;
+  @media screen and (max-width: 576px) {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  a {
+    display: flex;
+    position: relative;
+    // &::after {
+    //   content: "";
+    //   position: absolute;
+    //   inset: 0;
+    //   background: linear-gradient(to top, rgba(0, 0, 0, 0.62), transparent);
+    //   z-index: 1;
+    // }
+  }
+  img,
+  video {
+    width: 100%;
+    object-fit: cover;
+    aspect-ratio: 1;
+  }
+  .product_img.skeleton {
+    width: 100%;
+    aspect-ratio: 1;
+    background: $inputBg;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  .company {
+    padding: 12px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    .img {
+      width: 42px;
+      height: 42px;
+      overflow: hidden;
+      border-radius: 50%;
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+    h6 {
+      margin: 0;
+      color: $white;
+    }
+  }
+}
+
+.company_profile_section .product_vertical .favourite_btn {
+  background: $white !important;
+}
+
+.f_badge {
+  padding: 12px 24px !important;
+  border-radius: 12px;
+  background: $inputBg;
+}
+
+.color-white {
+  i {
+    color: white;
+  }
+}

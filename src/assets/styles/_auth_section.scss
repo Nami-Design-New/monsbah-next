@@ -1,0 +1,185 @@
+.auth_section {
+  width: 100%;
+  display: flex;
+  padding: 16px;
+  @media screen and (max-width: 768px) {
+    padding: 54px 16px 32px;
+  }
+  .form_wrapper {
+    display: flex;
+    width: 50%;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 24px 12px;
+    &.register,
+    &.register-company,
+    &.subscriptions,
+    &.finished {
+      width: 100%;
+    }
+    @media screen and (max-width: 992px) {
+      width: 100%;
+    }
+    @media screen and (max-width: 576px) {
+      padding: 0;
+    }
+  }
+  .img_wrapper {
+    width: 50%;
+    &.register,
+    &.register-company,
+    &.subscriptions,
+    &.finished {
+      display: none;
+    }
+
+    @media screen and (max-width: 992px) {
+      display: none;
+    }
+    .bg-img {
+      border-radius: 16px;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+  .small-screen-img {
+    display: none;
+    @media screen and (max-width: 576px) {
+      display: block;
+      height: 240px;
+      object-fit: contain;
+    }
+  }
+}
+
+.authModal {
+  .modal-header {
+    padding: 16px 8px 0 !important;
+    padding-bottom: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+  }
+  .modal-body {
+    padding: 0 !important;
+    .modal-content {
+      border-radius: 24px !important;
+    }
+  }
+}
+
+.sub {
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+  border-radius: 20px;
+  width: 100%;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    cursor: pointer;
+    gap: 8px;
+
+    .sub-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      input[type="radio"] {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #d6d6d6;
+        border-radius: 50%;
+        position: relative;
+        outline: none;
+
+        &:checked {
+          background-color: #1abc9c;
+          border-color: #1abc9c;
+
+          &::after {
+            content: "✔";
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+            position: absolute;
+            top: 58%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          }
+        }
+      }
+
+      h2 {
+        font-size: 18px;
+        line-height: 18px;
+        margin: 0;
+      }
+    }
+
+    .info-sub {
+      list-style-type: circle;
+      padding: 0 24px 0;
+      margin: 0;
+      li {
+        color: "#807C83";
+        font-size: 16px;
+        line-height: 28px;
+        font-weight: 400;
+      }
+    }
+
+    p {
+      margin: 0;
+      padding: 0 6px;
+      font-size: 14px;
+      white-space: wrap;
+    }
+
+    .price {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      .discount {
+        font-size: 14px;
+        color: #b5b5b5;
+        text-decoration: line-through;
+      }
+    }
+
+    .offer {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      top: 0;
+      left: 0;
+      padding: 6px 10px;
+      background-color: #1abc9c;
+      color: #fff;
+      border-radius: 100px;
+    }
+  }
+}
+
+.finish {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  margin-top: 105px;
+  margin-bottom: 64px;
+  img {
+    width: 146px;
+    aspect-ratio: 1/1;
+  }
+  button {
+    padding: 14px 144px;
+    background-color: #1abc9c;
+    color: #fff;
+    border-radius: 12px;
+  }
+}
