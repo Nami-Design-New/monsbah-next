@@ -22,7 +22,6 @@ export async function middleware(req) {
     pathname === '/sitemap.xml' ||
     pathname.startsWith('/icons') ||               // مجلد أيقوناتك
     pathname.startsWith('/branding') ||            // مجلد العلامة
-    pathname.startsWith('/images') ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next()
