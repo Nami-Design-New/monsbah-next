@@ -5,8 +5,25 @@ import { API_URL } from "./utils/constants";
 
 const intlMiddleware = createMiddleware(routing);
 
+// Public file extensions
+const PUBLIC_FILE = /\.(?:js|mjs|css|map|json|png|jpg|jpeg|gif|svg|ico|webp|avif|txt|woff2?|ttf|eot)$/i;
+
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
+
+  // Skip middleware for static assets and Next.js internals
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname === "/favicon.ico" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname.startsWith("/icons") ||
+    pathname.startsWith("/branding") ||
+    PUBLIC_FILE.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
 
   if (pathname === "/") {
     try {
@@ -33,7 +50,8 @@ export async function middleware(req) {
   const token = req.cookies.get("token");
   const role = req.cookies.get("user_type")?.value;
 
-  const locale = pathname.split("/")[1];
+  const segments = pathname.split("/").filter(Boolean);
+  const locale = segments[0] || "";
   const normalizedPathname = pathname.replace(/\/$/, "");
 
   const protectedRoutes = [
@@ -112,5 +130,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: "/((?!api|trpc|_next|_vercel|.*\\..*).*)",
+  matcher: ["/((?!api|trpc|_next|_vercel|icons|branding|.*\\..*).*)"],
 };
