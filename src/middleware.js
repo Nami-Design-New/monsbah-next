@@ -12,8 +12,7 @@ const PUBLIC_FILE = /\.(?:js|mjs|css|map|json|png|jpg|jpeg|gif|svg|ico|webp|avif
 export async function middleware(req) {
   const { pathname } = req.nextUrl
 
-  // ✅ استثناء كل ما هو static/public قبل أي منطق
-  // _next, ملفات بإمتداد، الأيقونات، البراندنج، الصور… إلخ
+
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api') ||                 // API لا تلمسه هنا
@@ -27,7 +26,6 @@ export async function middleware(req) {
     return NextResponse.next()
   }
 
-  // توجيه الهوم مرة واحدة فقط
   if (pathname === '/') {
     try {
       const res = await fetch(`${API_URL}/client/current_location`)
