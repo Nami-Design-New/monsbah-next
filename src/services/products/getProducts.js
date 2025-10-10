@@ -13,10 +13,17 @@ export default async function getProducts({
   user,
 }) {
   try {
+    // Validate required parameters
+    if (!user || !country_slug) {
+      console.error("Missing required parameters: user or country_slug");
+      return { data: { data: [] } };
+    }
+
     const res = await serverAxios.get(`/${user}/products`, {
       params: {
         page: pageParam,
         country_slug,
+        lang,
         type,
         sort,
         city_id,
@@ -25,11 +32,15 @@ export default async function getProducts({
         search,
       },
     });
+    
     if (res.status === 200) {
       return res.data;
     }
+    
+    return { data: { data: [] } };
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to fetch products");
+    console.error("Error fetching products:", error.message);
+    // Return empty data instead of throwing to prevent crashes
+    return { data: { data: [] } };
   }
 }

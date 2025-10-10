@@ -6,14 +6,11 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ImageLoad from "../loaders/ImageLoad";
-import Image from "next/image";
 
 function ProductCard({ product }) {
   const t = useTranslations();
   const router = useRouter();
-  const [isImageLoaded, setIsImageLoaded] = useState(true);
-
-  const handleImageLoad = () => setIsImageLoaded(false);
+  const [isImageLoaded] = useState(true);
 
   const handleCardClick = () => {
     router.push(`/product/${product?.slug}-id=${product?.id}`);
@@ -36,15 +33,24 @@ function ProductCard({ product }) {
             loop
             muted
             playsInline
-            // onLoadedM  etadata={handleImageLoad}
           />
         ) : (
-          <Image
-            fill={true}
-            src={product.image}
-            // onLoad={handleImageLoad}
-            alt={product.name}
-          />
+          <>
+            {/* Use regular img tag that works without JavaScript */}
+            <img
+              src={product.image}
+              alt={product.name}
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'cover',
+                position: 'absolute',
+                top: 0,
+                left: 0
+              }}
+              loading="lazy"
+            />
+          </>
         )}
 
         <ImageLoad isImageLoaded={isImageLoaded} />

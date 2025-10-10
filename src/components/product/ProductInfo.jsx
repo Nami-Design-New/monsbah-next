@@ -56,19 +56,35 @@ export default function ProductInfo({ product }) {
 
   return (
     <>
+      {/* Fallback for when JavaScript is disabled */}
+      <noscript>
+        <style>{`
+          .priceInfo .favorite, .priceInfo .dropdown { display: none !important; }
+          .priceInfo .no-js-login { display: inline-block !important; }
+        `}</style>
+      </noscript>
+      
       <div className="priceInfo mt-3">
         <h4 className="price">
           <span>{product?.price}</span> {product?.currency?.name}
         </h4>
         {user?.id !== product?.user?.id ? (
-          <button
-            aria-label="Toggle Favorite"
-            disabled={isPending}
-            onClick={user?.id ? handleFavorite : onOpen}
-            className={`favorite ${optimisticFav?.is_favorite ? "active" : ""}`}
-          >
-            <i className="fa-light fa-heart"></i>
-          </button>
+          <>
+            <button
+              aria-label="Toggle Favorite"
+              disabled={isPending}
+              onClick={user?.id ? handleFavorite : onOpen}
+              className={`favorite ${optimisticFav?.is_favorite ? "active" : ""}`}
+            >
+              <i className="fa-light fa-heart"></i>
+            </button>
+            {/* Fallback link when JS is disabled */}
+            <noscript>
+              <a href="/login" className="favorite no-js-login" style={{ display: 'none' }}>
+                <i className="fa-light fa-heart"></i>
+              </a>
+            </noscript>
+          </>
         ) : (
           <Dropdown
             onClick={(e) => e.stopPropagation()}

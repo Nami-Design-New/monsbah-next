@@ -18,6 +18,7 @@ export async function middleware(req) {
     pathname === "/favicon.ico" ||
     pathname === "/robots.txt" ||
     pathname === "/sitemap.xml" ||
+    pathname === "/mockServiceWorker.js" ||
     pathname.startsWith("/icons") ||
     pathname.startsWith("/branding") ||
     PUBLIC_FILE.test(pathname)
