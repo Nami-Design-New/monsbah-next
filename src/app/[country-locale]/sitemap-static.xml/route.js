@@ -38,9 +38,14 @@ const STATIC_PAGES = [
 export const dynamic = "force-dynamic";
 
 export async function GET(request, { params }) {
+  const startTime = Date.now();
+  
   try {
+    // Await params in Next.js 15
+    const resolvedParams = await params;
+    const locale = resolvedParams["country-locale"] || "kw-ar";
+    
     const sitemapEntries = [];
-    const locale = params["country-locale"] || "kw-ar";
 
     // Add static pages for this specific locale only
     STATIC_PAGES.forEach((pageConfig) => {
@@ -70,8 +75,10 @@ ${sitemapEntries
     return new Response(xml, {
       status: 200,
       headers: {
-        "Content-Type": "text/xml",
-        "Cache-Control": "s-maxage=86400, stale-while-revalidate",
+        "Content-Type": "application/xml; charset=UTF-8",
+        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        "X-Pages-Count": sitemapEntries.length.toString(),
+        "X-Generation-Time": `${Date.now() - startTime}ms`,
       },
     });
   } catch (error) {

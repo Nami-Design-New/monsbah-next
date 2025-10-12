@@ -6,15 +6,40 @@ export const dynamic = "force-dynamic";
 // Function to get all companies for sitemap
 async function getAllCompaniesForSitemap(locale) {
   try {
-    const [country_slug, lang] = locale.split("-");
+    const [country_slug] = locale.split("-");
     
-    // Fetch companies - you may need to adjust this based on your API structure
-    const companies = await getCompanies({
-      lang,
-      country_slug,
-      // Add any other parameters your API needs
-    });
-    return companies || [];
+    const allCompanies = [];
+    let page = 1;
+    let hasMore = true;
+    
+    // Fetch all companies with pagination
+    while (hasMore && page <= 10) { // Limit to 10 pages (safety)
+      try {
+        const response = await getCompanies({
+          country_slug,
+          pageParam: page,
+        });
+        
+        // Extract the companies array from the response
+        // The API returns: { data: { data: [...companies] } }
+        const companies = response?.data?.data || [];
+        
+        if (companies.length > 0) {
+          allCompanies.push(...companies);
+          
+          // Check if there are more pages
+          hasMore = Boolean(response?.data?.links?.next);
+          page++;
+        } else {
+          hasMore = false;
+        }
+      } catch (error) {
+        console.error(`Error fetching companies page ${page}:`, error);
+        hasMore = false;
+      }
+    }
+    
+    return allCompanies;
   } catch (error) {
     console.error("Error fetching companies for sitemap:", error);
     return [];
@@ -22,9 +47,14 @@ async function getAllCompaniesForSitemap(locale) {
 }
 
 export async function GET(request, { params }) {
+  const startTime = Date.now();
+  
   try {
+    // Await params in Next.js 15
+    const resolvedParams = await params;
+    const locale = resolvedParams["country-locale"] || "kw-ar";
+    
     const sitemapEntries = [];
-    const locale = params["country-locale"] || "kw-ar";
 
     // Get companies data for this locale
     const companies = await getAllCompaniesForSitemap(locale);
@@ -63,8 +93,10 @@ ${sitemapEntries
     return new Response(xml, {
       status: 200,
       headers: {
-        "Content-Type": "text/xml; charset=UTF-8",
-        "Cache-Control": "s-maxage=86400, stale-while-revalidate",
+        "Content-Type": "application/xml; charset=UTF-8",
+        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        "X-Companies-Count": companies.length.toString(),
+        "X-Generation-Time": `${Date.now() - startTime}ms`,
       },
     });
   } catch (error) {

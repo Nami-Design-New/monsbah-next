@@ -9,12 +9,12 @@ async function getAllCategoriesForSitemap(locale) {
     const [country_slug, lang] = locale.split("-");
     
     // Fetch categories for this specific locale
-    const categories = await getCategories({
-      lang,
-      country_slug,
-      // Add any other parameters your API needs
-    });
-    return categories || [];
+    // getCategories expects an endpoint string, not an object
+    const endpoint = `/client/categories?country_slug=${country_slug}&lang=${lang}`;
+    const categories = await getCategories(endpoint);
+    
+    // Ensure we return an array
+    return Array.isArray(categories) ? categories : [];
   } catch (error) {
     console.error("Error fetching categories for sitemap:", error);
     return [];
@@ -22,9 +22,14 @@ async function getAllCategoriesForSitemap(locale) {
 }
 
 export async function GET(request, { params }) {
+  const startTime = Date.now();
+  
   try {
+    // Await params in Next.js 15
+    const resolvedParams = await params;
+    const locale = resolvedParams["country-locale"] || "kw-ar";
+    
     const sitemapEntries = [];
-    const locale = params["country-locale"] || "kw-ar";
 
     // Get categories data for this specific locale
     const categories = await getAllCategoriesForSitemap(locale);
@@ -61,8 +66,10 @@ ${sitemapEntries
     return new Response(xml, {
       status: 200,
       headers: {
-        "Content-Type": "text/xml",
-        "Cache-Control": "s-maxage=86400, stale-while-revalidate",
+        "Content-Type": "application/xml; charset=UTF-8",
+        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        "X-Categories-Count": categories.length.toString(),
+        "X-Generation-Time": `${Date.now() - startTime}ms`,
       },
     });
   } catch (error) {

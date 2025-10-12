@@ -18,7 +18,10 @@ export async function GET(request, { params }) {
   try {
     const { searchParams } = new URL(request.url);
     const id = Number(searchParams.get("id") || "0"); // sitemap chunk index
-    const locale = params["country-locale"] || "sa-ar";
+    
+    // Await params in Next.js 15
+    const resolvedParams = await params;
+    const locale = resolvedParams["country-locale"] || "sa-ar";
 
     // Extract country and language
     const [country_slug, lang] = locale.split("-");

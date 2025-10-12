@@ -1,15 +1,18 @@
 import { LOCALES } from "@/i18n/routing";
 import getProducts from "@/services/products/getProducts";
+import getCompanies from "@/services/companies/getCompanies";
+import { getCategories } from "@/services/categories/getCategories";
+import { getBlogs } from "@/services/blogs/getBlogs";
 import { BASE_URL } from "@/utils/constants";
-
-const CHUNK_SIZE = 50000;
 
 export const dynamic = "force-dynamic";
 
-async function getChunkCountForLocale(locale) {
+const MAX_URLS_PER_SITEMAP = 50000;
+
+// Calculate chunk count for products
+async function getProductsChunkCount(locale) {
   try {
     const [country_slug, lang] = locale.split("-");
-
     const data = await getProducts({
       pageParam: 1,
       lang,
@@ -17,107 +20,167 @@ async function getChunkCountForLocale(locale) {
       user: "client",
     });
 
-    const firstPageLength = data?.data?.data?.length || 0;
+    const total =
+      data?.total ||
+      data?.data?.total ||
+      data?.meta?.total ||
+      data?.data?.meta?.total ||
+      0;
 
-    const perPageCandidates = [
-      data?.per_page,
-      data?.data?.per_page,
-      data?.meta?.per_page,
-      data?.data?.meta?.per_page,
-      firstPageLength || undefined,
-    ].filter(Boolean);
-    const perPage = perPageCandidates[0] || 50;
+    return total > 0 ? Math.ceil(total / MAX_URLS_PER_SITEMAP) : 1;
+  } catch {
+    return 1;
+  }
+}
 
-    const totalCandidates = [
-      data?.total,
-      data?.data?.total,
-      data?.meta?.total,
-      data?.data?.meta?.total,
-    ].filter((v) => typeof v === "number");
-
-    let total = totalCandidates[0];
-
-    if (typeof total !== "number") {
-      // Try to derive last_page from various shapes (Laravel-style paginator)
-      const lastPageCandidates = [
-        data?.meta?.last_page,
-        data?.data?.meta?.last_page,
-        (() => {
-          try {
-            const last = data?.links?.last || data?.data?.links?.last;
-            if (last) return Number(new URL(last).searchParams.get("page"));
-          } catch (_) {}
-          return undefined;
-        })(),
-      ].filter((v) => typeof v === "number" && !Number.isNaN(v));
-
-      if (lastPageCandidates[0]) {
-        total = lastPageCandidates[0] * perPage;
-      }
+// Calculate chunk count for companies
+async function getCompaniesChunkCount(locale) {
+  try {
+    const [country_slug] = locale.split("-");
+    
+    let total = 0;
+    let page = 1;
+    let hasMore = true;
+    
+    // Quick count by checking first few pages
+    while (hasMore && page <= 3) {
+      const response = await getCompanies({
+        country_slug,
+        pageParam: page,
+      });
+      
+      const companies = response?.data?.data || [];
+      total += companies.length;
+      hasMore = Boolean(response?.data?.links?.next);
+      
+      if (!hasMore) break;
+      page++;
     }
+    
+    // Estimate total based on first 3 pages
+    const meta = await getCompanies({ country_slug, pageParam: 1 });
+    const estimatedTotal = meta?.data?.meta?.total || total;
+    
+    return estimatedTotal > MAX_URLS_PER_SITEMAP ? Math.ceil(estimatedTotal / MAX_URLS_PER_SITEMAP) : 1;
+  } catch {
+    return 1;
+  }
+}
 
-    if (typeof total === "number" && total > 0) {
-      return Math.max(1, Math.ceil(total / CHUNK_SIZE));
+// Calculate chunk count for categories
+async function getCategoriesChunkCount(locale) {
+  try {
+    const [country_slug, lang] = locale.split("-");
+    const endpoint = `/client/categories?country_slug=${country_slug}&lang=${lang}`;
+    const categories = await getCategories(endpoint);
+    const count = Array.isArray(categories) ? categories.length : 0;
+    
+    return count > MAX_URLS_PER_SITEMAP ? Math.ceil(count / MAX_URLS_PER_SITEMAP) : 1;
+  } catch {
+    return 1;
+  }
+}
+
+// Calculate chunk count for blogs
+async function getBlogsChunkCount(locale) {
+  try {
+    const [country_slug, lang] = locale.split("-");
+    
+    let total = 0;
+    let page = 1;
+    
+    // Sample first page to estimate
+    const response = await getBlogs({
+      lang,
+      country_slug,
+      page,
+      per_page: 100,
+    });
+    
+    const blogs = Array.isArray(response) ? response : (response?.data || []);
+    total = blogs.length;
+    
+    // If there's a total in meta, use that
+    if (response?.meta?.total) {
+      total = response.meta.total;
     }
-
-    if (firstPageLength > 0) {
-      // If we only know first page length, assume at least one chunk
-      return Math.max(1, Math.ceil(firstPageLength / CHUNK_SIZE));
-    }
-
-    // Fallback to 10 chunks if total cannot be determined
-    return 10;
-  } catch (e) {
-    console.error("Error estimating product chunks for", locale, e);
-    return 10;
+    
+    return total > MAX_URLS_PER_SITEMAP ? Math.ceil(total / MAX_URLS_PER_SITEMAP) : 1;
+  } catch {
+    return 1;
   }
 }
 
 export async function GET() {
   try {
-    // Build sitemap list per-locale.
     const sitemapPaths = [];
     const currentDate = new Date().toISOString();
 
-    // Compute chunk counts for all locales in parallel for efficiency
-    const chunkCounts = await Promise.all(
-      LOCALES.map((locale) => getChunkCountForLocale(locale))
-    );
-
-    LOCALES.forEach((locale, idx) => {
-      // Static sitemap per-locale (highest priority)
+    // Process each locale
+    for (const locale of LOCALES) {
+      // 1. Static pages sitemap (always 1 chunk)
       sitemapPaths.push({
         loc: `${BASE_URL}/${locale}/sitemap-static.xml`,
         lastmod: currentDate,
       });
       
-      // Categories sitemap per-locale (high priority)
-      sitemapPaths.push({
-        loc: `${BASE_URL}/${locale}/sitemap-categories.xml`,
-        lastmod: currentDate,
-      });
-      
-      // Companies sitemap per-locale (good priority)
-      sitemapPaths.push({
-        loc: `${BASE_URL}/${locale}/sitemap-companies.xml`,
-        lastmod: currentDate,
-      });
-      
-      // Blogs sitemap per-locale (content priority)
-      sitemapPaths.push({
-        loc: `${BASE_URL}/${locale}/sitemap-blogs.xml`,
-        lastmod: currentDate,
-      });
-
-      // Products sitemaps (dynamic chunk count)
-      const chunks = chunkCounts[idx] || 10;
-      for (let id = 0; id < chunks; id++) {
+      // 2. Categories sitemap (chunked if > 50k)
+      const categoriesChunks = await getCategoriesChunkCount(locale);
+      if (categoriesChunks === 1) {
         sitemapPaths.push({
-          loc: `${BASE_URL}/${locale}/products/sitemap${id}.xml`,
+          loc: `${BASE_URL}/${locale}/sitemap-categories.xml`,
+          lastmod: currentDate,
+        });
+      } else {
+        for (let i = 0; i < categoriesChunks; i++) {
+          sitemapPaths.push({
+            loc: `${BASE_URL}/${locale}/categories/categories${i}.xml`,
+            lastmod: currentDate,
+          });
+        }
+      }
+      
+      // 3. Companies sitemap (chunked if > 50k)
+      const companiesChunks = await getCompaniesChunkCount(locale);
+      if (companiesChunks === 1) {
+        sitemapPaths.push({
+          loc: `${BASE_URL}/${locale}/sitemap-companies.xml`,
+          lastmod: currentDate,
+        });
+      } else {
+        for (let i = 0; i < companiesChunks; i++) {
+          sitemapPaths.push({
+            loc: `${BASE_URL}/${locale}/companies/companies${i}.xml`,
+            lastmod: currentDate,
+          });
+        }
+      }
+      
+      // 4. Blogs sitemap (chunked if > 50k)
+      const blogsChunks = await getBlogsChunkCount(locale);
+      if (blogsChunks === 1) {
+        sitemapPaths.push({
+          loc: `${BASE_URL}/${locale}/sitemap-blogs.xml`,
+          lastmod: currentDate,
+        });
+      } else {
+        for (let i = 0; i < blogsChunks; i++) {
+          sitemapPaths.push({
+            loc: `${BASE_URL}/${locale}/blogs/blogs${i}.xml`,
+            lastmod: currentDate,
+          });
+        }
+      }
+
+      // 5. Products sitemaps (chunked)
+      const productsChunks = await getProductsChunkCount(locale);
+      for (let i = 0; i < productsChunks; i++) {
+        sitemapPaths.push({
+          loc: `${BASE_URL}/${locale}/products/sitemap${i}.xml`,
           lastmod: currentDate,
         });
       }
-    });
+    }
 
     // Add global sitemaps (not locale-specific)
     sitemapPaths.push({
