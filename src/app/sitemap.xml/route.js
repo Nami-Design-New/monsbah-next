@@ -134,7 +134,7 @@ export async function GET() {
       } else {
         for (let i = 0; i < categoriesChunks; i++) {
           sitemapPaths.push({
-            loc: `${BASE_URL}/${locale}/categories/categories${i}.xml`,
+            loc: `${BASE_URL}/${locale}/categories/sitemap-categories${i}.xml`,
             lastmod: currentDate,
           });
         }
@@ -150,7 +150,7 @@ export async function GET() {
       } else {
         for (let i = 0; i < companiesChunks; i++) {
           sitemapPaths.push({
-            loc: `${BASE_URL}/${locale}/companies/companies${i}.xml`,
+            loc: `${BASE_URL}/${locale}/companies/sitemap-companies${i}.xml`,
             lastmod: currentDate,
           });
         }
@@ -166,7 +166,7 @@ export async function GET() {
       } else {
         for (let i = 0; i < blogsChunks; i++) {
           sitemapPaths.push({
-            loc: `${BASE_URL}/${locale}/blogs/blogs${i}.xml`,
+            loc: `${BASE_URL}/${locale}/blogs/sitemap-blogs${i}.xml`,
             lastmod: currentDate,
           });
         }
