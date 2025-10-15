@@ -4,16 +4,30 @@ import { useMemo, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Select from "react-select";
-import CountrySwitcher from "./CountrySwitcher";
+import dynamic from "next/dynamic";
 import useGetCities from "@/hooks/queries/settings/useGetCities";
 import { Dropdown } from "react-bootstrap";
+
+const CountrySwitcher = dynamic(() => import("./CountrySwitcher"), {
+  ssr: false,
+  loading: () => (
+    <div 
+      className="basic-single" 
+      style={{ 
+        height: "38px", 
+        backgroundColor: "#f3f4f6", 
+        borderRadius: "4px",
+        border: "1px solid #e5e7eb"
+      }}
+    />
+  ),
+});
 
 export default function AdvancedFilter({ countries, selectedCategory }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
 
   const locale = useLocale();
-  const lang = locale.split("-")[1];
   const countryUrl = locale.split("-")[0];
 
   const selectedCountry = countries.find(

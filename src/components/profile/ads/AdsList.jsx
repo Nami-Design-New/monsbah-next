@@ -5,7 +5,7 @@ import EmptyData from "@/components/shared/EmptyData";
 import ProductLoader from "@/components/shared/loaders/ProductLoader";
 import useGetUserProducts from "@/hooks/queries/products/useGetUserProducts";
 import { useTranslations } from "next-intl";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 
 export default function AdsList() {
   const sectionRef = useRef();
@@ -18,8 +18,16 @@ export default function AdsList() {
     isFetchingNextPage,
   } = useGetUserProducts();
 
-  const allProducts =
-    products?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  // Flatten products with global index to ensure unique keys - memoized
+  const allProducts = useMemo(() => {
+    let globalIndex = 0;
+    return products?.pages?.flatMap((page) => 
+      (page?.data?.data || []).map((product) => ({
+        ...product,
+        _globalIndex: globalIndex++,
+      }))
+    ) ?? [];
+  }, [products?.pages]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -44,8 +52,8 @@ export default function AdsList() {
 
   return (
     <section className="row" ref={sectionRef}>
-      {allProducts?.map((product, index) => (
-        <div className="col-12  col-lg-6  p-2" key={index}>
+      {allProducts?.map((product) => (
+        <div className="col-12  col-lg-6  p-2" key={`ad-${product._globalIndex}`}>
           <ProductVertical
             product={product}
             isShowAction={true}

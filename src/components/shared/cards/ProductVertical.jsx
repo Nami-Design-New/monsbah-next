@@ -221,6 +221,7 @@ function ProductVertical({
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const { user } = useAuthStore((state) => state);
   const { userType } = useAuthModal((state) => state);
@@ -286,9 +287,11 @@ function ProductVertical({
             <div className="position-relative w-100" style={{ height: "100%" }}>
               <Image
                 fill
-                src={product?.image}
+                src={imageError ? "/banner.png" : (product?.image || "/banner.png")}
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 alt="product name"
+                onError={() => setImageError(true)}
+                unoptimized={imageError}
               />
             </div>
           )}
@@ -296,7 +299,7 @@ function ProductVertical({
             <span className="type">{t(`${product?.type}`)}</span>
             {product?.is_popular ? (
               <span className="popular position-relative">
-                <Image width={42} height={32} src="/icons/crown.svg" alt="" />{" "}
+                <Image width={42} height={32} src="/icons/crown.svg" alt="" unoptimized />{" "}
                 {t("popular")}
               </span>
             ) : null}

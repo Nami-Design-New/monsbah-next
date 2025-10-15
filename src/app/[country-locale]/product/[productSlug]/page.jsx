@@ -15,41 +15,46 @@ export async function generateMetadata({ params }) {
   const decodedSlug = decodeURIComponent(productSlug);
   const country_slug = countryLocale.split("-")[0];
   
+  try {
+    const product = await fetchProduct(decodedSlug, country_slug);
 
-  const product = await fetchProduct(decodedSlug,country_slug);
+    const pathname = `/product/${productSlug}`;
+    const alternates = await generateHreflangAlternatesForProduct(
+      pathname,
+      product
+    );
+    
+    // Use product title (name) instead of meta_title to avoid duplication
+    // The layout.jsx will append "- مناسبة" or "- Monsbah" via template
+    return {
+      title: product?.title || product?.name,
+      description: product?.meta_description || product?.description,
 
-  if (process?.env?.NODE_ENV !== "production") {
-    const c = product?.country || {};
+      openGraph: {
+        title: product?.title || product?.name,
+        description: product?.meta_description || product?.description,
+        images: product?.images,
+        url: `https://www.monsbah.com/product/${productSlug}`,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: product?.title || product?.name,
+        description: product?.meta_description || product?.description,
+        images: product?.images,
+      },
+      alternates,
+      robots: {
+        index: product?.is_index !== false,
+        follow: product?.is_follow !== false,
+      },
+    };
+  } catch {
+    // Return default metadata if product fetch fails
+    return {
+      title: "Product Not Found",
+      description: "The requested product could not be found.",
+    };
   }
-
-  const pathname = `/product/${productSlug}`;
-  const alternates = await generateHreflangAlternatesForProduct(
-    pathname,
-    product
-  );
-
-  return {
-    title: product.meta_title,
-    description: product.meta_description,
-
-    openGraph: {
-      title: product.meta_title,
-      description: product.meta_description,
-      images: product.images,
-      url: `https://www.monsbah.com/products/${productSlug}`,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: product.meta_title,
-      description: product.meta_description,
-      images: product.images,
-    },
-    alternates,
-    robots: {
-      index: product.is_index,
-      follow: product.is_follow,
-    },
-  };
 }
 
 export default async function page({ params }) {

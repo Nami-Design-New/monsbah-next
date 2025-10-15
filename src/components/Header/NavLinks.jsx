@@ -19,6 +19,7 @@ const NavLinks = () => {
             width={120}
             height={40}
             alt="logo image"
+            unoptimized
           />
         </Link>
 

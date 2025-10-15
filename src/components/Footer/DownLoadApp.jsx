@@ -19,6 +19,7 @@ const DownLoadApp = async () => {
             height={42}
             src="/icons/appStore.svg"
             alt="App Store"
+            unoptimized
           />
         </a>
         <a
@@ -32,6 +33,7 @@ const DownLoadApp = async () => {
             height={42}
             src="/icons/playStore.svg"
             alt="Google Play"
+            unoptimized
           />
         </a>
       </div>

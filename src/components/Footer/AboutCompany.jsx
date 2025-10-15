@@ -9,7 +9,7 @@ const AboutCompany = async () => {
     <div className="about_company">
       <div className="logo">
         <Link href="/" aria-label="Home">
-          <Image alt="logo" src="/branding/icon.svg" width={56} height={86} />
+          <Image alt="logo" src="/branding/icon.svg" width={56} height={86} unoptimized />
         </Link>
       </div>
       <div className="text">

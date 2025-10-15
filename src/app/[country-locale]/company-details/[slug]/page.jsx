@@ -60,7 +60,7 @@ export default async function page({ params, searchParams }) {
         </div>
         <div className="row mb-5">
           {products?.data?.data?.map((product, index) => (
-            <div className="col-lg-4 col-md-6 col-12 p-2" key={index}>
+            <div className="col-lg-4 col-md-6 col-12 p-2" key={`company-product-${product?.id || index}`}>
               <ProductVertical product={product} isShowAction={false} />
             </div>
           ))}

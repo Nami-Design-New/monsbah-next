@@ -28,6 +28,7 @@ export default function Header() {
               width={40}
               height={40}
               alt="Navbar icon"
+              unoptimized
             />
           </Link>
 
@@ -45,7 +46,7 @@ export default function Header() {
             <LanguageSwitcher />
 
             <Link aria-label="Search" href="/search" className="link">
-              <Image src="/icons/search.svg" width={16} height={16} alt="" />
+              <Image src="/icons/search.svg" width={16} height={16} alt="" unoptimized />
             </Link>
 
             {user && userType ? (
@@ -111,6 +112,7 @@ export default function Header() {
                     height={16}
                     src="/icons/user.svg"
                     alt="user"
+                    unoptimized
                   />
                 </button>
               </>

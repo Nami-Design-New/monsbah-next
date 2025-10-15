@@ -2,9 +2,8 @@ import FilterSection from "@/components/home/FilterSection";
 import HeroSection from "@/components/home/HeroSection";
 import ProductsSection from "@/components/home/ProductsSection";
 import { getUserType } from "@/services/auth/getUserType";
-import { getCountries } from "@/services/getCountries";
 import getProducts from "@/services/products/getProducts";
-import { BASE_URL, LOCALES } from "@/utils/constants";
+import { META_DATA_CONTENT } from "@/utils/constants";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
@@ -14,8 +13,15 @@ import { generateHreflangAlternates } from "@/utils/hreflang";
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata() {
+  const locale = await getLocale();
+  const lang = locale.split("-")[1];
+  const content = META_DATA_CONTENT[lang];
+  
   const alternates = await generateHreflangAlternates("/");
   return {
+    title: {
+      absolute: content.title, // Just "مناسبة" or "Monsbah" without template
+    },
     other: {
       "google-site-verification": "kOD-M71HEym30Cx4W8U0FqAJXpQy8f5TgdYkxqNXeAk",
     },

@@ -45,6 +45,7 @@ export default function CountrySwitcher({ countries }) {
 
   return (
     <Select
+      instanceId="country-switcher"
       aria-label="Country"
       className="basic-single"
       classNamePrefix="select"

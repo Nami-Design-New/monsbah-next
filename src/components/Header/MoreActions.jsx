@@ -27,7 +27,7 @@ const MoreActions = () => {
         }`}
         className="link text d-lg-flex d-none"
       >
-        <Image src="/icons/plus.svg" width={16} height={16} alt="" />
+        <Image src="/icons/plus.svg" width={16} height={16} alt="" unoptimized />
         {t("addPost")}
       </Link>{" "}
       <GetApp show={showGetAppModal} setShow={setShowGetAppModal} />

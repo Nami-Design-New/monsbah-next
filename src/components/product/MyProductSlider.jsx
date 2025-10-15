@@ -11,19 +11,16 @@ import { useRouter } from "@/i18n/navigation";
 export default function MyProductSlider({ product }) {
   const router = useRouter();
 
-  // Initialize images immediately so noscript can use them
-  const srcs = product?.images?.map((image) => image?.image) || [];
-  const initialImages = product?.image ? [product?.image, ...srcs] : srcs;
-  
-  const [images, setImages] = useState(initialImages);
+  const [images, setImages] = useState([]);
   const [autoplayDelay, setAutoplayDelay] = useState(3000);
+  const [isClient, setIsClient] = useState(false);
   const videoRef = useRef(null);
   
   useEffect(() => {
-    const srcs = product?.images?.map((image) => image?.image);
-    if (srcs) {
-      setImages([product?.image, ...srcs]);
-    }
+    setIsClient(true);
+    const srcs = product?.images?.map((image) => image?.image) || [];
+    const allImages = product?.image ? [product?.image, ...srcs] : srcs;
+    setImages(allImages);
   }, [product]);
 
   useEffect(() => {
@@ -35,48 +32,18 @@ export default function MyProductSlider({ product }) {
     }
   }, [videoRef]);
 
-  // Initialize Fancybox on mount and hide no-js fallback
   useEffect(() => {
     Fancybox.bind("[data-fancybox]", {});
-    
-    // Hide the no-js images when JS is loaded
-    const noJsImages = document.querySelector('.swiper_wrapper .no-js-images');
-    if (noJsImages) {
-      noJsImages.style.display = 'none';
-    }
   }, []);
+  
   const slidesCount = images.length;
+
+  if (!isClient) {
+    return <div className="swiper_wrapper" style={{ minHeight: '400px' }} />;
+  }
 
   return (
     <div className="swiper_wrapper">
-      {/* Static images that work without JavaScript */}
-      <div className="no-js-images" style={{ display: 'none' }}>
-        {images?.map((image, index) => (
-          <div key={index} className="no-js-slide" style={{ marginBottom: '10px' }}>
-            {isValidVideoExtension(image) ? (
-              <video
-                src={image}
-                controls
-                style={{ width: '100%', maxHeight: '500px', objectFit: 'contain' }}
-              />
-            ) : (
-              <img 
-                src={image} 
-                alt={`Product image ${index + 1}`}
-                style={{ width: '100%', maxHeight: '500px', objectFit: 'contain' }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
-      
-      {/* Hide slider and show static images when JS is disabled */}
-      <noscript>
-        <style>{`
-          .swiper_wrapper .product_swiper { display: none !important; }
-          .swiper_wrapper .no-js-images { display: block !important; }
-        `}</style>
-      </noscript>
       
       {slidesCount > 1 && (
         <div className="swiperControl d-none d-md-block">
@@ -114,12 +81,12 @@ export default function MyProductSlider({ product }) {
         }}
       >
         {images?.map((image, index) => (
-          <SwiperSlide key={index}>
+          <SwiperSlide key={`slide-${product?.id}-${index}`}>
             {isValidVideoExtension(image) ? (
               <video
                 className="blurde_bg"
                 src={image}
-                ref={videoRef}
+                ref={index === 0 ? videoRef : null}
                 autoPlay
                 loop
                 muted
@@ -132,7 +99,7 @@ export default function MyProductSlider({ product }) {
               {isValidVideoExtension(image) ? (
                 <video
                   src={image}
-                  ref={videoRef}
+                  ref={index === 0 ? videoRef : null}
                   autoPlay
                   loop
                   muted

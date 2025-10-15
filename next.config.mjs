@@ -23,7 +23,17 @@ const nextConfig = {
         hostname: "monsbah-s3-shared-bucket.s3.me-south-1.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+        pathname: "/**",
+      },
     ],
+    formats: ["image/webp", "image/avif"],
+    minimumCacheTTL: 60,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   async rewrites() {
     return [
@@ -36,6 +46,16 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        // X-Robots-Tag for all pages (SEO)
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+          },
+        ],
+      },
       {
         // Apply headers to all static assets
         source: '/_next/static/:path*',

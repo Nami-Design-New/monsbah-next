@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo } from "react";
 import ProductLoader from "@/components/shared/loaders/ProductLoader";
 import ProductVertical from "../shared/cards/ProductVertical";
 import ProductVerticalCompany from "../shared/cards/ProductVerticalCompany";
@@ -19,12 +19,23 @@ export default function ProductsSection({ userType }) {
     currentPage,
     lastPage,
   } = useGetProducts(userType);
-  console.log(productsData);
 
-  const allProducts =
-    productsData?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  // Flatten products with global index to ensure unique keys - memoized
+  const allProducts = useMemo(() => {
+    let globalIndex = 0;
+    return productsData?.pages?.flatMap((page, pageIndex) => 
+      (page?.data?.data || []).map((product, itemIndex) => ({
+        ...product,
+        _globalIndex: globalIndex++, // Unique global index across all pages
+        _uniqueKey: `${product?.id}-${pageIndex}-${itemIndex}`, // Extra unique identifier
+      }))
+    ) ?? [];
+  }, [productsData?.pages]);
 
   useEffect(() => {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+
     const handleScroll = () => {
       const section = sectionRef.current;
       if (!section) return;
@@ -50,7 +61,7 @@ export default function ProductsSection({ userType }) {
           {allProducts.map((product) => (
             <div
               className="col-lg-4 col-md-6 col-12 p-2"
-              key={product?.id}
+              key={product?._uniqueKey || `product-${product?._globalIndex}`}
             >
               {userType === "company" ? (
                 <ProductVerticalCompany
