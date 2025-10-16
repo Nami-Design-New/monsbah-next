@@ -15,37 +15,40 @@ export async function generateMetadata({ params }) {
   const { productSlug } = await params;
   const decodedSlug = decodeURIComponent(productSlug);
 
-  const product = await fetchProduct(decodedSlug);
+  try {
+    const product = await fetchProduct(decodedSlug);
 
-  if (process?.env?.NODE_ENV !== "production") {
-    const c = product?.country || {};
+    const pathname = `/company-product/${productSlug}`;
+    const alternates = generateHreflangAlternatesForProduct(pathname, product);
+    
+    return {
+      title: product?.title || product?.name, // Use product name instead of meta_title
+      description: product?.meta_description || product?.description,
+
+      openGraph: {
+        title: product?.title || product?.name,
+        description: product?.meta_description || product?.description,
+        images: product?.images,
+        url: `https://www.monsbah.com/company-product/${productSlug}`,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: product?.title || product?.name,
+        description: product?.meta_description || product?.description,
+        images: product?.images,
+      },
+      alternates,
+      robots: {
+        index: product?.is_index !== false,
+        follow: product?.is_follow !== false,
+      },
+    };
+  } catch {
+    return {
+      title: "Product Not Found",
+      description: "The requested product could not be found.",
+    };
   }
-
-  const pathname = `/company-product/${productSlug}`;
-  const alternates = generateHreflangAlternatesForProduct(pathname, product);
-
-  return {
-    title: product.meta_title,
-    description: product.meta_description,
-
-    openGraph: {
-      title: product.meta_title,
-      description: product.meta_description,
-      images: product.images,
-      url: `https://www.monsbah.com/products/${productSlug}`,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: product.meta_title,
-      description: product.meta_description,
-      images: product.images,
-    },
-    alternates,
-    robots: {
-      index: product.is_index,
-      follow: product.is_follow,
-    },
-  };
 }
 
 export default async function page({ params }) {
