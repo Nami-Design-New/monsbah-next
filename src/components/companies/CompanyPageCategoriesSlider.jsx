@@ -2,26 +2,32 @@
 
 import { useCallback } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { usePathname, useRouter } from "@/i18n/navigation";
-import { useParams, useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 export default function CompanyPageCategoriesSlider({ categories }) {
   const t = useTranslations();
   const router = useRouter();
-  const pathname = usePathname();
-  const params = useParams();
-  // const searchParams = useSearchParams();
-  const selectedCategory = params?.category ?? "";
-  const decoudedCategory = decodeURIComponent(selectedCategory);
+  const searchParams = useSearchParams();
+  const selectedCategory = searchParams.get("category") ?? "";
 
   const handleSelectCategory = useCallback(
     (slug) => {
+      const params = new URLSearchParams(window.location.search);
+      
       if (!slug) {
-        router.push("/companies");
+        // Remove category and sub_category params
+        params.delete("category");
+        params.delete("sub_category");
       } else {
-        router.push(`/companies/${slug}`);
+        // Set new category and remove sub_category
+        params.set("category", slug);
+        params.delete("sub_category");
       }
+      
+      const newUrl = `/companies${params.toString() ? `?${params.toString()}` : ""}`;
+      router.push(newUrl);
     },
     [router]
   );
@@ -31,7 +37,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
       <SwiperSlide className="p-1">
         <button
           aria-label="Category"
-          className={`category ${!decoudedCategory ? "active" : ""}`}
+          className={`category ${!selectedCategory ? "active" : ""}`}
           onClick={() => handleSelectCategory("")}
         >
           <div className="img">
@@ -45,7 +51,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
         <SwiperSlide key={category?.slug} className="p-1">
           <button
             className={`category ${
-              decoudedCategory == category.slug ? "active" : ""
+              selectedCategory === category.slug ? "active" : ""
             }`}
             onClick={() => handleSelectCategory(category?.slug)}
             aria-label={`Category ${category?.slug}`}

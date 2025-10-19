@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Select from "react-select";
 import dynamic from "next/dynamic";
 import useGetCities from "@/hooks/queries/settings/useGetCities";
@@ -26,6 +26,7 @@ const CountrySwitcher = dynamic(() => import("./CountrySwitcher"), {
 export default function AdvancedFilter({ countries, selectedCategory }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const locale = useLocale();
   const countryUrl = locale.split("-")[0];
@@ -63,9 +64,9 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
       removeKeys.forEach((k) => params.delete(k));
 
       const newUrl = `?${params.toString()}`;
-      window.history.pushState(null, "", newUrl);
+      router.push(newUrl);
     },
-    [searchParams]
+    [searchParams, router]
   );
 
   return (

@@ -12,8 +12,9 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ searchParams }) {
   const t = await getTranslations("meta");
-  const category = (await searchParams)?.category;
-  const sub_category = (await searchParams)?.sub_category;
+  const params = await searchParams;
+  const category = params?.category;
+  const sub_category = params?.sub_category;
   const alternates = await generateHreflangAlternates("/companies");
 
   if (category && sub_category) {

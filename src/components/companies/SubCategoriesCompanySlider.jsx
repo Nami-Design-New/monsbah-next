@@ -3,41 +3,29 @@
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  useSearchParams,
-  useRouter,
-  usePathname,
-  useParams,
-} from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function SubCategoriesCompanySlider({ subCategories }) {
   const t = useTranslations();
   const router = useRouter();
-  const pathname = usePathname();
-  const params = useParams();
+  const searchParams = useSearchParams();
 
-  const selectedSubCategory = params.subcategory ?? "";
-  const decoudedSubCategory = decodeURIComponent(selectedSubCategory);
-
-  const categoryName = params.category ?? "";
-  const decoudedCategory = decodeURIComponent(categoryName);
   const handleSelectSubCategory = useCallback(
-    (newValue) => {
-      if (!decoudedCategory) {
-        // If categoryName is missing, just push subcategory or home
-        router.push(newValue ? `/companies/${newValue}` : `/companies`);
-        return;
-      }
-
-      if (!newValue) {
-        // Remove subcategory
-        router.push(`/companies/${decoudedCategory}`);
+    (slug) => {
+      const params = new URLSearchParams(window.location.search);
+      
+      if (!slug) {
+        // Remove sub_category param
+        params.delete("sub_category");
       } else {
-        // Navigate to category/subcategory
-        router.push(`/companies/${decoudedCategory}/${newValue}`);
+        // Set new sub_category
+        params.set("sub_category", slug);
       }
+      
+      const newUrl = `/companies${params.toString() ? `?${params.toString()}` : ""}`;
+      router.push(newUrl);
     },
-    [router, decoudedCategory]
+    [router]
   );
 
   return (
@@ -45,7 +33,7 @@ export default function SubCategoriesCompanySlider({ subCategories }) {
       <SwiperSlide className="p-1">
         <button
           aria-label="Subcategory"
-          className={`category sub ${!decoudedSubCategory ? "active" : ""}`}
+          className={`category sub ${!searchParams.get("sub_category") ? "active" : ""}`}
           onClick={() => handleSelectSubCategory("")}
         >
           <h6>{t("all")}</h6>
@@ -56,7 +44,7 @@ export default function SubCategoriesCompanySlider({ subCategories }) {
         <SwiperSlide key={sub.id} className="p-1">
           <button
             className={`category sub ${
-              decoudedSubCategory === sub?.slug ? "active" : ""
+              searchParams.get("sub_category") === sub?.slug ? "active" : ""
             }`}
             onClick={() => handleSelectSubCategory(sub?.slug)}
           >

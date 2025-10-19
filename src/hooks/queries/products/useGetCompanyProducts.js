@@ -6,7 +6,7 @@ import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
 
 function useGetCompanyProducts(isMyCompany) {
-  const { id, category, subcategory } = useParams();
+  const { id } = useParams();
   const { user } = useAuthStore((state) => state);
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -16,16 +16,8 @@ function useGetCompanyProducts(isMyCompany) {
   const sort = searchParams.get("sort");
   const city_id = searchParams.get("city");
   const search = searchParams.get("search");
-
-  const category_slug =
-    category && category !== "undefined"
-      ? decodeURIComponent(category)
-      : undefined;
-
-  const sub_category_slug =
-    subcategory && subcategory !== "undefined"
-      ? decodeURIComponent(subcategory)
-      : undefined;
+  const category_slug = searchParams.get("category");
+  const sub_category_slug = searchParams.get("sub_category");
   const {
     isLoading,
     data,
@@ -67,7 +59,7 @@ function useGetCompanyProducts(isMyCompany) {
       }
     },
 
-    getNextPageParam: (lastPage, pages) => {
+    getNextPageParam: (lastPage) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
     },
