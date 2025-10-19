@@ -207,7 +207,9 @@ ${sitemapPaths
       status: 200,
       headers: {
         "Content-Type": "application/xml; charset=UTF-8",
-        "Cache-Control": "s-maxage=86400, stale-while-revalidate",
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
       },
     });
   } catch (error) {
