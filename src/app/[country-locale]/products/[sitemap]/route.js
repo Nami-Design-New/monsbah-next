@@ -1,15 +1,15 @@
 import getProducts from "@/services/products/getProducts";
 import { BASE_URL } from "@/utils/constants";
 
-// Optimized limits for faster loading
-// Google allows up to 50k, but we use 5k for better performance
-const MAX_URLS_PER_SITEMAP = 5000;
-const PRODUCTS_PER_API_PAGE = 50;
-const PAGES_PER_CHUNK = Math.ceil(MAX_URLS_PER_SITEMAP / PRODUCTS_PER_API_PAGE); // 100 pages
-const PARALLEL_REQUESTS = 5; // Fetch 5 pages at once
-const REQUEST_TIMEOUT = 30000; // 30 seconds total timeout
+// Optimized limits for faster loading and avoiding timeouts
+const MAX_URLS_PER_SITEMAP = 100; // Only 100 products to avoid timeout
+const REQUEST_TIMEOUT = 10000; // 10 seconds total timeout
 
+// For development: use dynamic with aggressive caching
+// For production: will use ISR with revalidation
 export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Cache for 1 hour
+export const maxDuration = 15; // Max 15 seconds
 
 // Helper: Fetch with timeout
 async function fetchWithTimeout(promise, timeoutMs) {
@@ -27,80 +27,61 @@ export async function GET(request, { params }) {
     const resolvedParams = await params;
     
     // Extract the sitemap ID from the dynamic route param
-    // The param will be like "sitemap0.xml" or "sitemap1.xml"
     const sitemapParam = resolvedParams.sitemap || "sitemap0.xml";
     const id = parseInt(sitemapParam.replace('sitemap', '').replace('.xml', '')) || 0;
     
     const locale = resolvedParams["country-locale"] || "sa-ar";
     const [country_slug, lang] = locale.split("-");
 
-    // Compute the API page range for this sitemap chunk
-    const startPage = id * PAGES_PER_CHUNK + 1;
-    const endPage = startPage + PAGES_PER_CHUNK - 1;
-
+    // Simplified approach: fetch only first 2 pages with strict timeout
     const products = [];
-    let currentPage = startPage;
-
-    // Fetch pages in parallel batches for speed
-    while (currentPage <= endPage && products.length < MAX_URLS_PER_SITEMAP) {
-      // Check if we're approaching timeout
+    let consecutiveFailures = 0;
+    const maxPages = 2; // Only 2 pages = 100 products max
+    
+    for (let page = 1; page <= maxPages && products.length < MAX_URLS_PER_SITEMAP; page++) {
+      // Check timeout
       const elapsed = Date.now() - startTime;
       if (elapsed > REQUEST_TIMEOUT) {
-        console.warn(`Sitemap ${id} timeout after ${elapsed}ms, returning ${products.length} products`);
+        console.warn(`Timeout after ${elapsed}ms at page ${page}, products: ${products.length}`);
         break;
-      }
-
-      // Prepare batch of parallel requests
-      const batchPages = [];
-      for (let i = 0; i < PARALLEL_REQUESTS && currentPage <= endPage; i++) {
-        batchPages.push(currentPage);
-        currentPage++;
       }
 
       try {
-        // Fetch batch in parallel
-        const batchPromises = batchPages.map(page =>
-          fetchWithTimeout(
-            getProducts({
-              pageParam: page,
-              lang,
-              country_slug,
-              user: "client",
-            }),
-            10000 // 10s per request
-          ).catch(error => {
-            console.error(`Error fetching page ${page}:`, error.message);
-            return { data: { data: [] } };
-          })
+        const data = await fetchWithTimeout(
+          getProducts({
+            pageParam: page,
+            lang,
+            country_slug,
+            user: "client",
+          }),
+          2000 // Only 2s per request
         );
 
-        const results = await Promise.all(batchPromises);
-
-        // Process results
-        let hasData = false;
-        for (const data of results) {
-          const list = data?.data?.data || [];
-          if (list.length > 0) {
-            hasData = true;
-            products.push(...list);
-            
-            // Stop if we've reached the limit
-            if (products.length >= MAX_URLS_PER_SITEMAP) {
-              products.splice(MAX_URLS_PER_SITEMAP); // Trim excess
-              break;
-            }
+        const list = data?.data?.data || [];
+        
+        if (list.length > 0) {
+          products.push(...list);
+          consecutiveFailures = 0; // Reset on success
+        } else {
+          consecutiveFailures++;
+          if (consecutiveFailures >= 3) {
+            console.log(`No more data after ${page} pages`);
+            break; // Stop if 3 pages in a row have no data
           }
         }
-
-        // If no data in this batch, stop fetching
-        if (!hasData) {
+      } catch (error) {
+        console.error(`Error fetching page ${page}:`, error.message);
+        consecutiveFailures++;
+        if (consecutiveFailures >= 3) {
+          console.warn(`Too many failures, stopping at page ${page}`);
           break;
         }
-
-      } catch (error) {
-        console.error(`Error fetching batch starting at page ${batchPages[0]}:`, error.message);
-        break;
       }
+    }
+
+    // Trim to max if exceeded
+    if (products.length > MAX_URLS_PER_SITEMAP) {
+      products.splice(MAX_URLS_PER_SITEMAP);
     }
 
     console.log(`Sitemap ${id} generated with ${products.length} products in ${Date.now() - startTime}ms`);
@@ -127,14 +108,30 @@ ${products
       status: 200,
       headers: {
         "Content-Type": "application/xml; charset=UTF-8",
-        // Cache for 24 hours, revalidate in background for 7 days
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
+        // Cache for 1 hour, revalidate in background for 24 hours
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
         "X-Products-Count": products.length.toString(),
         "X-Generation-Time": `${Date.now() - startTime}ms`,
+        "X-Chunk-ID": id.toString(),
+        "X-Total-Pages": PAGES_PER_CHUNK.toString(),
       },
     });
   } catch (error) {
     console.error("Error generating products sitemap:", error);
-    return new Response("Error generating sitemap", { status: 500 });
+    
+    // Return empty sitemap instead of error to prevent 504
+    const emptyXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Error generating sitemap: ${error.message} -->
+</urlset>`;
+    
+    return new Response(emptyXml, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/xml; charset=UTF-8",
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
+        "X-Error": "true",
+      },
+    });
   }
 }
