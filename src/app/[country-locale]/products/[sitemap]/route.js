@@ -1,22 +1,41 @@
 import getProducts from "@/services/products/getProducts";
 import { BASE_URL } from "@/utils/constants";
 
-// Optimized limits for faster loading and avoiding timeouts
-const MAX_URLS_PER_SITEMAP = 100; // Only 100 products to avoid timeout
-const REQUEST_TIMEOUT = 10000; // 10 seconds total timeout
+// Optimized configuration
+const MAX_URLS_PER_SITEMAP = 500; // Increased back to 500 for better coverage
+const PRODUCTS_PER_PAGE = 50; // API returns 50 per page
+const MAX_PAGES_TO_FETCH = 10; // Fetch 10 pages = 500 products max
 
-// For development: use dynamic with aggressive caching
-// For production: will use ISR with revalidation
-export const dynamic = "force-dynamic";
-export const revalidate = 3600; // Cache for 1 hour
-export const maxDuration = 15; // Max 15 seconds
+// Use ISR (Incremental Static Regeneration) for better performance
+export const dynamic = "force-static";
+export const revalidate = 3600; // Regenerate every hour
+export const fetchCache = "force-cache";
+export const maxDuration = 60; // Allow up to 60 seconds for generation
 
-// Helper: Fetch with timeout
-async function fetchWithTimeout(promise, timeoutMs) {
-  const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Request timeout")), timeoutMs)
-  );
-  return Promise.race([promise, timeoutPromise]);
+// Pre-generate first 5 sitemaps for each locale at build time
+export async function generateStaticParams() {
+  const locales = [
+    "sa-ar", "sa-en",
+    "kw-ar", "kw-en",
+    "ae-ar", "ae-en",
+    "bh-ar", "bh-en",
+    "om-ar", "om-en",
+    "qa-ar", "qa-en"
+  ];
+  
+  const params = [];
+  
+  // Generate first 5 sitemaps for each locale
+  locales.forEach(locale => {
+    for (let i = 0; i < 5; i++) {
+      params.push({
+        "country-locale": locale,
+        sitemap: `sitemap${i}.xml`
+      });
+    }
+  });
+  
+  return params;
 }
 
 export async function GET(request, { params }) {
@@ -33,58 +52,53 @@ export async function GET(request, { params }) {
     const locale = resolvedParams["country-locale"] || "sa-ar";
     const [country_slug, lang] = locale.split("-");
 
-    // Simplified approach: fetch only first 2 pages with strict timeout
-    const products = [];
-    let consecutiveFailures = 0;
-    const maxPages = 2; // Only 2 pages = 100 products max
-    
-    for (let page = 1; page <= maxPages && products.length < MAX_URLS_PER_SITEMAP; page++) {
-      // Check timeout
-      const elapsed = Date.now() - startTime;
-      if (elapsed > REQUEST_TIMEOUT) {
-        console.warn(`Timeout after ${elapsed}ms at page ${page}, products: ${products.length}`);
-        break;
-      }
+    // Calculate which pages to fetch for this sitemap chunk
+    // sitemap0 = pages 1-10, sitemap1 = pages 11-20, etc.
+    const startPage = (id * 10) + 1;
+    const endPage = startPage + 9; // 10 pages per sitemap
 
+    console.log(`[Sitemap ${id}] Fetching pages ${startPage}-${endPage} for ${locale}`);
+
+    // Fetch pages with proper pagination
+    const products = [];
+    
+    for (let page = startPage; page <= endPage; page++) {
       try {
-        const data = await fetchWithTimeout(
-          getProducts({
-            pageParam: page,
-            lang,
-            country_slug,
-            user: "client",
-          }),
-          2000 // Only 2s per request
-        );
+        const data = await getProducts({
+          pageParam: page,
+          lang,
+          country_slug,
+          user: "client",
+        });
 
         const list = data?.data?.data || [];
         
-        if (list.length > 0) {
-          products.push(...list);
-          consecutiveFailures = 0; // Reset on success
-        } else {
-          consecutiveFailures++;
-          if (consecutiveFailures >= 3) {
-            console.log(`No more data after ${page} pages`);
-            break; // Stop if 3 pages in a row have no data
-          }
-        }
-      } catch (error) {
-        console.error(`Error fetching page ${page}:`, error.message);
-        consecutiveFailures++;
-        if (consecutiveFailures >= 3) {
-          console.warn(`Too many failures, stopping at page ${page}`);
+        if (list.length === 0) {
+          // No more data, stop fetching
+          console.log(`[Sitemap ${id}] No more data at page ${page}`);
           break;
         }
+        
+        products.push(...list);
+        
+        // Stop if we have enough products
+        if (products.length >= MAX_URLS_PER_SITEMAP) {
+          break;
+        }
+      } catch (error) {
+        console.error(`[Sitemap ${id}] Error fetching page ${page}:`, error.message);
+        // Continue to next page on error
+        continue;
       }
     }
 
     // Trim to max if exceeded
     if (products.length > MAX_URLS_PER_SITEMAP) {
-      products.splice(MAX_URLS_PER_SITEMAP);
+      products.length = MAX_URLS_PER_SITEMAP;
     }
 
-    console.log(`Sitemap ${id} generated with ${products.length} products in ${Date.now() - startTime}ms`);
+    const generationTime = Date.now() - startTime;
+    console.log(`[Sitemap ${id}] Generated with ${products.length} products in ${generationTime}ms`);
 
     // Generate XML sitemap
     const currentDate = new Date().toISOString();
@@ -108,12 +122,11 @@ ${products
       status: 200,
       headers: {
         "Content-Type": "application/xml; charset=UTF-8",
-        // Cache for 1 hour, revalidate in background for 24 hours
+        // ISR: Cache for 1 hour, serve stale for 24 hours while revalidating
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
         "X-Products-Count": products.length.toString(),
-        "X-Generation-Time": `${Date.now() - startTime}ms`,
-        "X-Chunk-ID": id.toString(),
-        "X-Total-Pages": PAGES_PER_CHUNK.toString(),
+        "X-Generation-Time": `${generationTime}ms`,
+        "X-Sitemap-ID": id.toString(),
       },
     });
   } catch (error) {

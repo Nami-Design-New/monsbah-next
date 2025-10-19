@@ -1,17 +1,44 @@
 import { LOCALES } from "@/i18n/routing";
-import { getCategories } from "@/services/categories/getCategories";
+import serverAxios from "@/libs/axios/severAxios";
 import { BASE_URL } from "@/utils/constants";
 
 export const dynamic = "force-dynamic";
 
-// Function to get all categories for sitemap  <mcreference link="https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap" index="1">1</mcreference>
+// Function to fetch categories with specific language
+async function getCategoriesForLang(lang, endpoint = "/client/categories") {
+  try {
+    const res = await serverAxios.get(endpoint, {
+      headers: {
+        "Accept-Language": lang,
+        "lang": lang,
+      }
+    });
+    if (res?.status === 200) {
+      return res.data.data.data || [];
+    }
+    return [];
+  } catch (error) {
+    console.error(`Error fetching categories for lang ${lang}:`, error);
+    return [];
+  }
+}
+
+// Function to get categories with proper language support
 async function getAllCategoriesForSitemap() {
   try {
-    const categories = await getCategories();
-    return categories || [];
+    // Fetch categories for both Arabic and English
+    const [categoriesAr, categoriesEn] = await Promise.all([
+      getCategoriesForLang("ar"),
+      getCategoriesForLang("en")
+    ]);
+    
+    return {
+      ar: categoriesAr,
+      en: categoriesEn
+    };
   } catch (error) {
     console.error("Error fetching categories for sitemap:", error);
-    return [];
+    return { ar: [], en: [] };
   }
 }
 
@@ -19,15 +46,19 @@ export async function GET() {
   try {
     const sitemapEntries = [];
 
-    // Get categories data  <mcreference link="https://nextjs.org/docs/app/api-reference/file-conventions/metadata/sitemap" index="1">1</mcreference>
-    const categories = await getAllCategoriesForSitemap();
+    // Get categories data with language support
+    const categoriesByLang = await getAllCategoriesForSitemap();
 
-    // Add category pages for all locales
+    // Add category pages for all locales with proper routing
     LOCALES.forEach((locale) => {
+      const lang = locale.split("-")[1]; // Extract language (ar or en)
+      const categories = categoriesByLang[lang] || categoriesByLang.ar; // Fallback to Arabic
+      
       categories.forEach((category) => {
         if (category?.slug) {
+          // Use new query parameter routing instead of dynamic routes
           sitemapEntries.push({
-            url: `${BASE_URL}/${locale}/${category.slug}`,
+            url: `${BASE_URL}/${locale}/${(category.slug)}`,
             lastModified: new Date(),
             changeFrequency: "weekly",
             priority: 0.8,
