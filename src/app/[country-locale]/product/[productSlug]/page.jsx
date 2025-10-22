@@ -5,6 +5,7 @@ import UserCard from "@/components/product/UserCard";
 import { getProduct } from "@/services/products/getProduct";
 import { cache } from "react";
 import { generateHreflangAlternatesForProduct } from "@/utils/hreflang";
+import { notFound } from "next/navigation";
 
 export const fetchProduct = cache(async (id ,country_slug ) => {
   return await getProduct(id , country_slug);
@@ -63,11 +64,27 @@ export default async function page({ params }) {
 
   const decodedSlug = decodeURIComponent(productSlug);
 
-  const product = await fetchProduct(decodedSlug,country_slug);
+  let product;
+
+  try {
+    product = await fetchProduct(decodedSlug, country_slug);
+  } catch (error) {
+    console.error("[Product Page] Failed to load product", error?.message);
+    notFound();
+  }
+
+  if (!product) {
+    notFound();
+  }
 
   return (
     <section className="product_details">
       <div className="container p-0">
+        <header className="py-3">
+          <h1 className="h3 mb-0">
+            {product?.name || product?.title || decodedSlug}
+          </h1>
+        </header>
         <div className="row m-0">
           <div className="col-lg-7 col-12 p-lg-3 p-2">
             <MyProductSlider product={product} />

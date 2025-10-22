@@ -48,6 +48,7 @@ export default async function Companies({ searchParams, params }) {
   const paramsObj = await searchParams;
   const { id } = await params;
   const locale = await getLocale();
+  const metaT = await getTranslations("meta");
 
   // Create a QueryClient for server-side
   const queryClient = getQueryClient();
@@ -63,16 +64,22 @@ export default async function Companies({ searchParams, params }) {
   const pageParamUrl = Number(paramsObj?.page) || 1;
 
   // Fetch first page to get meta for fallback pagination when JS disabled
-  const firstPageData = await getCompanyProducts({
-    pageParam: pageParamUrl,
-    lang,
-    country_slug,
-    type,
-    sort,
-    city_id,
-    category_slug,
-    sub_category_slug,
-  });
+  let firstPageData;
+  try {
+    firstPageData = await getCompanyProducts({
+      pageParam: pageParamUrl,
+      lang,
+      country_slug,
+      type,
+      sort,
+      city_id,
+      category_slug,
+      sub_category_slug,
+    });
+  } catch (error) {
+    console.error("[Companies Page] Failed to load initial data", error?.message);
+    firstPageData = { data: { data: [], meta: { last_page: 1 } } };
+  }
 
   await queryClient.prefetchInfiniteQuery({
     queryKey: [
@@ -105,11 +112,34 @@ export default async function Companies({ searchParams, params }) {
     },
   });
 
+  const initialProducts =
+    firstPageData?.data?.data || firstPageData?.data || [];
+
+  const visuallyHiddenStyle = {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    border: 0,
+  };
+
+  const pageTitle = category_slug && sub_category_slug
+    ? `${metaT("companies.titleByCategorySub")} ${category_slug} - ${sub_category_slug}`
+    : category_slug
+      ? `${metaT("companies.titleByCategory")} ${category_slug}`
+      : metaT("companies.defaultTitle");
+
   return (
     <div className="pt-4 pb-4">
+      <h1 style={visuallyHiddenStyle}>{pageTitle}</h1>
+
       <FilterCompanySection selectedCategory={category_slug} />
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ProductList />
+        <ProductList initialProducts={initialProducts} />
       </HydrationBoundary>
 
       {/* Fallback pagination for no-JS environments */}
@@ -153,7 +183,11 @@ export default async function Companies({ searchParams, params }) {
       {/* Fallback pagination for no-JS environments */}
       <Pagination
         currentPage={pageParamUrl}
-        totalPages={firstPageData?.data?.meta?.last_page || 1}
+        totalPages={
+          firstPageData?.data?.meta?.last_page ||
+          firstPageData?.meta?.last_page ||
+          1
+        }
       />
     </div>
   );

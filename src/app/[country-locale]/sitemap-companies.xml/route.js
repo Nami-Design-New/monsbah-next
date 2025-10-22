@@ -1,104 +1,76 @@
-import getCompanies from "@/services/companies/getCompanies";
 import { BASE_URL } from "@/utils/constants";
+import getAllCompanies from "@/services/companies/getAllCompanies";
+import {
+  generateCachedChunkedSitemap,
+  createSitemapResponse,
+  calculateChunks,
+} from "@/utils/sitemap-utils";
 
 export const dynamic = "force-dynamic";
 
-// Function to get all companies for sitemap
-async function getAllCompaniesForSitemap(locale) {
-  try {
-    const [country_slug] = locale.split("-");
-    
-    const allCompanies = [];
-    let page = 1;
-    let hasMore = true;
-    
-    // Fetch all companies with pagination
-    while (hasMore && page <= 10) { // Limit to 10 pages (safety)
-      try {
-        const response = await getCompanies({
-          country_slug,
-          pageParam: page,
-        });
-        
-        // Extract the companies array from the response
-        // The API returns: { data: { data: [...companies] } }
-        const companies = response?.data?.data || [];
-        
-        if (companies.length > 0) {
-          allCompanies.push(...companies);
-          
-          // Check if there are more pages
-          hasMore = Boolean(response?.data?.links?.next);
-          page++;
-        } else {
-          hasMore = false;
-        }
-      } catch (error) {
-        console.error(`Error fetching companies page ${page}:`, error);
-        hasMore = false;
-      }
-    }
-    
-    return allCompanies;
-  } catch (error) {
-    console.error("Error fetching companies for sitemap:", error);
-    return [];
-  }
-}
-
 export async function GET(request, { params }) {
-  const startTime = Date.now();
-  
   try {
-    // Await params in Next.js 15
     const resolvedParams = await params;
-    const locale = resolvedParams["country-locale"] || "kw-ar";
-    
-    const sitemapEntries = [];
+    const locale = resolvedParams["country-locale"];
+    const [country_slug, lang] = locale.split("-");
 
-    // Get companies data for this locale
-    const companies = await getAllCompaniesForSitemap(locale);
+    // Ensure language cookie is set for serverAxios interceptor
+    const { cookies: setCookie } = await import("next/headers");
+    const cookieStore = await setCookie();
+    cookieStore.set("NEXT_LOCALE", locale);
 
-    // Add company pages for this locale
-    companies.forEach((company) => {
-      if (company?.slug || company?.id) {
-        // Use slug if available, otherwise use id
-        const companyIdentifier = company.slug || company.id;
-        sitemapEntries.push({
-          url: `${BASE_URL}/${locale}/company-details/${companyIdentifier}`,
-          lastModified: new Date(
-            company.updated_at || company.created_at || new Date()
-          ),
-          changeFrequency: "monthly",
-          priority: 0.7,
+    let companiesArray = [];
+
+    try {
+      console.log(`[Companies Sitemap] Fetching all companies for ${country_slug}`);
+
+      const companiesPromise = getAllCompanies({ country_slug, lang });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Companies API timeout after 15s")), 15000)
+      );
+
+      const companies = await Promise.race([companiesPromise, timeoutPromise]);
+      companiesArray = Array.isArray(companies) ? companies : [];
+
+      console.log(
+        `[Companies Sitemap] Retrieved ${companiesArray.length} companies for ${country_slug}`
+      );
+    } catch (fetchError) {
+      console.error("[Companies Sitemap] Failed to fetch companies:", fetchError.message);
+      companiesArray = [];
+    }
+
+    const cacheKey = `sitemap-companies-${locale}`;
+    const totalChunks = calculateChunks(companiesArray.length || 0);
+
+    const sitemapOptions = {
+      cacheKey,
+      fetchDataFn: async () => companiesArray,
+      transformToUrlsFn: (companies) => {
+        return companies.map((company) => {
+          const identifier = company.slug || company.id;
+          return {
+            url: `${BASE_URL}/${locale}/company-details/${identifier}`,
+            lastModified: new Date(
+              company.updated_at || company.created_at || Date.now()
+            ).toISOString(),
+            changeFrequency: "monthly",
+            priority: 0.7,
+          };
         });
-      }
-    });
-
-    // Generate XML sitemap
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapEntries
-  .map(
-    (entry) => `  <url>
-    <loc>${entry.url}</loc>
-    <lastmod>${entry.lastModified.toISOString()}</lastmod>
-    <changefreq>${entry.changeFrequency}</changefreq>
-    <priority>${entry.priority}</priority>
-  </url>`
-  )
-  .join("\n")}
-</urlset>`;
-
-    return new Response(xml, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/xml; charset=UTF-8",
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
-        "X-Companies-Count": companies.length.toString(),
-        "X-Generation-Time": `${Date.now() - startTime}ms`,
       },
-    });
+    };
+
+    const xml = await generateCachedChunkedSitemap(
+      totalChunks > 1
+        ? {
+            ...sitemapOptions,
+            chunkIndex: 0,
+          }
+        : sitemapOptions
+    );
+
+    return createSitemapResponse(xml);
   } catch (error) {
     console.error("Error generating companies sitemap:", error);
     return new Response("Error generating sitemap", { status: 500 });

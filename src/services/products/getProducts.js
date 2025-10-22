@@ -11,6 +11,7 @@ export default async function getProducts({
   sub_category_slug,
   search,
   user,
+  per_page,
 }) {
   try {
     // Validate required parameters
@@ -30,6 +31,7 @@ export default async function getProducts({
         category_slug,
         sub_category_slug,
         search,
+        per_page,
       },
     });
     

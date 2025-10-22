@@ -39,10 +39,29 @@ export async function generateMetadata({ searchParams }) {
 export default async function Categories({ searchParams }) {
   const selectedCategory = (await searchParams).category ?? null;
   const categories = await getCategories();
+  const metaT = await getTranslations("meta");
+  const isValidSlug =
+    typeof selectedCategory === "string" && /^[a-z0-9-]+$/i.test(selectedCategory);
+  const safeSlug = isValidSlug ? selectedCategory : null;
+  const pageTitle = safeSlug
+    ? `${metaT("categories.titlePrefix")} ${safeSlug}`
+    : metaT("categories.defaultTitle");
+  const visuallyHiddenStyle = {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    border: 0,
+  };
 
   return (
     <section className="categories-page explore_ads">
       <div className="container">
+        <h1 style={visuallyHiddenStyle}>{pageTitle}</h1>
         <div className="row">
           <SideBar selectedCategory={selectedCategory} />
           <SubCategoriesList

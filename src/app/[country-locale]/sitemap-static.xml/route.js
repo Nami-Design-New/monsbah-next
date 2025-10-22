@@ -1,4 +1,8 @@
 import { BASE_URL } from "@/utils/constants";
+import {
+  generateCachedChunkedSitemap,
+  createSitemapResponse,
+} from "@/utils/sitemap-utils";
 
 // Static pages that exist for all locales with SEO priorities
 const STATIC_PAGES = [
@@ -38,49 +42,31 @@ const STATIC_PAGES = [
 export const dynamic = "force-dynamic";
 
 export async function GET(request, { params }) {
-  const startTime = Date.now();
-  
   try {
     // Await params in Next.js 15
     const resolvedParams = await params;
     const locale = resolvedParams["country-locale"] || "kw-ar";
     
-    const sitemapEntries = [];
-
-    // Add static pages for this specific locale only
-    STATIC_PAGES.forEach((pageConfig) => {
-      sitemapEntries.push({
-        url: `${BASE_URL}/${locale}${pageConfig.path}`,
-        lastModified: new Date(),
-        changeFrequency: pageConfig.changeFreq,
-        priority: pageConfig.priority,
-      });
-    });
-
-    // Generate XML sitemap
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapEntries
-  .map(
-    (entry) => `  <url>
-    <loc>${entry.url}</loc>
-    <lastmod>${entry.lastModified.toISOString()}</lastmod>
-    <changefreq>${entry.changeFrequency}</changefreq>
-    <priority>${entry.priority}</priority>
-  </url>`
-  )
-  .join("\n")}
-</urlset>`;
-
-    return new Response(xml, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/xml; charset=UTF-8",
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
-        "X-Pages-Count": sitemapEntries.length.toString(),
-        "X-Generation-Time": `${Date.now() - startTime}ms`,
+    // Unique cache key for this locale
+    const cacheKey = `sitemap-static-${locale}`;
+    
+    // Generate sitemap with caching and automatic chunking
+    const xml = await generateCachedChunkedSitemap({
+      cacheKey,
+      // Fetch function: returns static pages data
+      fetchDataFn: async () => STATIC_PAGES,
+      // Transform function: converts pages to URL entries
+      transformToUrlsFn: (pages) => {
+        return pages.map((pageConfig) => ({
+          url: `${BASE_URL}/${locale}${pageConfig.path}`,
+          lastModified: new Date().toISOString(),
+          changeFrequency: pageConfig.changeFreq,
+          priority: pageConfig.priority,
+        }));
       },
     });
+
+    return createSitemapResponse(xml);
   } catch (error) {
     console.error("Error generating static sitemap:", error);
     return new Response("Error generating sitemap", { status: 500 });

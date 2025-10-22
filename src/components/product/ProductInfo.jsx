@@ -131,7 +131,7 @@ export default function ProductInfo({ product }) {
         </div>
       </div>
       <div className="itemInfo mt-3">
-        <h3 className="title">{product?.name}</h3>
+        <h1 className="title h3">{product?.name}</h1>
 
         <div className="itemBottom">
           <div className="location">

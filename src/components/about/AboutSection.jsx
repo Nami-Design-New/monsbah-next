@@ -9,9 +9,9 @@ export default async function AboutSection() {
         <img src="/auth-benner.png" alt="Monsbah" layout="responsive" />
       </div>
       <div className="info-wrapper">
-        <h3>
+        <h1 className="h3">
           {t("title")} <span>{t("appName")}</span>
-        </h3>
+        </h1>
         <p>{t("desc")}</p>
       </div>
     </div>

@@ -53,7 +53,7 @@ export default function ContactForm() {
   return (
     <div className="col-lg-6 p-2">
       <div className="contact_form">
-        <h3>{t("sendMessage")}</h3>
+        <h1 className="h3">{t("sendMessage")}</h1>
         <p>{t("sendSubtitle")}</p>
 
         <form className="form" onSubmit={handleSubmit(onSubmit)}>

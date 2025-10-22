@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import { Fancybox } from "@fancyapps/ui";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -11,17 +11,21 @@ import { useRouter } from "@/i18n/navigation";
 export default function MyProductSlider({ product }) {
   const router = useRouter();
 
-  const [images, setImages] = useState([]);
+  const initialImages = useMemo(() => {
+    const galleryImages = product?.images?.map((image) => image?.image).filter(Boolean) || [];
+    const coverImage = product?.image ? [product.image] : [];
+    return [...coverImage, ...galleryImages];
+  }, [product]);
+
+  const [images, setImages] = useState(initialImages);
   const [autoplayDelay, setAutoplayDelay] = useState(3000);
   const [isClient, setIsClient] = useState(false);
   const videoRef = useRef(null);
   
   useEffect(() => {
     setIsClient(true);
-    const srcs = product?.images?.map((image) => image?.image) || [];
-    const allImages = product?.image ? [product?.image, ...srcs] : srcs;
-    setImages(allImages);
-  }, [product]);
+    setImages(initialImages);
+  }, [initialImages]);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -39,7 +43,70 @@ export default function MyProductSlider({ product }) {
   const slidesCount = images.length;
 
   if (!isClient) {
-    return <div className="swiper_wrapper" style={{ minHeight: '400px' }} />;
+    if (!images || images.length === 0) {
+      return (
+        <div className="swiper_wrapper" style={{ minHeight: "400px" }}>
+          <div className="d-flex align-items-center justify-content-center h-100">
+            <p className="text-center mb-0">No media available for this product.</p>
+          </div>
+        </div>
+      );
+    }
+
+    const primaryMedia = images[0];
+    const remainingMedia = images.slice(1, 4); // show up to three additional thumbnails
+
+    return (
+      <div className="swiper_wrapper no-js">
+        <figure className="no-js-slide mb-3">
+          {isValidVideoExtension(primaryMedia) ? (
+            <video
+              src={primaryMedia}
+              controls
+              playsInline
+              preload="metadata"
+              className="w-100 rounded"
+            >
+              Sorry, your browser does not support embedded videos.
+            </video>
+          ) : (
+            <img
+              src={primaryMedia}
+              alt={product?.name || "Product image"}
+              className="w-100 rounded"
+            />
+          )}
+        </figure>
+
+        {remainingMedia.length > 0 && (
+          <div className="d-flex gap-2 flex-wrap">
+            {remainingMedia.map((media, index) => (
+              <figure key={`no-js-thumb-${index}`} className="no-js-thumb m-0">
+                <a href={media}>
+                  {isValidVideoExtension(media) ? (
+                    <video
+                      src={media}
+                      muted
+                      playsInline
+                      preload="metadata"
+                      className="rounded"
+                      style={{ maxWidth: "120px" }}
+                    />
+                  ) : (
+                    <img
+                      src={media}
+                      alt={`${product?.name || "Product"} thumbnail ${index + 2}`}
+                      className="rounded"
+                      style={{ maxWidth: "120px" }}
+                    />
+                  )}
+                </a>
+              </figure>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

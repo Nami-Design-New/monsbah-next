@@ -1,80 +1,58 @@
-import { getBlogs } from "@/services/blogs/getBlogs";
 import { BASE_URL } from "@/utils/constants";
+import { getBlogs } from "@/services/blogs/getBlogs";
+import {
+  generateCachedChunkedSitemap,
+  createSitemapResponse,
+} from "@/utils/sitemap-utils";
 
 export const dynamic = "force-dynamic";
 
-// Function to get all blogs for sitemap
-async function getAllBlogsForSitemap(locale) {
-  try {
-    const [country_slug, lang] = locale.split("-");
-    
-    // Fetch blogs for this specific locale
-    const blogs = await getBlogs({
-      lang,
-      country_slug,
-      per_page: 1000, // Get comprehensive blog list
-      // Add other parameters as needed
-    });
-    return blogs || [];
-  } catch (error) {
-    console.error("Error fetching blogs for sitemap:", error);
-    return [];
-  }
-}
-
 export async function GET(request, { params }) {
-  const startTime = Date.now();
-  
   try {
     // Await params in Next.js 15
     const resolvedParams = await params;
-    const locale = resolvedParams["country-locale"] || "kw-ar";
+    const locale = resolvedParams["country-locale"];
     
-    const sitemapEntries = [];
-
-    // Get blogs data for this specific locale
-    const blogs = await getAllBlogsForSitemap(locale);
-
-    // Add dynamic blog pages for this locale only
-    blogs.forEach((blog) => {
-      if (blog?.slug || blog?.id) {
-        // Use slug if available, otherwise use id
-        const blogIdentifier = blog.slug || blog.id;
-        sitemapEntries.push({
-          url: `${BASE_URL}/${locale}/blogs/${blogIdentifier}`,
-          lastModified: new Date(
-            blog.updated_at || blog.created_at || new Date()
-          ),
-          changeFrequency: "monthly",
-          priority: 0.7, // Good priority for content
+    // Set the language cookie so serverAxios interceptor can use it
+    const { cookies: setCookie } = await import("next/headers");
+    const cookieStore = await setCookie();
+    cookieStore.set("NEXT_LOCALE", locale);
+    
+    // Fetch blogs first to generate cache key with fingerprint
+    // Language is passed via headers by serverAxios interceptor
+    const blogsArray = await getBlogs();
+    const blogs = Array.isArray(blogsArray) ? blogsArray : [];
+    
+    // Generate cache fingerprint based on latest update time
+    const latestUpdate = blogs.reduce((latest, blog) => {
+      const blogTime = new Date(blog.updated_at || blog.created_at || 0).getTime();
+      return Math.max(latest, blogTime);
+    }, 0);
+    
+    // Unique cache key including data fingerprint
+    const cacheKey = `sitemap-blogs-${locale}-${latestUpdate}`;
+    
+    // Generate sitemap with caching and automatic chunking
+    const xml = await generateCachedChunkedSitemap({
+      cacheKey,
+      // Fetch function: return already-fetched blogs
+      fetchDataFn: async () => {
+        return blogs;
+      },
+      // Transform function: converts blogs to URL entries
+      transformToUrlsFn: (blogs) => {
+        return blogs.map((blog) => {
+          return {
+            url: `${BASE_URL}/${locale}/blogs/${blog.title}`,
+            lastModified: new Date(blog.updated_at || blog.created_at || Date.now()).toISOString(),
+            changeFrequency: "weekly",
+            priority: 0.6,
+          };
         });
-      }
-    });
-
-    // Generate XML sitemap
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapEntries
-  .map(
-    (entry) => `  <url>
-    <loc>${entry.url}</loc>
-    <lastmod>${entry.lastModified.toISOString()}</lastmod>
-    <changefreq>${entry.changeFrequency}</changefreq>
-    <priority>${entry.priority}</priority>
-  </url>`
-  )
-  .join("\n")}
-</urlset>`;
-
-    return new Response(xml, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/xml; charset=UTF-8",
-        "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=604800",
-        "X-Blogs-Count": blogs.length.toString(),
-        "X-Generation-Time": `${Date.now() - startTime}ms`,
       },
     });
+
+    return createSitemapResponse(xml);
   } catch (error) {
     console.error("Error generating blogs sitemap:", error);
     return new Response("Error generating sitemap", { status: 500 });

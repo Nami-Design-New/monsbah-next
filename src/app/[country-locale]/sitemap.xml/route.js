@@ -1,186 +1,150 @@
-import getProducts from "@/services/products/getProducts";
-import getCompanies from "@/services/companies/getCompanies";
-import { getCategories } from "@/services/categories/getCategories";
-import { getBlogs } from "@/services/blogs/getBlogs";
 import { BASE_URL } from "@/utils/constants";
+import { getCategories } from "@/services/categories/getCategories";
+import getAllCompanies from "@/services/companies/getAllCompanies";
+import getProducts from "@/services/products/getProducts";
+import { getBlogs } from "@/services/blogs/getBlogs";
+import {
+  generateSitemapIndexXML,
+  getSitemapEntriesForIndex,
+  calculateChunks,
+} from "@/utils/sitemap-utils";
 
 export const dynamic = "force-dynamic";
 
-const MAX_URLS_PER_SITEMAP = 50000;
-
-// Calculate chunk count for products
-async function getProductsChunkCount(locale) {
-  try {
-    const [country_slug, lang] = locale.split("-");
-    const data = await getProducts({
-      pageParam: 1,
-      lang,
-      country_slug,
-      user: "client",
-    });
-
-    const total =
-      data?.total ||
-      data?.data?.total ||
-      data?.meta?.total ||
-      data?.data?.meta?.total ||
-      0;
-
-    return total > 0 ? Math.ceil(total / MAX_URLS_PER_SITEMAP) : 1;
-  } catch {
-    return 1;
-  }
-}
-
-// Calculate chunk count for companies
-async function getCompaniesChunkCount(locale) {
-  try {
-    const [country_slug] = locale.split("-");
-    
-    let total = 0;
-    let page = 1;
-    let hasMore = true;
-    
-    while (hasMore && page <= 3) {
-      const response = await getCompanies({
-        country_slug,
-        pageParam: page,
-      });
-
-      const pageTotal = response?.data?.data?.length || 0;
-      total += pageTotal;
-
-      if (pageTotal < 30) {
-        hasMore = false;
-      }
-      page++;
-    }
-
-    return total > 0 ? Math.ceil(total / MAX_URLS_PER_SITEMAP) : 1;
-  } catch {
-    return 1;
-  }
-}
-
-// Calculate chunk count for categories
-async function getCategoriesChunkCount(locale) {
-  try {
-    const [country_slug, lang] = locale.split("-");
-    const data = await getCategories({ country_slug, lang });
-    const total = data?.data?.data?.length || 0;
-    return total > 0 ? Math.ceil(total / MAX_URLS_PER_SITEMAP) : 1;
-  } catch {
-    return 1;
-  }
-}
-
-// Calculate chunk count for blogs
-async function getBlogsChunkCount(locale) {
-  try {
-    const [country_slug, lang] = locale.split("-");
-    const data = await getBlogs({ country_slug, lang, pageParam: 1 });
-    const total = data?.data?.meta?.total || 0;
-    return total > 0 ? Math.ceil(total / MAX_URLS_PER_SITEMAP) : 1;
-  } catch {
-    return 1;
-  }
-}
-
 export async function GET(request, { params }) {
   const { "country-locale": locale } = await params;
+  const [country_slug, lang] = locale.split("-");
 
-  const productsChunks = await getProductsChunkCount(locale);
-  const companiesChunks = await getCompaniesChunkCount(locale);
-  const categoriesChunks = await getCategoriesChunkCount(locale);
-  const blogsChunks = await getBlogsChunkCount(locale);
+  // Ensure downstream requests pick up locale-specific language
+  const { cookies: setCookie } = await import("next/headers");
+  const cookieStore = await setCookie();
+  cookieStore.set("NEXT_LOCALE", locale);
 
   const sitemapEntries = [];
 
-  // Static pages sitemap
-  sitemapEntries.push({
-    loc: `${BASE_URL}/${locale}/sitemap-static.xml`,
-    lastmod: new Date().toISOString(),
-  });
-
-  // Categories sitemap
-  if (categoriesChunks === 1) {
+  try {
+    // 1. Static pages sitemap (always single file)
     sitemapEntries.push({
-      loc: `${BASE_URL}/${locale}/sitemap-categories.xml`,
+      loc: `${BASE_URL}/${locale}/sitemap-static.xml`,
       lastmod: new Date().toISOString(),
     });
-  } else {
-    for (let i = 0; i < categoriesChunks; i++) {
-      sitemapEntries.push({
-        loc: `${BASE_URL}/${locale}/categories/sitemap-categories-${i}.xml`,
-        lastmod: new Date().toISOString(),
-      });
-    }
-  }
 
-  // Companies sitemaps
-  if (companiesChunks === 1) {
+    // 2. Categories sitemap (with auto-chunking detection)
+    const categoriesEntries = await getSitemapEntriesForIndex({
+      locale,
+      sitemapType: "categories",
+      cacheKey: `sitemap-categories-${locale}`,
+      fetchDataFn: async () => {
+        const endpoint = `/client/categories?country_slug=${country_slug}&lang=${lang}`;
+        const categories = await getCategories(endpoint);
+        return Array.isArray(categories) ? categories : [];
+      },
+      transformToUrlsFn: (categories) => {
+        return categories.map((category) => ({
+          url: `${BASE_URL}/${locale}/category/${category.slug || category.id}`,
+        }));
+      },
+    });
+    sitemapEntries.push(...categoriesEntries);
+
+    // 3. Products sitemap - FAST: only fetch first page to get total, then generate chunk URLs
+    try {
+      // Fetch first page only to get total count
+      const response = await getProducts({
+        pageParam: 1,
+        lang,
+        country_slug,
+        user: "client",
+      });
+
+      const total =
+        response?.data?.meta?.total ||
+        response?.meta?.total ||
+        response?.data?.total ||
+        response?.total ||
+        0;
+
+      const productChunks = total > 0 ? calculateChunks(total) : 1;
+      console.log(`[Products Sitemap] ${locale}: ${total} products, ${productChunks} chunks`);
+
+      // Generate sitemap URLs for each chunk
+      for (let i = 0; i < Math.max(productChunks, 1); i++) {
+        sitemapEntries.push({
+          loc: `${BASE_URL}/${locale}/sitemap-products${i}.xml`,
+          lastmod: new Date().toISOString(),
+        });
+      }
+    } catch (error) {
+      console.error("Products sitemap failed:", error.message);
+    }
+
+    // Always include base companies sitemap reference
     sitemapEntries.push({
       loc: `${BASE_URL}/${locale}/sitemap-companies.xml`,
       lastmod: new Date().toISOString(),
     });
-  } else {
-    for (let i = 0; i < companiesChunks; i++) {
-      sitemapEntries.push({
-        loc: `${BASE_URL}/${locale}/companies/sitemap-companies-${i}.xml`,
-        lastmod: new Date().toISOString(),
-      });
-    }
-  }
 
-  // Blogs sitemaps
-  if (blogsChunks === 1) {
-    sitemapEntries.push({
-      loc: `${BASE_URL}/${locale}/sitemap-blogs.xml`,
-      lastmod: new Date().toISOString(),
-    });
-  } else {
-    for (let i = 0; i < blogsChunks; i++) {
-      sitemapEntries.push({
-        loc: `${BASE_URL}/${locale}/blogs/sitemap-blogs-${i}.xml`,
-        lastmod: new Date().toISOString(),
+    // 4. Companies sitemap (with auto-chunking detection)
+    try {
+      const companiesPromise = getSitemapEntriesForIndex({
+        locale,
+        sitemapType: "companies",
+        cacheKey: `sitemap-companies-${locale}`,
+        fetchDataFn: async () => {
+          try {
+            const fetchPromise = getAllCompanies({ country_slug, lang });
+            const timeoutPromise = new Promise((_, reject) =>
+              setTimeout(() => reject(new Error("Companies API timeout after 15s")), 15000)
+            );
+            const companies = await Promise.race([fetchPromise, timeoutPromise]);
+            return Array.isArray(companies) ? companies : [];
+          } catch (error) {
+            console.error("Error fetching companies for sitemap:", error);
+            return [];
+          }
+        },
+        transformToUrlsFn: (companies) => {
+          return companies.map((company) => ({
+            url: `${BASE_URL}/${locale}/company-details/${company.slug || company.id}`,
+          }));
+        },
       });
-    }
-  }
 
-  // Products sitemaps
-  if (productsChunks === 1) {
-    sitemapEntries.push({
-      loc: `${BASE_URL}/${locale}/products/sitemap.xml`,
-      lastmod: new Date().toISOString(),
-    });
-  } else {
-    for (let i = 0; i < productsChunks; i++) {
-      sitemapEntries.push({
-        loc: `${BASE_URL}/${locale}/products/sitemap${i}.xml`,
-        lastmod: new Date().toISOString(),
-      });
+      const companiesEntries = await companiesPromise;
+      sitemapEntries.push(...companiesEntries);
+    } catch (error) {
+      console.error("Companies sitemap timed out or failed, skipping:", error.message);
+      // Skip companies if it fails
     }
+
+    // 4. Blogs sitemap (with auto-chunking detection)
+    const blogsEntries = await getSitemapEntriesForIndex({
+      locale,
+      sitemapType: "blogs",
+      cacheKey: `sitemap-blogs-${locale}`,
+      fetchDataFn: async () => {
+        const blogs = await getBlogs();
+        return Array.isArray(blogs) ? blogs : [];
+      },
+      transformToUrlsFn: (blogs) => {
+        return blogs.map((blog) => ({
+          url: `${BASE_URL}/${locale}/blogs/${blog.id}`,
+        }));
+      },
+    });
+    sitemapEntries.push(...blogsEntries);
+
+  } catch (error) {
+    console.error("Error generating sitemap index:", error);
   }
 
   // Generate sitemap index XML
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${sitemapEntries
-  .map(
-    (entry) => `  <sitemap>
-    <loc>${entry.loc}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
-  </sitemap>`
-  )
-  .join("\n")}
-</sitemapindex>`;
+  const xml = generateSitemapIndexXML(sitemapEntries);
 
   return new Response(xml, {
     headers: {
-      "Content-Type": "application/xml",
-      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-      "Pragma": "no-cache",
-      "Expires": "0",
+      "Content-Type": "application/xml; charset=UTF-8",
+      "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=86400",
     },
   });
 }
