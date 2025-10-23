@@ -38,6 +38,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        // Ensure locale-specific sitemap variants don't collide with category slugs
+        source: "/:country_locale/sitemap-:filename.xml",
+        destination: "/:country_locale/sitemaps/:filename",
+      },
+      {
         // Map clean product sitemap URLs like /sa-ar/products/sitemap1.xml -> /sa-ar/products/sitemap?id=1
         source: "/:country_locale/products/sitemap:id(\\d+).xml",
         destination: "/:country_locale/products/sitemap?id=:id",

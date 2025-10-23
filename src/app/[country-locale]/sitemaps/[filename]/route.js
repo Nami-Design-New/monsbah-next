@@ -145,16 +145,16 @@ export async function GET(request, { params }) {
     // If this is actually the locale sitemap index (sitemap.xml), delegate to dedicated route
     if (normalized === "sitemap") {
       console.log(`[Sitemap Dynamic] Delegating to locale sitemap index handler`);
-      const { GET: localeSitemapHandler } = await import("../sitemap.xml/route");
+      const { GET: localeSitemapHandler } = await import("../../sitemap.xml/route");
       return localeSitemapHandler(request, { params: Promise.resolve(resolvedParams) });
     }
 
     // Delegate to specific sitemap routes when available (e.g., sitemap-static.xml)
     const directHandlers = new Map([
-      ["static", () => import("../sitemap-static.xml/route")],
-      ["categories", () => import("../sitemap-categories.xml/route")],
-      ["blogs", () => import("../sitemap-blogs.xml/route")],
-      ["companies", () => import("../sitemap-companies.xml/route")],
+      ["static", () => import("../../sitemap-static.xml/route")],
+      ["categories", () => import("../../sitemap-categories.xml/route")],
+      ["blogs", () => import("../../sitemap-blogs.xml/route")],
+      ["companies", () => import("../../sitemap-companies.xml/route")],
     ]);
     if (directHandlers.has(normalized)) {
       console.log(`[Sitemap Dynamic] Delegating to dedicated ${normalized} sitemap`);

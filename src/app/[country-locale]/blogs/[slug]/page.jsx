@@ -6,16 +6,61 @@ import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { cache } from "react";
 import { generateBlogSEO } from "@/utils/seo";
+import { notFound, redirect } from "next/navigation";
 
 const fetchBlogDetails = cache(async (id) => {
   return await getBlogsDetails(id);
 });
 
+function normalizeSlug(slug) {
+  if (!slug) return "";
+  return slug
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+async function resolveBlog(slug) {
+  const candidates = [];
+  let decoded = slug || "";
+  if (slug) {
+    try {
+      decoded = decodeURIComponent(slug);
+    } catch {
+      decoded = slug;
+    }
+  }
+  if (decoded) {
+    candidates.push(decoded);
+    const hyphenated = normalizeSlug(decoded);
+    if (hyphenated && hyphenated !== decoded) {
+      candidates.push(hyphenated);
+    }
+    const spaced = decoded.replace(/-/g, " ").trim();
+    if (spaced && spaced !== decoded && spaced !== hyphenated) {
+      candidates.push(spaced);
+    }
+  }
+
+  for (const candidate of [...new Set(candidates)]) {
+    try {
+      const blog = await fetchBlogDetails(candidate);
+      if (blog) {
+        return { blog, matchedSlug: candidate };
+      }
+    } catch {
+      // continue to next candidate
+    }
+  }
+
+  return { blog: null, matchedSlug: normalizeSlug(decoded) };
+}
+
 export async function generateMetadata({ params }) {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const rawSlug = resolvedParams?.slug;
   const locale = await getLocale();
-  
-  const blog = await fetchBlogDetails(slug);
+  const { blog } = await resolveBlog(rawSlug);
   
   if (!blog) {
     return {
@@ -54,9 +99,47 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function page({ params }) {
-  const { slug } = await params;
+  const resolvedParams = await params;
+  const { slug } = resolvedParams;
+  const localeParam = resolvedParams["country-locale"];
   const t = await getTranslations();
-  const blog = await fetchBlogDetails(slug);
+  const { blog, matchedSlug } = await resolveBlog(slug);
+
+  if (!blog) {
+    notFound();
+  }
+
+  const fallbackId = blog.id ? String(blog.id) : "";
+  const canonicalSlugFromBlog = normalizeSlug(blog.slug || "");
+  const canonicalSlug =
+    canonicalSlugFromBlog ||
+    normalizeSlug(matchedSlug || "") ||
+    normalizeSlug(fallbackId) ||
+    fallbackId;
+
+  let decodedRequestSlug = slug || "";
+  if (slug) {
+    try {
+      decodedRequestSlug = decodeURIComponent(slug);
+    } catch {
+      decodedRequestSlug = slug;
+    }
+  }
+  const requestSlugNormalized =
+    normalizeSlug(decodedRequestSlug) ||
+    normalizeSlug(matchedSlug || "") ||
+    normalizeSlug(fallbackId) ||
+    fallbackId;
+
+  if (
+    canonicalSlugFromBlog &&
+    requestSlugNormalized &&
+    requestSlugNormalized !== canonicalSlugFromBlog
+  ) {
+    const targetLocale = localeParam || (await getLocale());
+    redirect(`/${targetLocale}/blogs/${encodeURIComponent(canonicalSlugFromBlog)}`);
+  }
+
   const blogs = await getBlogs();
 
   return (
@@ -87,15 +170,25 @@ export default async function page({ params }) {
             <div className="recent_blogs">
               <h3>{t("recentArticles")}</h3>
               <ul>
-                {blogs
-                  ?.filter((blog) => blog?.id !== +slug)
-                  ?.map((blog) => (
-                    <li key={blog?.id}>
-                      <Link href={`/blogs/${blog?.id}`}>
-                        <h4>{blog?.title}</h4>
+                {blogs?.map((blogItem) => {
+                  const normalizedSlug =
+                    normalizeSlug(blogItem?.slug || "") ||
+                    (blogItem?.id ? String(blogItem.id) : "");
+
+                  if (!normalizedSlug || normalizedSlug === canonicalSlug) {
+                    return null;
+                  }
+
+                  return (
+                    <li key={blogItem?.id ?? normalizedSlug}>
+                      <Link
+                        href={`/blogs/${encodeURIComponent(normalizedSlug)}`}
+                      >
+                        <h4>{blogItem?.title}</h4>
                       </Link>
                     </li>
-                  ))}
+                  );
+                })}
               </ul>
             </div>
           </div>

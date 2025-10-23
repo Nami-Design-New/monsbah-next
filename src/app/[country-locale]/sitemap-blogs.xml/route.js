@@ -7,6 +7,15 @@ import {
 
 export const dynamic = "force-dynamic";
 
+function resolveBlogSlug(blog) {
+  const raw = blog?.slug || blog?.title || "";
+  return raw
+    .toString()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 export async function GET(request, { params }) {
   try {
     // Await params in Next.js 15
@@ -42,8 +51,10 @@ export async function GET(request, { params }) {
       // Transform function: converts blogs to URL entries
       transformToUrlsFn: (blogs) => {
         return blogs.map((blog) => {
+          const slug = resolveBlogSlug(blog);
+          const encodedSlug = encodeURIComponent(slug);
           return {
-            url: `${BASE_URL}/${locale}/blogs/${blog.title}`,
+            url: `${BASE_URL}/${locale}/blogs/${encodedSlug}`,
             lastModified: new Date(blog.updated_at || blog.created_at || Date.now()).toISOString(),
             changeFrequency: "weekly",
             priority: 0.6,
