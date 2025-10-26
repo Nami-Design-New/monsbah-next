@@ -3,6 +3,7 @@ import { BASE_URL } from "@/utils/constants";
 import { getCategories } from "@/services/categories/getCategories";
 import getProducts from "@/services/products/getProducts";
 import { calculateChunks, generateChunkedSitemapEntries } from "@/utils/sitemap-utils";
+import { getGlobalImageEntries } from "./sitemap-images.xml/route";
 
 export const dynamic = "force-dynamic";
 
@@ -44,10 +45,27 @@ export async function GET(request) {
     const currentDate = new Date().toISOString();
 
     // --- Global sitemaps
-    sitemapPaths.push(
-      { loc: `${BASE_URL}/sitemap-images.xml`, lastmod: currentDate },
-      { loc: `${BASE_URL}/sitemap-news.xml`, lastmod: currentDate }
-    );
+    const imageEntries = await getGlobalImageEntries();
+    const imageChunks = calculateChunks(imageEntries.length || 0);
+
+    if (imageChunks <= 1) {
+      sitemapPaths.push({
+        loc: `${BASE_URL}/sitemap-images.xml`,
+        lastmod: currentDate,
+      });
+    } else {
+      for (let i = 0; i < imageChunks; i += 1) {
+        sitemapPaths.push({
+          loc: `${BASE_URL}/sitemap-image${i}.xml`,
+          lastmod: currentDate,
+        });
+      }
+    }
+
+    sitemapPaths.push({
+      loc: `${BASE_URL}/sitemap-news.xml`,
+      lastmod: currentDate,
+    });
 
     // --- Loop through all locales
     for (const locale of LOCALES) {

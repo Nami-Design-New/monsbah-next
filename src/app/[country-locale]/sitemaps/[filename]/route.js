@@ -6,6 +6,7 @@ import {
   generateCachedChunkedImageSitemap,
   createSitemapResponse,
 } from "@/utils/sitemap-utils";
+import { LOCALES } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -115,6 +116,12 @@ export async function GET(request, { params }) {
   try {
     const resolvedParams = await params;
     const locale = resolvedParams["country-locale"];
+    if (!LOCALES.includes(locale)) {
+      console.log(
+        `[Sitemap Dynamic] Unsupported locale requested: ${locale}, returning 404`
+      );
+      return new Response("Locale not supported", { status: 404 });
+    }
     const rawFilename = Array.isArray(resolvedParams["filename"])
       ? resolvedParams["filename"].join("")
       : resolvedParams["filename"] || "";
