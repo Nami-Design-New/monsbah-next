@@ -218,7 +218,10 @@
   "error": {
     "pageNotFound": "This link doesn't exist or may have been deleted. How did you get here?",
     "noAccountWithThisId": "No user exists with this ID. How did you get here?",
-    "goHome": "Home"
+    "goHome": "Home",
+    "serverErrorTitle": "Something went wrong",
+    "serverErrorDescription": "An unexpected error occurred. Please try again later.",
+    "tryAgain": "Try again"
   },
   "verification": {
     "type": "Account Type",

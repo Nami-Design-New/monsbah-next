@@ -216,7 +216,10 @@
   "error": {
     "pageNotFound": "هذا الرابط غير موجود لدينا او ربما تم حذفه. كيف وصلت الي هنا ؟",
     "noAccountWithThisId": "لا يوجد مستخدم لدينا لديه هذا الـ ID. كيف وصلت الي هنا ؟",
-    "goHome": "الرئيسية"
+    "goHome": "الرئيسية",
+    "serverErrorTitle": "حدث خطأ ما",
+    "serverErrorDescription": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقاً.",
+    "tryAgain": "أعد المحاولة"
   },
   "verification": {
     "type": "نوع الحساب",

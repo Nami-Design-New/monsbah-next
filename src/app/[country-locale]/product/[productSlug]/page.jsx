@@ -5,7 +5,8 @@ import UserCard from "@/components/product/UserCard";
 import { getProduct } from "@/services/products/getProduct";
 import { cache } from "react";
 import { generateHreflangAlternatesForProduct } from "@/utils/hreflang";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
+import { getManualProductRedirect } from "@/utils/manual-redirects";
 
 export const fetchProduct = cache(async (id ,country_slug ) => {
   return await getProduct(id , country_slug);
@@ -70,10 +71,33 @@ export default async function page({ params }) {
     product = await fetchProduct(decodedSlug, country_slug);
   } catch (error) {
     console.error("[Product Page] Failed to load product", error?.message);
-    notFound();
+    const redirectTarget = getManualProductRedirect({
+      locale: countryLocale,
+      slug: decodedSlug,
+    });
+
+    if (redirectTarget) {
+      permanentRedirect(redirectTarget);
+    }
+
+    const status = error?.response?.status ?? error?.status;
+    if (status === 404) {
+      notFound();
+    }
+
+    throw error;
   }
 
   if (!product) {
+    const redirectTarget = getManualProductRedirect({
+      locale: countryLocale,
+      slug: decodedSlug,
+    });
+
+    if (redirectTarget) {
+      permanentRedirect(redirectTarget);
+    }
+
     notFound();
   }
 
