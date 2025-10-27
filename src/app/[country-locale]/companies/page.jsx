@@ -6,16 +6,33 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale, getTranslations } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import Pagination from "@/components/shared/Pagination";
+import { getSeoOverride } from "@/utils/seo-overrides";
 
 // Mark as dynamic - uses searchParams
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ searchParams }) {
+export async function generateMetadata({ params, searchParams }) {
   const t = await getTranslations("meta");
-  const params = await searchParams;
-  const category = params?.category;
-  const sub_category = params?.sub_category;
+  const resolvedParams = await params;
+  const locale = resolvedParams?.["country-locale"];
+  const paramsObj = await searchParams;
+  const category = paramsObj?.category;
+  const sub_category = paramsObj?.sub_category;
   const alternates = await generateHreflangAlternates("/companies");
+
+  const override = getSeoOverride({
+    route: "companies",
+    locale,
+    category,
+    subCategory: sub_category,
+  });
+
+  if (override) {
+    return {
+      ...override,
+      alternates,
+    };
+  }
 
   if (category && sub_category) {
     return {
@@ -46,7 +63,7 @@ export async function generateMetadata({ searchParams }) {
 
 export default async function Companies({ searchParams, params }) {
   const paramsObj = await searchParams;
-  const { id } = await params;
+  const resolvedParams = await params;
   const locale = await getLocale();
   const metaT = await getTranslations("meta");
 
@@ -88,7 +105,6 @@ export default async function Companies({ searchParams, params }) {
       type,
       sort,
       city_id,
-      id,
       category_slug,
       sub_category_slug,
       search,
@@ -132,10 +148,18 @@ export default async function Companies({ searchParams, params }) {
     : category_slug
       ? `${metaT("companies.titleByCategory")} ${category_slug}`
       : metaT("companies.defaultTitle");
+  const seoOverride = getSeoOverride({
+    route: "companies",
+    locale: resolvedParams?.["country-locale"] || locale,
+    category: category_slug,
+    subCategory: sub_category_slug,
+  });
+
+  const resolvedPageTitle = seoOverride?.h1 || seoOverride?.title || pageTitle;
 
   return (
     <div className="pt-4 pb-4">
-      <h1 style={visuallyHiddenStyle}>{pageTitle}</h1>
+      <h1 style={visuallyHiddenStyle}>{resolvedPageTitle}</h1>
 
       <FilterCompanySection selectedCategory={category_slug} />
       <HydrationBoundary state={dehydrate(queryClient)}>

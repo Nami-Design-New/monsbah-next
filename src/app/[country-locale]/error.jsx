@@ -2,10 +2,11 @@
 
 import { Link } from "@/i18n/navigation";
 import { useEffect } from "react";
-import { useTranslations } from "use-intl";
+import { useTranslations, useLocale } from "use-intl";
 
 export default function Error({ error, reset }) {
   const t = useTranslations("error");
+  const locale = useLocale();
 
   useEffect(() => {
     console.error(error);
@@ -28,7 +29,7 @@ export default function Error({ error, reset }) {
           <i className="fa-solid fa-rotate-right" aria-hidden="true" />
           <span>{t("tryAgain")}</span>
         </button>
-        <Link aria-label="Home" to="/" className="backhome">
+        <Link aria-label="Home" href="/" locale={locale} className="backhome">
           <i className="fa-solid fa-home" aria-hidden="true" />
           <span>{t("goHome")}</span>
         </Link>
