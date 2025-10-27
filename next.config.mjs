@@ -47,6 +47,11 @@ const nextConfig = {
         source: "/:country_locale/products/sitemap:id(\\d+).xml",
         destination: "/:country_locale/products/sitemap?id=:id",
       },
+      {
+        // Allow global sitemap-image0.xml style URLs to resolve to the chunk handler
+        source: "/sitemap-image:id(\\d+).xml",
+        destination: "/sitemap-image/:id",
+      },
     ];
   },
   async headers() {

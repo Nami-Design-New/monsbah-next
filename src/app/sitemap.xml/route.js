@@ -3,7 +3,7 @@ import { BASE_URL } from "@/utils/constants";
 import { getCategories } from "@/services/categories/getCategories";
 import getProducts from "@/services/products/getProducts";
 import { calculateChunks, generateChunkedSitemapEntries } from "@/utils/sitemap-utils";
-// import { getGlobalImageEntries } from "./sitemap-images.xml/route";
+import { getGlobalImageEntries, chunkImageEntries } from "@/utils/imageSitemap";
 
 export const dynamic = "force-dynamic";
 
@@ -44,24 +44,31 @@ export async function GET(request) {
     const sitemapPaths = [];
     const currentDate = new Date().toISOString();
 
-    // --- Global sitemaps
-    // const imageEntries = await getGlobalImageEntries();
-    // const imageChunks = calculateChunks(imageEntries.length || 0);
+    // --- Global image/video sitemaps (skip when filtering by locale)
+    if (!filterLocale) {
+      try {
+        const imageEntries = await getGlobalImageEntries();
+        const imageChunks = chunkImageEntries(imageEntries);
 
-    // if (imageChunks <= 1) {
-    //   sitemapPaths.push({
-    //     loc: `${BASE_URL}/sitemap-images.xml`,
-    //     lastmod: currentDate,
-    //   });
-    // } else {
-    //   for (let i = 0; i < imageChunks; i += 1) {
-    //     sitemapPaths.push({
-    //       loc: `${BASE_URL}/sitemap-image${i}.xml`,
-    //       lastmod: currentDate,
-    //     });
-    //   }
-    // }
-
+        if (imageChunks.length === 0) {
+          // No global media entries available; skip adding paths
+        } else if (imageChunks.length === 1) {
+          sitemapPaths.push({
+            loc: `${BASE_URL}/sitemap-images.xml`,
+            lastmod: currentDate,
+          });
+        } else {
+          imageChunks.forEach((_, index) => {
+            sitemapPaths.push({
+              loc: `${BASE_URL}/sitemap-image${index}.xml`,
+              lastmod: currentDate,
+            });
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error preparing global image sitemap entries:", error);
+      }
+    }
 
     // delete this block if you want to enable news sitemap
     // sitemapPaths.push({

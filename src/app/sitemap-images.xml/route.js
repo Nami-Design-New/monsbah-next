@@ -2,28 +2,36 @@ import { BASE_URL } from "@/utils/constants";
 import {
   generateImageSitemapXML,
   generateSitemapIndexXML,
-  calculateChunks,
   createSitemapResponse,
 } from "@/utils/sitemap-utils";
-import { getGlobalImageEntries } from "@/utils/imageSitemap";
+import { getGlobalImageEntries, chunkImageEntries } from "@/utils/imageSitemap";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     const allEntries = await getGlobalImageEntries();
-    const totalChunks = calculateChunks(allEntries.length || 0);
+    if (!allEntries.length) {
+      const xml = generateImageSitemapXML([]);
+      return createSitemapResponse(xml);
+    }
+
+    const chunks = chunkImageEntries(allEntries);
+    const totalChunks = chunks.length;
 
     if (totalChunks <= 1) {
-      const xml = generateImageSitemapXML(allEntries);
+      const singleChunk = chunks[0] || allEntries;
+      const xml = generateImageSitemapXML(singleChunk);
       return createSitemapResponse(xml);
     }
 
     const lastmod = new Date().toISOString();
-    const sitemapEntries = Array.from({ length: totalChunks }, (_, index) => ({
-      loc: `${BASE_URL}/sitemap-image${index}.xml`,
-      lastmod,
-    }));
+    const sitemapEntries = chunks.map((_, index) => {
+      return {
+        loc: `${BASE_URL}/sitemap-image${index}.xml`,
+        lastmod,
+      };
+    });
 
     const xml = generateSitemapIndexXML(sitemapEntries);
     return createSitemapResponse(xml);

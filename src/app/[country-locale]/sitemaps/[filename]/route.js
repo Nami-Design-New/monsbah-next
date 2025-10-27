@@ -1,5 +1,5 @@
 import { BASE_URL } from "@/utils/constants";
-import getProductsForSitemap from "@/services/products/getProductsForSitemap";
+import fetchAllProductsForSitemap from "@/services/products/fetchAllProductsForSitemap";
 import getAllCompanies from "@/services/companies/getAllCompanies";
 import {
   generateCachedChunkedSitemap,
@@ -9,104 +9,6 @@ import {
 import { LOCALES } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
-
-const PRODUCTS_PAGE_SIZE = 10000;
-const MAX_PRODUCTS_PAGES = 300;
-const PRODUCT_PAGE_CONCURRENCY = 10;
-
-async function fetchAllProductsForSitemap({ locale, country_slug, lang }) {
-  const allProducts = [];
-  let pagesFetched = 0;
-
-  const initialResponse = await getProductsForSitemap({
-    page: 1,
-    lang,
-    country_slug,
-    length: PRODUCTS_PAGE_SIZE,
-  });
-
-  const firstPageProducts = initialResponse.items ?? [];
-  const meta = initialResponse.meta ?? {};
-  const links = initialResponse.links ?? {};
-
-  allProducts.push(...firstPageProducts);
-  pagesFetched += 1;
-
-  const perPage = meta.per_page || meta.perPage || PRODUCTS_PAGE_SIZE;
-  const total = meta.total || meta.Total || (firstPageProducts.length || 0);
-  const reportedLastPage = meta.last_page || meta.lastPage || null;
-  const hasNext = Boolean(links?.next);
-
-  const derivedLastPage =
-    reportedLastPage ||
-    (total && perPage ? Math.ceil(total / perPage) : null);
-
-  if (derivedLastPage && derivedLastPage > 1) {
-    const pagesQueue = [];
-    for (let page = 2; page <= Math.min(derivedLastPage, MAX_PRODUCTS_PAGES); page += 1) {
-      pagesQueue.push(page);
-    }
-
-    const concurrency = Math.min(PRODUCT_PAGE_CONCURRENCY, pagesQueue.length);
-
-    await Promise.all(
-      Array.from({ length: concurrency || 0 }, async () => {
-        while (pagesQueue.length) {
-          const nextPage = pagesQueue.shift();
-          if (nextPage === undefined) break;
-          try {
-            const response = await getProductsForSitemap({
-              page: nextPage,
-              lang,
-              country_slug,
-              length: PRODUCTS_PAGE_SIZE,
-            });
-            const items = response.items ?? [];
-            allProducts.push(...items);
-            pagesFetched += 1;
-          } catch (error) {
-            console.error(
-              `[Products] Failed to fetch page ${nextPage} for ${locale}:`,
-              error.message
-            );
-          }
-        }
-      })
-    );
-  } else if (!derivedLastPage && hasNext) {
-    let nextPage = 2;
-    let continueFetching = hasNext;
-
-    while (continueFetching && nextPage <= MAX_PRODUCTS_PAGES) {
-      try {
-        const response = await getProductsForSitemap({
-          page: nextPage,
-          lang,
-          country_slug,
-          length: PRODUCTS_PAGE_SIZE,
-        });
-        const items = response.items ?? [];
-        const nextLinks = response.links ?? {};
-        allProducts.push(...items);
-        continueFetching = Boolean(nextLinks?.next);
-        nextPage += 1;
-        pagesFetched += 1;
-      } catch (error) {
-        console.error(
-          `[Products] Failed to fetch page ${nextPage} for ${locale}:`,
-          error.message
-        );
-        break;
-      }
-    }
-  }
-
-  console.log(
-    `[Products] ${locale}: fetched ${allProducts.length} products across ${pagesFetched} pages`
-  );
-
-  return allProducts;
-}
 
 /**
  * Dynamic route for chunked sitemaps
