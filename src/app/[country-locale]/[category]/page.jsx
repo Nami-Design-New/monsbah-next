@@ -5,13 +5,14 @@ import CompaniesList from "@/components/search/CompaniesList";
 import { getCompanies } from "@/services/ads/getCompanies";
 import { getUserType } from "@/services/auth/getUserType";
 import { getCategories } from "@/services/categories/getCategories";
-import { getCountries } from "@/services/getCountries";
 import getProducts from "@/services/products/getProducts";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
 import React from "react";
 import { generateHreflangAlternates } from "@/utils/hreflang";
+import { getSettings } from "@/services/settings/getSettings";
+import { META_DATA_CONTENT } from "@/utils/constants";
 
 export async function generateMetadata({ params }) {
   const { category } = await params;
@@ -20,8 +21,26 @@ export async function generateMetadata({ params }) {
   const pathname = categoryDecoded ? `/${categoryDecoded}` : "/";
   const categories = await getCategories();
   const categoryData = categories.find((item) => item.slug === categoryDecoded);
+  const locale = await getLocale();
+  const lang = locale.split("-")[1];
+  const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
+  const settings = await getSettings();
+  const siteTitle = settings?.meta_title || settings?.name || content.title;
+  const siteDescription = settings?.meta_description || content.description;
+  const segmentsTitle = categoryDecoded || null;
+  const title = segmentsTitle ? `${segmentsTitle} - ${siteTitle}` : siteTitle;
   const alternates = await generateHreflangAlternates(pathname);
   return {
+    title: {
+      absolute: title,
+    },
+    description: siteDescription,
+    applicationName: siteTitle,
+    openGraph: {
+      title,
+      siteName: siteTitle,
+      description: siteDescription,
+    },
     alternates,
     robots: {
       index: categoryData.is_index,

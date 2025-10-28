@@ -10,6 +10,7 @@ import Header from "@/components/Header/Header";
 import ResponsiveNav from "@/components/Header/ResponsiveNav";
 import Providers from "@/providers/Providers";
 import { META_DATA_CONTENT } from "@/utils/constants";
+import { getSettings } from "@/services/settings/getSettings";
 
 import "swiper/css";
 import "swiper/css/effect-fade";
@@ -43,22 +44,24 @@ export async function generateMetadata({ params }) {
   const locale = await params;
 
   const lang = locale["country-locale"].split("-")[1];
-  const content = META_DATA_CONTENT[lang];
+  const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
+  const settings = await getSettings();
+  const siteTitle = settings?.meta_title || settings?.name || content.title;
+  const siteDescription = settings?.meta_description || content.description;
 
   return {
     metadataBase: new URL("https://monsbah.com"),
     title: {
-      template: `%s - ${content.title}`,
-      default: content.title,
+      template: `%s - ${siteTitle}`,
+      default: siteTitle,
     },
-    description: content.description,
+    description: siteDescription,
     keywords: content.keywords,
-    authors: [{ name: "Monsbah" }],
+    authors: [{ name: siteTitle }],
     robots: "index, follow",
     openGraph: {
-      title:
-        lang === "ar" ? "مناسبة - سوق المرأة" : "Monsbah - Women's Marketplace",
-      description: content.description,
+      title: siteTitle,
+      description: siteDescription,
       url: "https://www.monsbah.com",
       type: "website",
       images: [
@@ -72,8 +75,8 @@ export async function generateMetadata({ params }) {
     },
     twitter: {
       card: "summary_large_image",
-      title: content.title,
-      description: content.description,
+      title: siteTitle,
+      description: siteDescription,
       images: ["/branding/storeicon.svg"],
     },
     icons: {

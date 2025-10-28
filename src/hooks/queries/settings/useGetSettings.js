@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
+import { useLocale } from "next-intl";
 import clientAxios from "../../../libs/axios/clientAxios";
 
 function useGetSettings() {
-  const lang = useSelector((state) => state.language.lang);
+  const locale = useLocale();
+  const lang = locale.split("-")[1] || "ar";
 
   const { isLoading, data, error } = useQuery({
     queryKey: ["settings", lang],

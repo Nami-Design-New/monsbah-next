@@ -19,7 +19,7 @@ export async function generateMetadata() {
   const lang = locale.split("-")[1];
   const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
   const settings = await getSettings();
-  const title = settings?.nea || content.title;
+  const title = settings?.name || content.title;
   const siteName = settings?.name || content.title;
 
   const alternates = await generateHreflangAlternates("/");
@@ -96,7 +96,6 @@ export default async function Home({ searchParams }) {
 
   return (
     <>
-      <HomeSettingsHeader />
       <HeroSection />
       <FilterSection selectedCategory={null} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>

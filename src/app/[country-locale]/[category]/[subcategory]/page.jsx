@@ -8,6 +8,8 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getSubCategories } from "@/services/categories/getSubCategories";
+import { getSettings } from "@/services/settings/getSettings";
+import { META_DATA_CONTENT } from "@/utils/constants";
 
 export async function generateMetadata({ params }) {
   const { category, subcategory } = await params;
@@ -46,8 +48,27 @@ export async function generateMetadata({ params }) {
     }
   }
   
+  const locale = await getLocale();
+  const lang = locale.split("-")[1];
+  const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
+  const settings = await getSettings();
+  const siteTitle = settings?.meta_title || settings?.name || content.title;
+  const siteDescription = settings?.meta_description || content.description;
+  const segments = [categoryDecoded, subCategoryDecoded].filter(Boolean);
+  const segmentsTitle = segments.length > 0 ? segments.join("-") : null;
+  const title = segmentsTitle ? `${segmentsTitle} - ${siteTitle}` : siteTitle;
   const alternates = await generateHreflangAlternates(pathname);
   return {
+    title: {
+      absolute: title,
+    },
+    description: siteDescription,
+    applicationName: siteTitle,
+    openGraph: {
+      title,
+      siteName: siteTitle,
+      description: siteDescription,
+    },
     alternates,
     robots: {
       index: subCategoryData.is_index,
