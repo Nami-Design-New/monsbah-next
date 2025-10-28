@@ -1,8 +1,10 @@
 import FilterSection from "@/components/home/FilterSection";
 import HeroSection from "@/components/home/HeroSection";
 import ProductsSection from "@/components/home/ProductsSection";
+import HomeSettingsHeader from "@/components/home/HomeSettingsHeader";
 import { getUserType } from "@/services/auth/getUserType";
 import getProducts from "@/services/products/getProducts";
+import { getSettings } from "@/services/settings/getSettings";
 import { META_DATA_CONTENT } from "@/utils/constants";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
@@ -15,15 +17,26 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const locale = await getLocale();
   const lang = locale.split("-")[1];
-  const content = META_DATA_CONTENT[lang];
-  
+  const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
+  const settings = await getSettings();
+  const title = settings?.nea || content.title;
+  const siteName = settings?.name || content.title;
+
   const alternates = await generateHreflangAlternates("/");
   return {
     title: {
-      absolute: content.title, // Just "مناسبة" or "Monsbah" without template
+      absolute: title,
+    },
+    applicationName: siteName,
+    description: content.description,
+    openGraph: {
+      title,
+      siteName,
+      description: content.description,
     },
     other: {
       "google-site-verification": "kOD-M71HEym30Cx4W8U0FqAJXpQy8f5TgdYkxqNXeAk",
+      "og:site_name": siteName,
     },
     alternates,
   };
@@ -83,6 +96,7 @@ export default async function Home({ searchParams }) {
 
   return (
     <>
+      <HomeSettingsHeader />
       <HeroSection />
       <FilterSection selectedCategory={null} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
