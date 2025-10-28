@@ -13,6 +13,7 @@ import React from "react";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getSettings } from "@/services/settings/getSettings";
 import { META_DATA_CONTENT } from "@/utils/constants";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 
 export async function generateMetadata({ params }) {
   const { category } = await params;
@@ -30,6 +31,14 @@ export async function generateMetadata({ params }) {
   const segmentsTitle = categoryDecoded || null;
   const title = segmentsTitle ? `${segmentsTitle} - ${siteTitle}` : siteTitle;
   const alternates = await generateHreflangAlternates(pathname);
+  const canonicalUrl = resolveCanonicalUrl(
+    categoryData?.canonical_url,
+    categoryData?.canonicalUrl,
+    categoryData?.canonical
+  );
+  if (canonicalUrl) {
+    alternates.canonical = canonicalUrl;
+  }
   return {
     title: {
       absolute: title,

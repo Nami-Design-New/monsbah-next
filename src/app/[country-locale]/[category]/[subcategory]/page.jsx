@@ -10,6 +10,7 @@ import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getSubCategories } from "@/services/categories/getSubCategories";
 import { getSettings } from "@/services/settings/getSettings";
 import { META_DATA_CONTENT } from "@/utils/constants";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 
 export async function generateMetadata({ params }) {
   const { category, subcategory } = await params;
@@ -58,6 +59,14 @@ export async function generateMetadata({ params }) {
   const segmentsTitle = segments.length > 0 ? segments.join("-") : null;
   const title = segmentsTitle ? `${segmentsTitle} - ${siteTitle}` : siteTitle;
   const alternates = await generateHreflangAlternates(pathname);
+  const canonicalUrl = resolveCanonicalUrl(
+    subCategoryData?.canonical_url,
+    subCategoryData?.canonicalUrl,
+    subCategoryData?.canonical
+  );
+  if (canonicalUrl) {
+    alternates.canonical = canonicalUrl;
+  }
   return {
     title: {
       absolute: title,

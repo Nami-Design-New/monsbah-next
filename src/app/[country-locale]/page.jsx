@@ -6,6 +6,7 @@ import { getUserType } from "@/services/auth/getUserType";
 import getProducts from "@/services/products/getProducts";
 import { getSettings } from "@/services/settings/getSettings";
 import { META_DATA_CONTENT } from "@/utils/constants";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
@@ -23,16 +24,23 @@ export async function generateMetadata() {
   const siteName = settings?.name || content.title;
 
   const alternates = await generateHreflangAlternates("/");
+  const canonicalUrl = resolveCanonicalUrl(
+    settings?.canonical_url,
+    settings?.canonicalUrl
+  );
+  if (canonicalUrl) {
+    alternates.canonical = canonicalUrl;
+  }
   return {
     title: {
       absolute: title,
     },
     applicationName: siteName,
-    description: content.description,
+    description: settings?.meta_description || content.description,
     openGraph: {
       title,
       siteName,
-      description: content.description,
+      description: settings?.meta_description || content.description,
     },
     other: {
       "google-site-verification": "kOD-M71HEym30Cx4W8U0FqAJXpQy8f5TgdYkxqNXeAk",

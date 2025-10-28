@@ -7,6 +7,7 @@ import { cache } from "react";
 import { generateHreflangAlternatesForProduct } from "@/utils/hreflang";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getManualProductRedirect } from "@/utils/manual-redirects";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 
 export const fetchProduct = cache(async (id ,country_slug ) => {
   return await getProduct(id , country_slug);
@@ -25,7 +26,17 @@ export async function generateMetadata({ params }) {
       pathname,
       product
     );
-    
+    const canonicalUrl = resolveCanonicalUrl(
+      product?.canonical_url,
+      product?.canonicalUrl,
+      product?.canonical
+    );
+    if (canonicalUrl) {
+      alternates.canonical = canonicalUrl;
+    }
+    const defaultPageUrl = `https://www.monsbah.com/product/${productSlug}`;
+    const pageUrl = canonicalUrl || defaultPageUrl;
+
     // Use product title (name) instead of meta_title to avoid duplication
     // The layout.jsx will append "- مناسبة" or "- Monsbah" via template
     return {
@@ -36,7 +47,7 @@ export async function generateMetadata({ params }) {
         title: product?.title || product?.name,
         description: product?.meta_description || product?.description,
         images: product?.images,
-        url: `https://www.monsbah.com/product/${productSlug}`,
+        url: pageUrl,
       },
       twitter: {
         card: "summary_large_image",

@@ -6,6 +6,7 @@ import UserCardCompany from "@/components/product/UserCardCompany";
 import { getProduct } from "@/services/products/getProduct";
 import { cache } from "react";
 import { generateHreflangAlternatesForProduct } from "@/utils/hreflang";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 
 export const fetchProduct = cache(async (id) => {
   return await getProduct(id);
@@ -20,7 +21,17 @@ export async function generateMetadata({ params }) {
 
     const pathname = `/company-product/${productSlug}`;
     const alternates = generateHreflangAlternatesForProduct(pathname, product);
-    
+    const canonicalUrl = resolveCanonicalUrl(
+      product?.canonical_url,
+      product?.canonicalUrl,
+      product?.canonical
+    );
+    if (canonicalUrl) {
+      alternates.canonical = canonicalUrl;
+    }
+    const defaultPageUrl = `https://www.monsbah.com/company-product/${productSlug}`;
+    const pageUrl = canonicalUrl || defaultPageUrl;
+
     return {
       title: product?.title || product?.name, // Use product name instead of meta_title
       description: product?.meta_description || product?.description,
@@ -29,7 +40,7 @@ export async function generateMetadata({ params }) {
         title: product?.title || product?.name,
         description: product?.meta_description || product?.description,
         images: product?.images,
-        url: `https://www.monsbah.com/company-product/${productSlug}`,
+        url: pageUrl,
       },
       twitter: {
         card: "summary_large_image",

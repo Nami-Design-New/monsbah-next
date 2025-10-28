@@ -4,6 +4,7 @@ import { getCategories } from "@/services/categories/getCategories";
 import { getSubCategories } from "@/services/categories/getSubCategories";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getTranslations } from "next-intl/server";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 
 // Mark as dynamic since it uses searchParams
 export const dynamic = "force-dynamic";
@@ -20,10 +21,30 @@ export async function generateMetadata({ searchParams }) {
     category_slug: safeSlug,
   });
 
+  let canonicalUrl = null;
+  if (safeSlug) {
+    try {
+      const categories = await getCategories();
+      const matchedCategory = categories?.find(
+        (item) => item.slug === safeSlug
+      );
+      canonicalUrl = resolveCanonicalUrl(
+        matchedCategory?.canonical_url,
+        matchedCategory?.canonicalUrl,
+        matchedCategory?.canonical
+      );
+    } catch {
+      // Ignore failures and fall back to default alternates
+    }
+  }
+
   const pathname = safeSlug
     ? `/categories?category=${safeSlug}`
     : "/categories";
   const alternates = await generateHreflangAlternates(pathname);
+  if (canonicalUrl) {
+    alternates.canonical = canonicalUrl;
+  }
 
   return {
     title: safeSlug

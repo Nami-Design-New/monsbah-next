@@ -1,12 +1,15 @@
 import ProductList from "@/components/companies/ProductList";
 import FilterCompanySection from "@/components/home/FilterCompanySection";
 import { getCompanyProducts } from "@/services/companies/getCompanyProducts";
+import { getCategories } from "@/services/categories/getCategories";
+import { getSubCategories } from "@/services/categories/getSubCategories";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale, getTranslations } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import Pagination from "@/components/shared/Pagination";
 import { getSeoOverride } from "@/utils/seo-overrides";
+import { resolveCanonicalUrl } from "@/utils/canonical";
 
 // Mark as dynamic - uses searchParams
 export const dynamic = "force-dynamic";
@@ -18,14 +21,56 @@ export async function generateMetadata({ params, searchParams }) {
   const paramsObj = await searchParams;
   const category = paramsObj?.category;
   const sub_category = paramsObj?.sub_category;
-  const alternates = await generateHreflangAlternates("/companies");
-
   const override = getSeoOverride({
     route: "companies",
     locale,
     category,
     subCategory: sub_category,
   });
+  let canonicalUrl = resolveCanonicalUrl(
+    override?.canonical,
+    override?.canonical_url,
+    override?.canonicalUrl
+  );
+
+  if (!canonicalUrl && category && sub_category) {
+    try {
+      const subCategories = await getSubCategories({
+        category_slug: category,
+      });
+      const matchedSubCategory = subCategories?.find(
+        (item) => item.slug === sub_category
+      );
+      canonicalUrl = resolveCanonicalUrl(
+        matchedSubCategory?.canonical_url,
+        matchedSubCategory?.canonicalUrl,
+        matchedSubCategory?.canonical
+      );
+    } catch {
+      // Ignore errors and keep default canonical
+    }
+  }
+
+  if (!canonicalUrl && category) {
+    try {
+      const categories = await getCategories();
+      const matchedCategory = categories?.find(
+        (item) => item.slug === category
+      );
+      canonicalUrl = resolveCanonicalUrl(
+        matchedCategory?.canonical_url,
+        matchedCategory?.canonicalUrl,
+        matchedCategory?.canonical
+      );
+    } catch {
+      // Ignore errors and keep default canonical
+    }
+  }
+
+  const alternates = await generateHreflangAlternates("/companies");
+  if (canonicalUrl) {
+    alternates.canonical = canonicalUrl;
+  }
 
   if (override) {
     return {

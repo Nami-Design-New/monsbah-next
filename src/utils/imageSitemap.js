@@ -1,6 +1,5 @@
 import { BASE_URL } from "@/utils/constants";
-import { LOCALES } from "@/i18n/routing";
-import fetchAllProductsForSitemap from "@/services/products/fetchAllProductsForSitemap";
+import fetchAllProductImagesForSitemap from "@/services/products/fetchAllProductImagesForSitemap";
 import { isValidVideoExtension } from "@/utils/helpers";
 import {
   MAX_URLS_PER_SITEMAP,
@@ -11,186 +10,72 @@ import {
 } from "@/utils/sitemap-utils";
 
 export const IMAGE_SITEMAP_CACHE_KEY = "sitemap-images-global";
-export const MAX_IMAGE_SITEMAP_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB as requested
+export const MAX_IMAGE_SITEMAP_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
 
 const CACHE_CHUNK_KEY = `${IMAGE_SITEMAP_CACHE_KEY}-chunks`;
+const FALLBACK_VIDEO_THUMBNAIL = `${BASE_URL}/branding/icon.svg`;
 
-const MEDIA_SOURCE_KEYS = [
-  "url",
-  "image",
-  "src",
-  "path",
-  "file",
-  "value",
-  "original",
-  "photo",
-  "media",
-];
-
-function normaliseMediaValue(item) {
-  if (!item) return null;
-  if (typeof item === "string") return item.trim() || null;
-  if (typeof item === "object") {
-    for (const key of MEDIA_SOURCE_KEYS) {
-      const value = item[key];
-      if (typeof value === "string" && value.trim()) {
-        return value.trim();
-      }
-    }
-  }
-  return null;
-}
-
-function getPrimaryLocales(locales = LOCALES) {
-  const byCountry = new Map();
-  for (const locale of locales) {
-    const [country, lang] = locale.split("-");
-    if (!byCountry.has(country)) {
-      byCountry.set(country, locale);
-      continue;
-    }
-
-    const current = byCountry.get(country);
-    if (!current.endsWith("-ar") && lang === "ar") {
-      byCountry.set(country, locale);
-    }
-  }
-  return Array.from(byCountry.values());
-}
-
-function extractMediaSources(product) {
-  const sources = [];
-  const push = (value) => {
-    const normalised = normaliseMediaValue(value);
-    if (normalised) {
-      sources.push(normalised);
-    }
-  };
-
-  push(product?.image);
-  push(product?.video);
-  push(product?.video_url);
-  push(product?.videoUrl);
-  push(product?.videoLink);
-  push(product?.media);
-
-  if (Array.isArray(product?.images)) {
-    product.images.forEach((img) => push(img));
-  }
-
-  if (Array.isArray(product?.media_files)) {
-    product.media_files.forEach((item) => push(item));
-  }
-
-  if (Array.isArray(product?.videos)) {
-    product.videos.forEach((item) => push(item));
-  }
-
-  if (Array.isArray(product?.attachments)) {
-    product.attachments.forEach((item) => push(item));
-  }
-
-  return sources.filter(Boolean);
-}
-
-function buildMediaPayload(product, locale, country_slug) {
-  const mediaSources = extractMediaSources(product);
-  if (!mediaSources.length) {
-    return { images: [], videos: [] };
-  }
-
-  const title = product?.name || product?.title || `Product ${product?.id || ""}`.trim();
-  const baseDescription =
-    product?.description ||
-    product?.short_description ||
-    product?.shortDescription ||
-    title;
-
-  const geoLocation = country_slug ? country_slug.toUpperCase() : "";
-
-  const images = [];
-  const videos = [];
-  const seen = new Set();
-  let fallbackThumbnail = normaliseMediaValue(product?.image) || null;
-
-  mediaSources.forEach((source) => {
-    if (!source || seen.has(source)) {
-      return;
-    }
-    seen.add(source);
-
-    if (isValidVideoExtension(source)) {
-      videos.push({
-        url: source,
-        title,
-        description: baseDescription || title,
-        thumbnail: fallbackThumbnail,
-      });
-      return;
-    }
-
-    const imageIndex = images.length + 1;
-    const caption =
-      imageIndex === 1
-        ? baseDescription || title
-        : `${title}${imageIndex ? ` - Image ${imageIndex}` : ""}`;
-
-    const imageEntry = {
-      url: source,
-      title,
-      caption,
-      geoLocation,
-    };
-
-    images.push(imageEntry);
-
-    if (!fallbackThumbnail) {
-      fallbackThumbnail = source;
-    }
-  });
-
-  // Ensure videos have thumbnails; fallback to first image if available
-  if (videos.length && !fallbackThumbnail && images.length) {
-    fallbackThumbnail = images[0].url;
-  }
-
-  if (videos.length && fallbackThumbnail) {
-    videos.forEach((video) => {
-      if (!video.thumbnail) {
-        video.thumbnail = fallbackThumbnail;
-      }
-    });
-  }
-
-  return {
-    images,
-    videos,
-  };
-}
-
-function buildProductUrl(product, locale) {
-  const slug = product?.slug || product?.id || "";
-  const encodedSlug = encodeURIComponent(slug);
-  const idSuffix = product?.id ? `-id=${product.id}` : "";
-  return `${BASE_URL}/${locale}/product/${encodedSlug}${idSuffix}`;
-}
-
-function mapProductToEntry(product, locale, country_slug) {
-  const { images, videos } = buildMediaPayload(product, locale, country_slug);
-  if (!images.length && !videos.length) {
+function normalizeMediaUrl(rawUrl) {
+  if (!rawUrl || typeof rawUrl !== "string") {
     return null;
   }
 
-  return {
-    url: buildProductUrl(product, locale),
-    lastModified: new Date(
-      product?.updated_at || product?.updatedAt || product?.created_at || Date.now()
-    ).toISOString(),
-    changeFrequency: "daily",
-    priority: 0.9,
-    images: images.length ? images : undefined,
-    videos: videos.length ? videos : undefined,
+  const trimmed = rawUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("//")) {
+    return `https:${trimmed}`;
+  }
+
+  const base = BASE_URL?.replace(/\/+$/, "") || "https://www.monsbah.com";
+  const normalizedPath = trimmed.startsWith("/")
+    ? trimmed.slice(1)
+    : trimmed;
+
+  return `${base}/${normalizedPath}`;
+}
+
+function buildMediaEntry(item) {
+  const mediaUrl = normalizeMediaUrl(
+    typeof item === "string" ? item : item?.image
+  );
+  const id = typeof item === "object" ? item?.id : null;
+
+  if (!mediaUrl) {
+    return null;
+  }
+
+  const entry = {
+    url: mediaUrl,
+    id: id != null ? String(id) : null,
   };
+
+  if (isValidVideoExtension(mediaUrl)) {
+    entry.videos = [
+      {
+        url: mediaUrl,
+        title: id != null ? `Media ${id}` : "Product Media Video",
+        description: id != null ? `Media ${id}` : "Product Media Video",
+        thumbnail: FALLBACK_VIDEO_THUMBNAIL,
+        id: id != null ? String(id) : null,
+      },
+    ];
+  } else {
+    entry.images = [
+      {
+        url: mediaUrl,
+        id: id != null ? String(id) : null,
+      },
+    ];
+  }
+
+  return entry;
 }
 
 export async function getGlobalImageEntries({ disableCache = false } = {}) {
@@ -201,35 +86,23 @@ export async function getGlobalImageEntries({ disableCache = false } = {}) {
     }
   }
 
-  const selectedLocales = getPrimaryLocales();
+  const mediaItems = await fetchAllProductImagesForSitemap();
   const entries = [];
-  const seenProducts = new Set();
+  const seen = new Set();
 
-  for (const locale of selectedLocales) {
-    const [country_slug, lang] = locale.split("-");
-    try {
-      const products = await fetchAllProductsForSitemap({
-        locale,
-        country_slug,
-        lang,
-      });
-
-      products.forEach((product) => {
-        const key = product?.id || `${locale}-${product?.slug}`;
-        if (!key || seenProducts.has(key)) {
-          return;
-        }
-
-        const entry = mapProductToEntry(product, locale, country_slug);
-        if (entry) {
-          entries.push(entry);
-          seenProducts.add(key);
-        }
-      });
-    } catch (error) {
-      console.error(`[Image Sitemap] Failed to fetch products for ${locale}:`, error?.message);
+  mediaItems.forEach((item) => {
+    const entry = buildMediaEntry(item);
+    if (!entry || !entry.url) {
+      return;
     }
-  }
+
+    if (seen.has(entry.url)) {
+      return;
+    }
+
+    entries.push(entry);
+    seen.add(entry.url);
+  });
 
   if (!disableCache) {
     setCachedData(IMAGE_SITEMAP_CACHE_KEY, entries);
@@ -245,7 +118,10 @@ function buildChunksWithLimits(entries) {
   let cursor = 0;
 
   while (cursor < entries.length) {
-    const upperBound = Math.min(cursor + MAX_URLS_PER_SITEMAP, entries.length);
+    const upperBound = Math.min(
+      cursor + MAX_URLS_PER_SITEMAP,
+      entries.length
+    );
     let chunk = entries.slice(cursor, upperBound);
     cursor = upperBound;
 
@@ -253,7 +129,10 @@ function buildChunksWithLimits(entries) {
       break;
     }
 
-    let xmlSize = Buffer.byteLength(generateImageSitemapXML(chunk), "utf8");
+    let xmlSize = Buffer.byteLength(
+      generateImageSitemapXML(chunk),
+      "utf8"
+    );
 
     while (xmlSize > MAX_IMAGE_SITEMAP_FILE_SIZE_BYTES && chunk.length > 1) {
       cursor -= 1;
@@ -281,7 +160,8 @@ export function chunkImageEntries(entries) {
   const cached = getCachedData(CACHE_CHUNK_KEY);
   if (Array.isArray(cached)) {
     const cachedCount = cached.reduce(
-      (total, chunk) => total + (Array.isArray(chunk) ? chunk.length : 0),
+      (total, chunk) =>
+        total + (Array.isArray(chunk) ? chunk.length : 0),
       0
     );
     if (cachedCount === entries.length) {
