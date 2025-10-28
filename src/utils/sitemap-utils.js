@@ -119,61 +119,78 @@ export function generateImageSitemapXML(urls) {
   const urlEntries = urls
     .map((entry) => {
       const loc = entry.url || entry.loc;
-      const lastmod = entry.lastModified || entry.lastmod || new Date().toISOString();
-      const changefreq = entry.changeFrequency || entry.changefreq || "weekly";
-      const priority = entry.priority !== undefined ? entry.priority : 0.5;
+      const lastmod = entry.lastModified || entry.lastmod || null;
+      const changefreq = entry.changeFrequency || entry.changefreq || null;
+      const priority =
+        entry.priority !== undefined && entry.priority !== null
+          ? entry.priority
+          : null;
 
-      let imageEntries = "";
+      const urlLines = [`  <url>`];
+
+      if (entry.id) {
+        urlLines.push(`    <id>${entry.id}</id>`);
+      }
+
+      urlLines.push(`    <loc>${loc}</loc>`);
+
+      if (lastmod) {
+        urlLines.push(`    <lastmod>${lastmod}</lastmod>`);
+      }
+
+      if (changefreq) {
+        urlLines.push(`    <changefreq>${changefreq}</changefreq>`);
+      }
+
+      if (priority !== null) {
+        urlLines.push(`    <priority>${priority}</priority>`);
+      }
+
       if (entry.images && Array.isArray(entry.images) && entry.images.length > 0) {
-        imageEntries = entry.images
-          .map((img) => {
-            const caption = img.caption || img.title || "";
-            const title = img.title || "";
-            const geoLocation = img.geoLocation || img.geo_location || "";
-            const license = img.license || "";
+        entry.images.forEach((img) => {
+          const imgLines = [
+            `    <image:image>`,
+            `      <image:loc>${img.url || img.loc}</image:loc>`,
+          ];
 
-            return `    <image:image>
-      <image:loc>${img.url || img.loc}</image:loc>${caption ? `
-      <image:caption><![CDATA[${caption}]]></image:caption>` : ""}${title ? `
-      <image:title><![CDATA[${title}]]></image:title>` : ""}${geoLocation ? `
-      <image:geo_location>${geoLocation}</image:geo_location>` : ""}${license ? `
-      <image:license>${license}</image:license>` : ""}
-    </image:image>`;
-          })
-          .join("\n");
+          urlLines.push(...imgLines, `    </image:image>`);
+        });
       }
 
-      let videoEntries = "";
       if (entry.videos && Array.isArray(entry.videos) && entry.videos.length > 0) {
-        videoEntries = entry.videos
-          .map((video) => {
-            const thumbnail = video.thumbnail || video.thumbnail_loc || video.thumbnailLoc;
-            const title = video.title || "Video";
-            const description = video.description || title;
-            const contentLoc = video.url || video.loc;
+        entry.videos.forEach((video) => {
+          const contentLoc = video.url || video.loc;
+          if (!contentLoc) {
+            return;
+          }
 
-            if (!contentLoc) {
-              return "";
-            }
+          const thumbnail =
+            video.thumbnail || video.thumbnail_loc || video.thumbnailLoc || "";
+          const title = video.title || (video.id ? `Media ${video.id}` : "Video");
+          const description = video.description || title;
 
-            return `    <video:video>
-      <video:content_loc>${contentLoc}</video:content_loc>${thumbnail ? `
-      <video:thumbnail_loc>${thumbnail}</video:thumbnail_loc>` : ""}
-      <video:title><![CDATA[${title}]]></video:title>
-      <video:description><![CDATA[${description}]]></video:description>
-    </video:video>`;
-          })
-          .filter(Boolean)
-          .join("\n");
+          const videoLines = [
+            `    <video:video>`,
+            `      <video:content_loc>${contentLoc}</video:content_loc>`,
+          ];
+
+          if (thumbnail) {
+            videoLines.push(`      <video:thumbnail_loc>${thumbnail}</video:thumbnail_loc>`);
+          }
+
+          videoLines.push(
+            `      <video:title><![CDATA[${title}]]></video:title>`,
+            `      <video:description><![CDATA[${description}]]></video:description>`,
+            `    </video:video>`
+          );
+
+          urlLines.push(...videoLines);
+        });
       }
 
-      return `  <url>
-    <loc>${loc}</loc>
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>${changefreq}</changefreq>
-    <priority>${priority}</priority>
-${imageEntries}${videoEntries ? `\n${videoEntries}` : ""}
-  </url>`;
+      urlLines.push(`  </url>`);
+
+      return urlLines.join("\n");
     })
     .join("\n");
 
