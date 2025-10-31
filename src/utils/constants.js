@@ -3,11 +3,13 @@ export const FCM = process.env.NEXT_PUBLIC_FCM_TOKEN;
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 export const LOCALES = ["ar", "en"];
 
+// Hreflang locales in format: lang-country
+// Ordered by country, with both Arabic and English for each
 export const META_LOCALES = [
   "ar-kw",
+  "en-kw",
   "ar-sa",
   "en-sa",
-  "en-kw",
   "ar-ae",
   "en-ae",
   "ar-bh",

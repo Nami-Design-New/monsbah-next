@@ -49,7 +49,7 @@ export default function HeroSlider({ sliders = [] }) {
             {sliders.map((slider) => (
               <SwiperSlide key={slider?.id}>
                 <div className="slider_link" aria-label="Slide">
-                  <img src={slider?.image} alt="Monsbah slide" />
+                  <img src={slider?.image} alt={slider?.alt || slider?.title || "Monsbah slide"} />
                 </div>
               </SwiperSlide>
             ))}

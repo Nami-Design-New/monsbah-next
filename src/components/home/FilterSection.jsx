@@ -76,7 +76,7 @@ export default async function FilterSection({
                       aria-label={`Category ${cat.slug}`}
                     >
                       <div className="img">
-                        <img src={cat.image} alt={cat.slug} />
+                        <img src={cat.image} alt={cat.alt || cat.name || cat.slug} />
                       </div>
                       <h6>{cat.name}</h6>
                     </a>

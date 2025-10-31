@@ -39,7 +39,7 @@ function ProductCard({ product }) {
             {/* Use regular img tag that works without JavaScript */}
             <img
               src={product.image}
-              alt={product.name}
+              alt={product.alt || product.name}
               style={{ 
                 width: '100%', 
                 height: '100%', 

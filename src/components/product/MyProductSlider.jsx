@@ -72,7 +72,7 @@ export default function MyProductSlider({ product }) {
           ) : (
             <img
               src={primaryMedia}
-              alt={product?.name || "Product image"}
+              alt={product?.alt || product?.name || "Product image"}
               className="w-100 rounded"
             />
           )}
@@ -95,7 +95,7 @@ export default function MyProductSlider({ product }) {
                   ) : (
                     <img
                       src={media}
-                      alt={`${product?.name || "Product"} thumbnail ${index + 2}`}
+                      alt={product?.alt || `${product?.name || "Product"} thumbnail ${index + 2}`}
                       className="rounded"
                       style={{ maxWidth: "120px" }}
                     />

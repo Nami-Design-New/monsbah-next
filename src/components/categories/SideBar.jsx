@@ -29,7 +29,7 @@ export default async function SideBar({ selectedCategory }) {
             aria-label={category.name}
           >
             <div className="img">
-              <img src={category.image} alt={category.name} />
+              <img src={category.image} alt={category.alt || category.name} />
             </div>
             <h6>{category.name}</h6>
           </Link>

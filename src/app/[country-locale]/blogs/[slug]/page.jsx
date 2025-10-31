@@ -158,7 +158,7 @@ export default async function page({ params }) {
             </div>
             <div className="blog_content">
               <div className="img">
-                <img src={blog?.image} alt="فساتين زفاف 2024" />
+                <img src={blog?.image} alt={blog?.alt || blog?.title || "Blog image"} />
               </div>{" "}
               <div
                 className="content-text"

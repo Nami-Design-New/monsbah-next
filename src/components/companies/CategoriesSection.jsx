@@ -20,7 +20,7 @@ export default async function CategoriesSection({ categories }) {
                 <div className="category-card">
                   <img
                     src={category.image}
-                    alt={category.name}
+                    alt={category.alt || category.name}
                     loading="lazy"
                   />
                   <h2>{category.name}</h2>

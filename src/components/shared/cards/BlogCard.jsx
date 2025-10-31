@@ -7,7 +7,7 @@ export default async function BlogCard({ blog }) {
   return (
     <Link href={`/blogs/${blog?.slug}`} className="blog_card">
       <div className="blog_image">
-        <img src={blog?.image} alt="فساتين زفاف" />
+        <img src={blog?.image} alt={blog?.alt || blog?.title || "Blog"} />
       </div>
 
       <div className="blog_content">

@@ -23,7 +23,7 @@ export default function CompanyCard({ company }) {
           fill={true}
           src={company?.image}
           sizes="(max-width: 86px) 100vw, (max-width: 60px) 50vw, 300px"
-          alt=""
+          alt={company?.alt || company?.name || "Company"}
         />
         {/* <ImageLoad isImageLoaded={false} /> */}
       </div>

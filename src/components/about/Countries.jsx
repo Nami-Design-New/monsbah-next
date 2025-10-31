@@ -17,7 +17,7 @@ export default async function Countries() {
         >
           <div className="country-box">
             <div className="image-wrapper">
-              <img src={country?.cover} alt={"Saudi"} />
+              <img src={country?.cover} alt={country?.alt || country?.name || "Country"} />
             </div>
             <div className="info-wrapper">
               <h5>{country?.name}</h5>

@@ -11,7 +11,7 @@ function NotificationCard({ item, onClick, bgColor }) {
       key={item.id}
     >
       <div className="img">
-        <img src={item?.image} alt={item?.name} />
+        <img src={item?.image} alt={item?.alt || item?.name || "Notification"} />
       </div>
       <div className="notify">
         <h6>{item?.name}</h6>
