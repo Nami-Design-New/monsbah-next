@@ -1,3 +1,5 @@
+import { generateHreflangAlternates } from "./hreflang";
+
 // SEO Configuration and Helpers for Monsbah
 // This file contains SEO optimizations and structured data helpers
 
@@ -161,29 +163,6 @@ export function generateCanonicalUrl(path, locale, customCanonicalUrl = null) {
   return `${SEO_CONFIG.siteUrl}/${locale}${path}`;
 }
 
-// Helper function to generate hreflang alternatives
-export function generateHreflangAlternates(path, customCanonicalUrl = null) {
-  const alternates = {
-    canonical: customCanonicalUrl && customCanonicalUrl.trim() !== '' 
-      ? customCanonicalUrl.trim() 
-      : `${SEO_CONFIG.siteUrl}/kw-ar${path}`, // Default locale
-    languages: {}
-  };
-
-  // Add all locale alternatives
-  const locales = [
-    "sa-ar", "sa-en", "kw-ar", "kw-en", 
-    "ae-ar", "ae-en", "bh-ar", "bh-en",
-    "om-ar", "om-en", "qa-ar", "qa-en"
-  ];
-
-  locales.forEach(locale => {
-    alternates.languages[locale] = `${SEO_CONFIG.siteUrl}/${locale}${path}`;
-  });
-
-  return alternates;
-}
-
 // Helper function to generate Open Graph data
 export function generateOpenGraphData(title, description, image, url, type = 'website') {
   return {
@@ -288,14 +267,19 @@ export function generateBreadcrumbStructuredData(breadcrumbs, locale) {
 }
 
 // Helper function specifically for blog SEO
-export function generateBlogSEO(blog, locale) {
+export async function generateBlogSEO(blog, locale) {
   const blogPath = `/blogs/${blog.slug || blog.id}`;
   
   // Generate canonical URL (uses custom canonical_url if provided)
   const canonicalUrl = generateCanonicalUrl(blogPath, locale, blog.canonical_url);
   
   // Generate hreflang alternates
-  const hreflangAlternates = generateHreflangAlternates(blogPath, blog.canonical_url);
+  const hreflangAlternates = await generateHreflangAlternates(blogPath, {
+    locale,
+  });
+  if (canonicalUrl) {
+    hreflangAlternates.canonical = canonicalUrl;
+  }
   
   // Generate structured data
   const structuredData = generateBlogStructuredData(blog, locale);

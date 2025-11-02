@@ -70,7 +70,7 @@ export async function generateMetadata({ params }) {
   }
 
   // Use the new SEO utility with canonical URL support
-  const seoData = generateBlogSEO(blog, locale);
+  const seoData = await generateBlogSEO(blog, locale);
 
   return {
     title: seoData.metaTags.title,
@@ -78,10 +78,7 @@ export async function generateMetadata({ params }) {
     keywords: seoData.metaTags.keywords,
     
     // Use canonical URL (either custom or generated)
-    alternates: {
-      canonical: seoData.canonicalUrl,
-      ...seoData.hreflangAlternates,
-    },
+    alternates: seoData.hreflangAlternates,
 
     openGraph: seoData.openGraph,
     twitter: seoData.twitterCard,

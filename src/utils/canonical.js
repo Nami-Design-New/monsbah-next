@@ -1,6 +1,6 @@
 import { BASE_URL } from "@/utils/constants";
 
-const DEFAULT_BASE_URL = "https://www.monsbah.com";
+const DEFAULT_BASE_URL = "https://monsbah.com";
 
 function getBaseUrl() {
   const explicitBase =
