@@ -51,9 +51,16 @@ export async function middleware(req) {
   }
 
   // ===  Proceed with intlMiddleware + your custom logic ===
-  // Note: alternateLinks is disabled in intlMiddleware config
+  // Note: alternateLinks config might not work in all next-intl versions
   // We handle hreflang manually in metadata for correct format (ar-KW not kw-ar)
   let res = intlMiddleware(req);
+
+  // FORCE remove any Link headers that might have been added
+  // This ensures no HTTP Link headers with wrong format are sent
+  if (res && res.headers) {
+    res.headers.delete('Link');
+    res.headers.delete('link');
+  }
 
   const token = req.cookies.get("token");
   const role = req.cookies.get("user_type")?.value;
