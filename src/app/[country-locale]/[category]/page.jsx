@@ -20,16 +20,23 @@ export async function generateMetadata({ params }) {
   const categoryDecoded =
     category && category !== "undefined" ? decodeURIComponent(category) : null;
   const pathname = categoryDecoded ? `/${categoryDecoded}` : "/";
-  const categories = await getCategories();
-  const categoryData = categories.find((item) => item.slug === categoryDecoded);
+  const user = await getUserType();
+  const categories = await getCategories(`/${user}/categories`);
+  const categoryData = categories?.find((item) => item.slug === categoryDecoded) || {};
   const locale = await getLocale();
   const lang = locale.split("-")[1];
   const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
   const settings = await getSettings();
   const siteTitle = settings?.meta_title || settings?.name || content.title;
-  const siteDescription = settings?.meta_description || content.description;
-  const segmentsTitle = categoryDecoded || null;
-  const title = segmentsTitle ? `${segmentsTitle} - ${siteTitle}` : siteTitle;
+  const siteName = settings?.name || content.title;
+  
+  // Use category-specific metadata if available, otherwise fallback to site defaults
+  const title = categoryData?.meta_title || 
+                (categoryData?.name ? `${categoryData.name} - ${siteTitle}` : siteTitle);
+  const description = categoryData?.meta_description || 
+                      settings?.meta_description || 
+                      content.description;
+  
   const alternates = await generateHreflangAlternates(pathname);
   const canonicalUrl = resolveCanonicalUrl(
     categoryData?.canonical_url,
@@ -39,21 +46,22 @@ export async function generateMetadata({ params }) {
   if (canonicalUrl) {
     alternates.canonical = canonicalUrl;
   }
+  
   return {
     title: {
       absolute: title,
     },
-    description: siteDescription,
-    applicationName: siteTitle,
+    description,
+    applicationName: siteName,
     openGraph: {
       title,
-      siteName: siteTitle,
-      description: siteDescription,
+      siteName,
+      description,
     },
     alternates,
     robots: {
-      index: categoryData.is_index,
-      follow: categoryData.is_follow,
+      index: categoryData?.is_index ?? true,
+      follow: categoryData?.is_follow ?? true,
     },
   };
 }
@@ -75,6 +83,12 @@ export default async function page({ params, searchParams }) {
   const queryClient = getQueryClient();
   const selectedCategory = categoryDecoded;
   const [country_slug, lang] = locale.split("-");
+
+  // Get category data for H1 title
+  const categories = await getCategories(`/${user}/categories`);
+  const categoryData = categories?.find((item) => item.slug === categoryDecoded);
+  const settings = await getSettings();
+  const h1Title = categoryData?.name || settings?.name;
 
   // Extract all search parameters
   const type = paramsObj?.type || null;
@@ -153,7 +167,7 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection h1Title={h1Title} />
       <FilterSection selectedCategory={selectedCategory} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         {showCompanies ? (

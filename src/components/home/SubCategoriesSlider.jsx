@@ -1,41 +1,37 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
-import {
-  useSearchParams,
-  useRouter,
-  usePathname,
-  useParams,
-} from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
 
 export default function SubCategoriesSlider({ subCategories }) {
   const t = useTranslations();
   const router = useRouter();
-  const pathname = usePathname();
   const params = useParams();
+  const [_isPending, startTransition] = useTransition();
 
   const selectedSubCategory = params.subcategory ?? "";
   const decoudedSubCategory = decodeURIComponent(selectedSubCategory);
 
   const categoryName = params.category ?? "";
   const decoudedCategory = decodeURIComponent(categoryName);
+  
   const handleSelectSubCategory = useCallback(
     (newValue) => {
-      if (!decoudedCategory) {
-        // If categoryName is missing, just push subcategory or home
-        router.push(newValue ? `/${newValue}` : `/`);
-        return;
-      }
+      startTransition(() => {
+        if (!decoudedCategory) {
+          router.push(newValue ? `/${newValue}` : `/`);
+          return;
+        }
 
-      if (!newValue) {
-        // Remove subcategory
-        router.push(`/${decoudedCategory}`);
-      } else {
-        // Navigate to category/subcategory
-        router.push(`/${decoudedCategory}/${newValue}`);
-      }
+        if (!newValue) {
+          router.push(`/${decoudedCategory}`);
+        } else {
+          router.push(`/${decoudedCategory}/${newValue}`);
+        }
+      });
     },
     [router, decoudedCategory]
   );

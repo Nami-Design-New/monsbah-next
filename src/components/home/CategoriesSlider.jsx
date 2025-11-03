@@ -1,27 +1,28 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useTransition } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { usePathname, useRouter } from "@/i18n/navigation";
-import { useParams, useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
+import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 export default function CategoriesSlider({ categories }) {
   const t = useTranslations();
   const router = useRouter();
-  const pathname = usePathname();
   const params = useParams();
-  // const searchParams = useSearchParams();
+  const [_isPending, startTransition] = useTransition();
   const selectedCategory = params?.category ?? "";
   const decoudedCategory = decodeURIComponent(selectedCategory);
 
   const handleSelectCategory = useCallback(
     (slug) => {
-      if (!slug) {
-        router.push("/");
-      } else {
-        router.push(`/${slug}`);
-      }
+      startTransition(() => {
+        if (!slug) {
+          router.push("/");
+        } else {
+          router.push(`/${slug}`);
+        }
+      });
     },
     [router]
   );

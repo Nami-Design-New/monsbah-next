@@ -1,7 +1,6 @@
 import FilterSection from "@/components/home/FilterSection";
 import HeroSection from "@/components/home/HeroSection";
 import ProductsSection from "@/components/home/ProductsSection";
-import HomeSettingsHeader from "@/components/home/HomeSettingsHeader";
 import { getUserType } from "@/services/auth/getUserType";
 import getProducts from "@/services/products/getProducts";
 import { getSettings } from "@/services/settings/getSettings";
@@ -20,8 +19,11 @@ export async function generateMetadata() {
   const lang = locale.split("-")[1];
   const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
   const settings = await getSettings();
-  const title = settings?.name || content.title;
+  
+  // Use meta_title for page title, fallback to name
+  const title = settings?.meta_title || settings?.name || content.title;
   const siteName = settings?.name || content.title;
+  const description = settings?.meta_description || content.description;
 
   const alternates = await generateHreflangAlternates("/");
   const canonicalUrl = resolveCanonicalUrl(
@@ -36,11 +38,11 @@ export async function generateMetadata() {
       absolute: title,
     },
     applicationName: siteName,
-    description: settings?.meta_description || content.description,
+    description,
     openGraph: {
       title,
       siteName,
-      description: settings?.meta_description || content.description,
+      description,
     },
     other: {
       "google-site-verification": "kOD-M71HEym30Cx4W8U0FqAJXpQy8f5TgdYkxqNXeAk",

@@ -54,10 +54,15 @@ export async function generateMetadata({ params }) {
   const content = META_DATA_CONTENT[lang] ?? META_DATA_CONTENT.ar;
   const settings = await getSettings();
   const siteTitle = settings?.meta_title || settings?.name || content.title;
-  const siteDescription = settings?.meta_description || content.description;
-  const segments = [categoryDecoded, subCategoryDecoded].filter(Boolean);
-  const segmentsTitle = segments.length > 0 ? segments.join("-") : null;
-  const title = segmentsTitle ? `${segmentsTitle} - ${siteTitle}` : siteTitle;
+  const siteName = settings?.name || content.title;
+  
+  // Use subcategory-specific metadata if available, otherwise fallback to site defaults
+  const title = subCategoryData?.meta_title || 
+                (subCategoryData?.name ? `${subCategoryData.name} - ${siteTitle}` : siteTitle);
+  const description = subCategoryData?.meta_description || 
+                      settings?.meta_description || 
+                      content.description;
+  
   const alternates = await generateHreflangAlternates(pathname);
   const canonicalUrl = resolveCanonicalUrl(
     subCategoryData?.canonical_url,
@@ -67,21 +72,22 @@ export async function generateMetadata({ params }) {
   if (canonicalUrl) {
     alternates.canonical = canonicalUrl;
   }
+  
   return {
     title: {
       absolute: title,
     },
-    description: siteDescription,
-    applicationName: siteTitle,
+    description,
+    applicationName: siteName,
     openGraph: {
       title,
-      siteName: siteTitle,
-      description: siteDescription,
+      siteName,
+      description,
     },
     alternates,
     robots: {
-      index: subCategoryData.is_index,
-      follow: subCategoryData.is_follow,
+      index: subCategoryData?.is_index ?? true,
+      follow: subCategoryData?.is_follow ?? true,
     },
   };
 }
@@ -104,6 +110,22 @@ export default async function page({ params, searchParams }) {
   const queryClient = getQueryClient();
   const selectedCategory = categoryDecoded;
   const [country_slug, lang] = locale.split("-");
+
+  // Get subcategory data for H1 title
+  let subCategoryData = null;
+  if (categoryDecoded) {
+    try {
+      const subCategories = await getSubCategories(
+        { category_slug: categoryDecoded },
+        `/${user}/sub-categories`
+      );
+      subCategoryData = subCategories?.find((item) => item.slug === subCategoryDecoded);
+    } catch {
+      // Use default if fetch fails
+    }
+  }
+  const settings = await getSettings();
+  const h1Title = subCategoryData?.name || settings?.name;
 
   // Extract all search parameters
   const sort = paramsObj?.type || null;
@@ -148,8 +170,8 @@ export default async function page({ params, searchParams }) {
 
   return (
     <>
-      <HeroSection />
-      <FilterSection selectedCategory={selectedCategory} selectedSubCategory={subCategoryDecoded} />{" "}
+      <HeroSection h1Title={h1Title} />
+      <FilterSection selectedCategory={selectedCategory} selectedSubCategory={subCategoryDecoded} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />
       </HydrationBoundary>
