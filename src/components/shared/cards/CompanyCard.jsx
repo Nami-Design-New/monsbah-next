@@ -3,10 +3,12 @@
 import { Link } from "@/i18n/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Image from "next/image";
+import { useState } from "react";
 import StarsRate from "../StarsRate";
 
 export default function CompanyCard({ company }) {
   const { user } = useAuthStore((state) => state);
+  const [imageError, setImageError] = useState(false);
 
   return (
     <Link
@@ -21,9 +23,10 @@ export default function CompanyCard({ company }) {
       <div className="img position-relative">
         <Image
           fill={true}
-          src={company?.image}
+          src={imageError ? "/company.png" : company?.image}
           sizes="(max-width: 86px) 100vw, (max-width: 60px) 50vw, 300px"
           alt={company?.alt || company?.name || "Company"}
+          onError={() => setImageError(true)}
         />
         {/* <ImageLoad isImageLoaded={false} /> */}
       </div>

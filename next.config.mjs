@@ -34,6 +34,10 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Disable image optimization errors in console
+    unoptimized: false,
+    // Add loader for better error handling
+    loader: 'default',
   },
   async rewrites() {
     return [

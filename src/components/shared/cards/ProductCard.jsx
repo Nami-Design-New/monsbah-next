@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ImageLoad from "../loaders/ImageLoad";
+import SafeImage from "../SafeImage";
 
 function ProductCard({ product }) {
   const t = useTranslations();
@@ -36,10 +37,11 @@ function ProductCard({ product }) {
           />
         ) : (
           <>
-            {/* Use regular img tag that works without JavaScript */}
-            <img
+            {/* Use SafeImage component with automatic fallback */}
+            <SafeImage
               src={product.image}
               alt={product.alt || product.name}
+              fallbackSrc="/banner.png"
               style={{ 
                 width: '100%', 
                 height: '100%', 

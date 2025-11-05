@@ -12,6 +12,9 @@ import Providers from "@/providers/Providers";
 import { META_DATA_CONTENT } from "@/utils/constants";
 import { getSettings } from "@/services/settings/getSettings";
 
+// Suppress S3 image errors
+import "@/utils/imageErrorHandler";
+
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
