@@ -5,6 +5,8 @@ import Image from "next/image";
 import React from "react";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata() {
   const t = await getTranslations("meta");
 

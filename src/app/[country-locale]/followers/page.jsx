@@ -6,6 +6,8 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale, getTranslations } from "next-intl/server";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
+
 export default async function page() {
   const t = await getTranslations();
   const lang = (await getLocale()).split("-")[1];

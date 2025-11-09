@@ -5,6 +5,8 @@ import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
 
+export const dynamic = 'force-dynamic';
+
 export default async function page() {
   const queryClient = getQueryClient();
   const locale = await getLocale();

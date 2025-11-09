@@ -2,6 +2,8 @@ import { getTranslations } from "next-intl/server";
 import React from "react";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata() {
   const t = await getTranslations("meta");
 
