@@ -111,7 +111,7 @@ export default async function page({ params, searchParams }) {
   const selectedCategory = categoryDecoded;
   const [country_slug, lang] = locale.split("-");
 
-  // Get subcategory data for H1 title
+  // Get subcategory data for H1 title and description
   let subCategoryData = null;
   if (categoryDecoded) {
     try {
@@ -125,7 +125,14 @@ export default async function page({ params, searchParams }) {
     }
   }
   const settings = await getSettings();
-  const h1Title = subCategoryData?.name || settings?.name;
+  
+  // Use meta_title for H1, fallback to name
+  const h1Title = subCategoryData?.meta_title || 
+                  subCategoryData?.name || 
+                  settings?.name;
+  
+  // Get description for display
+  const pageDescription = subCategoryData?.meta_description;
 
   // Extract all search parameters
   const sort = paramsObj?.type || null;
@@ -171,6 +178,14 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <HeroSection h1Title={h1Title} />
+      
+      {/* Display subcategory description if available */}
+      {pageDescription && (
+        <div className="container mb-3 mt-3">
+          <p className="text-muted text-center">{pageDescription}</p>
+        </div>
+      )}
+      
       <FilterSection selectedCategory={selectedCategory} selectedSubCategory={subCategoryDecoded} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />

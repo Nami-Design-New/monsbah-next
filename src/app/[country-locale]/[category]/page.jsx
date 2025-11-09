@@ -84,11 +84,18 @@ export default async function page({ params, searchParams }) {
   const selectedCategory = categoryDecoded;
   const [country_slug, lang] = locale.split("-");
 
-  // Get category data for H1 title
+  // Get category data for H1 title and description
   const categories = await getCategories(`/${user}/categories`);
   const categoryData = categories?.find((item) => item.slug === categoryDecoded);
   const settings = await getSettings();
-  const h1Title = categoryData?.name || settings?.name;
+  
+  // Use meta_title for H1, fallback to name
+  const h1Title = categoryData?.meta_title || 
+                  categoryData?.name || 
+                  settings?.name;
+  
+  // Get description for display
+  const pageDescription = categoryData?.meta_description;
 
   // Extract all search parameters
   const type = paramsObj?.type || null;
@@ -168,6 +175,14 @@ export default async function page({ params, searchParams }) {
   return (
     <>
       <HeroSection h1Title={h1Title} />
+      
+      {/* Display category description if available */}
+      {pageDescription && (
+        <div className="container mb-3 mt-3">
+          <p className="text-muted text-center">{pageDescription}</p>
+        </div>
+      )}
+      
       <FilterSection selectedCategory={selectedCategory} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         {showCompanies ? (

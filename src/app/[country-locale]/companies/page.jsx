@@ -19,51 +19,65 @@ export async function generateMetadata({ params, searchParams }) {
   const resolvedParams = await params;
   const locale = resolvedParams?.["country-locale"];
   const paramsObj = await searchParams;
-  const category = paramsObj?.category;
-  const sub_category = paramsObj?.sub_category;
+  const categorySlug = paramsObj?.category;
+  const subCategorySlug = paramsObj?.sub_category;
   const override = getSeoOverride({
     route: "companies",
     locale,
-    category,
-    subCategory: sub_category,
+    category: categorySlug,
+    subCategory: subCategorySlug,
   });
+  
   let canonicalUrl = resolveCanonicalUrl(
     override?.canonical,
     override?.canonical_url,
     override?.canonicalUrl
   );
 
-  if (!canonicalUrl && category && sub_category) {
+  // Fetch category and subcategory data for metadata
+  let matchedCategory = null;
+  let matchedSubCategory = null;
+
+  if (categorySlug) {
     try {
-      const subCategories = await getSubCategories({
-        category_slug: category,
-      });
-      const matchedSubCategory = subCategories?.find(
-        (item) => item.slug === sub_category
-      );
-      canonicalUrl = resolveCanonicalUrl(
-        matchedSubCategory?.canonical_url,
-        matchedSubCategory?.canonicalUrl,
-        matchedSubCategory?.canonical
-      );
+      const categories = await getCategories("/company/categories");
+      matchedCategory = categories?.find((item) => item.slug === categorySlug);
+      
+      // Set canonical from category if not already set
+      if (!canonicalUrl && matchedCategory) {
+        canonicalUrl = resolveCanonicalUrl(
+          matchedCategory?.canonical_url,
+          matchedCategory?.canonicalUrl,
+          matchedCategory?.canonical
+        );
+      }
     } catch {
-      // Ignore errors and keep default canonical
+      // Ignore errors and continue
     }
   }
 
-  if (!canonicalUrl && category) {
+  if (categorySlug && subCategorySlug) {
     try {
-      const categories = await getCategories();
-      const matchedCategory = categories?.find(
-        (item) => item.slug === category
+      const subCategories = await getSubCategories({
+        category_slug: categorySlug,
+      }, "/company/sub-categories");
+      matchedSubCategory = subCategories?.find(
+        (item) => item.slug === subCategorySlug
       );
-      canonicalUrl = resolveCanonicalUrl(
-        matchedCategory?.canonical_url,
-        matchedCategory?.canonicalUrl,
-        matchedCategory?.canonical
-      );
+      
+      // Set canonical from subcategory if available (overrides category)
+      if (matchedSubCategory) {
+        const subCanonicalUrl = resolveCanonicalUrl(
+          matchedSubCategory?.canonical_url,
+          matchedSubCategory?.canonicalUrl,
+          matchedSubCategory?.canonical
+        );
+        if (subCanonicalUrl) {
+          canonicalUrl = subCanonicalUrl;
+        }
+      }
     } catch {
-      // Ignore errors and keep default canonical
+      // Ignore errors and continue
     }
   }
 
@@ -79,23 +93,38 @@ export async function generateMetadata({ params, searchParams }) {
     };
   }
 
-  if (category && sub_category) {
+  // Generate metadata based on category/subcategory data
+  if (matchedSubCategory) {
+    const title = matchedSubCategory?.meta_title || 
+                  `${t("companies.titleByCategorySub")} ${matchedSubCategory.name}`;
+    const description = matchedSubCategory?.meta_description || 
+                        `${t("companies.descriptionByCategorySub")} ${matchedCategory?.name || categorySlug}, ${matchedSubCategory.name}`;
+    
     return {
-      title: `${t(
-        "companies.titleByCategorySub"
-      )} ${category} - ${sub_category}`,
-      description: `${t(
-        "companies.descriptionByCategorySub"
-      )} ${category}, ${sub_category}`,
+      title,
+      description,
       alternates,
+      robots: {
+        index: matchedSubCategory?.is_index ?? true,
+        follow: matchedSubCategory?.is_follow ?? true,
+      },
     };
   }
 
-  if (category) {
+  if (matchedCategory) {
+    const title = matchedCategory?.meta_title || 
+                  `${t("companies.titleByCategory")} ${matchedCategory.name}`;
+    const description = matchedCategory?.meta_description || 
+                        `${t("companies.descriptionByCategory")} ${matchedCategory.name}`;
+    
     return {
-      title: `${t("companies.titleByCategory")} ${category}`,
-      description: `${t("companies.descriptionByCategory")} ${category}`,
+      title,
+      description,
       alternates,
+      robots: {
+        index: matchedCategory?.is_index ?? true,
+        follow: matchedCategory?.is_follow ?? true,
+      },
     };
   }
 
@@ -124,6 +153,32 @@ export default async function Companies({ searchParams, params }) {
   const sub_category_slug = paramsObj?.sub_category || null;
   const search = paramsObj?.search || null;
   const pageParamUrl = Number(paramsObj?.page) || 1;
+
+  // Fetch category/subcategory data for page content
+  let matchedCategory = null;
+  let matchedSubCategory = null;
+
+  if (category_slug) {
+    try {
+      const categories = await getCategories("/company/categories");
+      matchedCategory = categories?.find((item) => item.slug === category_slug);
+    } catch {
+      // Ignore errors
+    }
+  }
+
+  if (category_slug && sub_category_slug) {
+    try {
+      const subCategories = await getSubCategories({
+        category_slug: category_slug,
+      }, "/company/sub-categories");
+      matchedSubCategory = subCategories?.find(
+        (item) => item.slug === sub_category_slug
+      );
+    } catch {
+      // Ignore errors
+    }
+  }
 
   // Fetch first page to get meta for fallback pagination when JS disabled
   let firstPageData;
@@ -188,11 +243,33 @@ export default async function Companies({ searchParams, params }) {
     border: 0,
   };
 
-  const pageTitle = category_slug && sub_category_slug
-    ? `${metaT("companies.titleByCategorySub")} ${category_slug} - ${sub_category_slug}`
-    : category_slug
-      ? `${metaT("companies.titleByCategory")} ${category_slug}`
-      : metaT("companies.defaultTitle");
+  // Generate page title and description from category data
+  let pageTitle;
+  let pageDescription;
+
+  if (matchedSubCategory) {
+    pageTitle = matchedSubCategory.meta_title || 
+                matchedSubCategory.name || 
+                `${metaT("companies.titleByCategorySub")} ${sub_category_slug}`;
+    pageDescription = matchedSubCategory.meta_description || 
+                      `${metaT("companies.descriptionByCategorySub")} ${sub_category_slug}`;
+  } else if (matchedCategory) {
+    pageTitle = matchedCategory.meta_title || 
+                matchedCategory.name || 
+                `${metaT("companies.titleByCategory")} ${category_slug}`;
+    pageDescription = matchedCategory.meta_description || 
+                      `${metaT("companies.descriptionByCategory")} ${category_slug}`;
+  } else if (category_slug && sub_category_slug) {
+    pageTitle = `${metaT("companies.titleByCategorySub")} ${category_slug} - ${sub_category_slug}`;
+    pageDescription = `${metaT("companies.descriptionByCategorySub")} ${category_slug}, ${sub_category_slug}`;
+  } else if (category_slug) {
+    pageTitle = `${metaT("companies.titleByCategory")} ${category_slug}`;
+    pageDescription = `${metaT("companies.descriptionByCategory")} ${category_slug}`;
+  } else {
+    pageTitle = metaT("companies.defaultTitle");
+    pageDescription = metaT("companies.defaultDescription");
+  }
+
   const seoOverride = getSeoOverride({
     route: "companies",
     locale: resolvedParams?.["country-locale"] || locale,
@@ -201,10 +278,18 @@ export default async function Companies({ searchParams, params }) {
   });
 
   const resolvedPageTitle = seoOverride?.h1 || seoOverride?.title || pageTitle;
+  const resolvedPageDescription = seoOverride?.description || pageDescription;
 
   return (
     <div className="pt-4 pb-4">
       <h1 style={visuallyHiddenStyle}>{resolvedPageTitle}</h1>
+
+      {/* Display category description if available */}
+      {resolvedPageDescription && (
+        <div className="container mb-3">
+          <p className="text-muted">{resolvedPageDescription}</p>
+        </div>
+      )}
 
       <FilterCompanySection selectedCategory={category_slug} />
       <HydrationBoundary state={dehydrate(queryClient)}>
