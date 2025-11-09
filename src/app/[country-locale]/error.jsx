@@ -9,17 +9,21 @@ export default function Error({ error, reset }) {
   const locale = useLocale();
 
   useEffect(() => {
-    console.error(error);
+    // Log the error to console for debugging
+    console.error('Application error:', error);
   }, [error]);
 
   return (
     <section className="error-section">
-      <img src="/icons/error.svg" alt={t("serverErrorTitle")} />
+      <div style={{ fontSize: "120px", marginBottom: "1rem" }}>⚠️</div>
       <h2>{t("serverErrorTitle")}</h2>
-      <p style={{ maxWidth: 420, textAlign: "center", margin: "0 auto 1.5rem" }}>
+      <p style={{ maxWidth: 520, textAlign: "center", margin: "0 auto 1rem" }}>
         {t("serverErrorDescription")}
       </p>
-      <div className="d-flex gap-3 justify-content-center flex-wrap">
+      <p style={{ maxWidth: 520, textAlign: "center", margin: "0 auto 1.5rem", fontStyle: "italic", opacity: 0.8 }}>
+        {t("apologyMessage")}
+      </p>
+      <div className="d-flex gap-3 justify-content-center flex-wrap mb-4">
         <button
           type="button"
           onClick={() => reset()}
@@ -34,6 +38,30 @@ export default function Error({ error, reset }) {
           <span>{t("goHome")}</span>
         </Link>
       </div>
+      
+      {/* Additional helpful links */}
+      {/* <div className="error-links" style={{ 
+        display: "flex", 
+        gap: "1rem", 
+        justifyContent: "center", 
+        flexWrap: "wrap",
+        paddingTop: "1rem",
+        borderTop: "1px solid #dee2e6",
+        maxWidth: "520px",
+        margin: "0 auto"
+      }}>
+        <Link href="/categories" aria-label="Browse categories" style={{ color: "var(--primary-color)", textDecoration: "none" }}>
+          {t("browseCategories")}
+        </Link>
+        <span style={{ color: "#dee2e6" }}>•</span>
+        <Link href="/companies" aria-label="Browse companies" style={{ color: "var(--primary-color)", textDecoration: "none" }}>
+          {t("browseCompanies")}
+        </Link>
+        <span style={{ color: "#dee2e6" }}>•</span>
+        <Link href="/contact" aria-label="Contact us" style={{ color: "var(--primary-color)", textDecoration: "none" }}>
+          {t("contactUs")}
+        </Link>
+      </div> */}
     </section>
   );
 }
