@@ -216,12 +216,17 @@
     "send": "Send"
   },
   "error": {
+    "notFoundTitle": "Page Not Found",
     "pageNotFound": "This link doesn't exist or may have been deleted. How did you get here?",
     "noAccountWithThisId": "No user exists with this ID. How did you get here?",
     "goHome": "Home",
-    "serverErrorTitle": "Something went wrong",
-    "serverErrorDescription": "An unexpected error occurred. Please try again later.",
-    "tryAgain": "Try again"
+    "serverErrorTitle": "Server Error",
+    "serverErrorDescription": "An unexpected error occurred on our server. We're working to fix this issue.",
+    "apologyMessage": "We apologize for the inconvenience. This is temporary and we're working to resolve it as soon as possible.",
+    "tryAgain": "Try again",
+    "browseCategories": "Browse Categories",
+    "browseCompanies": "Browse Companies",
+    "contactUs": "Contact Us"
   },
   "verification": {
     "type": "Account Type",

@@ -5,6 +5,7 @@ import { getSubCategories } from "@/services/categories/getSubCategories";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getTranslations } from "next-intl/server";
 import { resolveCanonicalUrl } from "@/utils/canonical";
+import { getSettings } from "@/services/settings/getSettings";
 
 // Mark as dynamic since it uses searchParams
 export const dynamic = "force-dynamic";
@@ -44,6 +45,33 @@ export async function generateMetadata({ searchParams }) {
   const alternates = await generateHreflangAlternates(pathname);
   if (canonicalUrl) {
     alternates.canonical = canonicalUrl;
+  }
+
+  // If no specific category, use settings metadata
+  if (!safeSlug) {
+    try {
+      const settings = await getSettings();
+      if (settings?.meta?.categories) {
+        const categoriesMeta = settings.meta.categories;
+        const categoriesCanonicalUrl = resolveCanonicalUrl(
+          categoriesMeta?.canonical_url,
+          categoriesMeta?.canonicalUrl,
+          categoriesMeta?.canonical
+        );
+        
+        if (categoriesCanonicalUrl) {
+          alternates.canonical = categoriesCanonicalUrl;
+        }
+        
+        return {
+          title: categoriesMeta?.meta_title || t("categories.defaultTitle"),
+          description: categoriesMeta?.meta_description || t("categories.defaultDescription"),
+          alternates,
+        };
+      }
+    } catch {
+      // Ignore errors and use fallback
+    }
   }
 
   return {

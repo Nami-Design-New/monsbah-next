@@ -21,11 +21,29 @@ export async function generateMetadata({ params }) {
   const pathname = `/company-details/${slug}`;
   const alternates = await generateHreflangAlternates(pathname);
 
+  // Create a dynamic meta title with company name
+  const metaTitle = profile?.client?.meta_title
+    ? `${profile.client.meta_title} - ${t("companyProfile.titleSuffix")}`
+    : t("companyProfile.titleSuffix");
+console.log(profile?.client);
+
+  // Create a dynamic meta description with company info
+  let metaDescription = t("companyProfile.description");
+  if (profile?.client?.meta_description) {
+    metaDescription = profile.client.meta_description.slice(0, 160);
+  } else if (profile?.client?.meta_title) {
+    metaDescription = `${t("companyProfile.description")} - ${profile.client.meta_title}`;
+  }
+
   return {
-    title: `${profile?.client?.name} | ${t("companyProfile.titleSuffix")}`,
-    description:
-      profile?.client?.about?.slice(0, 160) || t("companyProfile.description"),
+    title: metaTitle,
+    description: metaDescription,
     alternates,
+    openGraph: {
+      title: metaTitle,
+      description: metaDescription,
+      images: profile?.client?.image ? [profile.client.image] : [],
+    },
   };
 }
 

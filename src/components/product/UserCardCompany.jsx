@@ -5,14 +5,14 @@ import { toggleFollowAction } from "@/libs/actions/followActions";
 import { useAuthModal } from "@/stores/useAuthModal";
 import { useAuthStore } from "@/stores/useAuthStore";
 import Image from "next/image";
-import { startTransition, useOptimistic } from "react";
+import { startTransition, useOptimistic, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useTranslations } from "use-intl";
 
 export default function UserCardCompany({ product }) {
   const { user } = useAuthStore((state) => state);
 
-  const { userType, onOpen } = useAuthModal((state) => state);
+  const { onOpen } = useAuthModal((state) => state);
   const t = useTranslations();
   const whatsappMessage = `${t("whatsappMessage")} ${product?.name} ${t(
     "onMonsbah"
@@ -20,7 +20,11 @@ export default function UserCardCompany({ product }) {
 
   const encodedWhatsappMessage = encodeURIComponent(whatsappMessage);
 
-  const initialUser = product.user;
+  const initialUser = product?.user || {};
+  
+  // Use ref to persist error state across re-renders and prevent infinite loops
+  const imageErrorRef = useRef(false);
+  const [imageError, setImageError] = useState(false);
 
   const [optimisticUser, setOptimisticUser] = useOptimistic(
     initialUser,
@@ -34,13 +38,15 @@ export default function UserCardCompany({ product }) {
           ...currentUser,
           is_follow: isFollowing,
           [followerKey]: isFollowing
-            ? currentUser[followerKey] + 1
-            : currentUser[followerKey] - 1,
+            ? (currentUser[followerKey] || 0) + 1
+            : Math.max((currentUser[followerKey] || 0) - 1, 0),
         };
       }
       return currentUser;
     }
   );
+  console.log(optimisticUser);
+  
 
   const handleFollow = async () => {
     startTransition(() => {
@@ -57,17 +63,23 @@ export default function UserCardCompany({ product }) {
     }
   };
 
-  const profileLink =
-    +optimisticUser?.id === +user?.id
-      ? `/company-profile`
-      : `/company-details/${optimisticUser?.id}`;
+  // Return null if no user data - check this early
+  if (!optimisticUser?.id) {
+    return null;
+  }
 
-  const followerKey =
-    optimisticUser.user_type === "user" ? "followers-count" : "followers";
-  const postsKey =
-    optimisticUser.user_type === "user" ? "ads-count" : "products_count";
-  const followingKey =
-    optimisticUser.user_type === "user" ? "following-count" : "following";
+  const profileLink =
+    +optimisticUser.id === +user?.id
+      ? `/company-profile`
+      : `/company-details/${optimisticUser.id}`;
+
+  // Use company default image if no image is provided
+  const defaultImage = "/icons/user_default.png";
+  
+  // Determine which image to display
+  const userImage = imageError || !optimisticUser.image 
+    ? defaultImage 
+    : optimisticUser.image;
 
   return (
     <div className="mulen_user">
@@ -81,10 +93,16 @@ export default function UserCardCompany({ product }) {
             <Image
               width={90}
               height={90}
-              src={optimisticUser?.image}
-              onError={(e) => (e.target.src = "/images/icons/user_default.png")}
+              src={userImage}
+              alt={optimisticUser.name || "user"}
               loading="lazy"
-              alt="user"
+              onError={() => {
+                // Prevent infinite loop - only set error state once using ref
+                if (!imageErrorRef.current) {
+                  imageErrorRef.current = true;
+                  setImageError(true);
+                }
+              }}
             />
           </Link>
           {optimisticUser?.id !== user?.id && (
@@ -118,20 +136,20 @@ export default function UserCardCompany({ product }) {
           )}
         </div>
         <div className="content">
-          <Link aria-label="Profile" to={profileLink}>
-            <h3 className="name">{optimisticUser?.name}</h3>
+          <Link aria-label="Profile" href={profileLink}>
+            <h3 className="name">{optimisticUser.name || ''}</h3>
           </Link>
           <ul>
             <li>
-              <h6>{optimisticUser?.[postsKey]}</h6>
+              <h6>{Number(optimisticUser["ads-count"] || optimisticUser["products_count"] || 0)}</h6>
               <span>{t("posts")}</span>
             </li>
             <li>
-              <h6>{optimisticUser?.[followerKey]}</h6>
+              <h6>{Number(optimisticUser["followers-count"] || optimisticUser["followers"] || 0)}</h6>
               <span>{t("followers")}</span>
             </li>
             <li>
-              <h6>{optimisticUser?.[followingKey]}</h6>
+              <h6>{Number(optimisticUser["following-count"] || optimisticUser["following"] || 0)}</h6>
               <span>{t("following")}</span>
             </li>
           </ul>

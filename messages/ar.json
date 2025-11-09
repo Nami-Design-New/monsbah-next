@@ -214,12 +214,17 @@
     "send": "ارسال"
   },
   "error": {
+    "notFoundTitle": "الصفحة غير موجودة",
     "pageNotFound": "هذا الرابط غير موجود لدينا او ربما تم حذفه. كيف وصلت الي هنا ؟",
     "noAccountWithThisId": "لا يوجد مستخدم لدينا لديه هذا الـ ID. كيف وصلت الي هنا ؟",
     "goHome": "الرئيسية",
-    "serverErrorTitle": "حدث خطأ ما",
-    "serverErrorDescription": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقاً.",
-    "tryAgain": "أعد المحاولة"
+    "serverErrorTitle": "خطأ في الخادم",
+    "serverErrorDescription": "حدث خطأ غير متوقع على الخادم الخاص بنا. نحن نعمل على إصلاح هذه المشكلة.",
+    "apologyMessage": "نعتذر عن هذا الإزعاج. هذا الخطأ مؤقت ونعمل على حله في أقرب وقت ممكن.",
+    "tryAgain": "أعد المحاولة",
+    "browseCategories": "تصفح الأقسام",
+    "browseCompanies": "تصفح الشركات",
+    "contactUs": "تواصل معنا"
   },
   "verification": {
     "type": "نوع الحساب",

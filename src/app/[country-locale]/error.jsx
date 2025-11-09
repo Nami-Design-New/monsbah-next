@@ -15,7 +15,7 @@ export default function Error({ error, reset }) {
 
   return (
     <section className="error-section">
-      <div style={{ fontSize: "120px", marginBottom: "1rem" }}>⚠️</div>
+      <img src="/icons/server-error.svg" alt={t("serverErrorTitle")} style={{ width: "200px", height: "200px", marginBottom: "1rem" }} />
       <h2>{t("serverErrorTitle")}</h2>
       <p style={{ maxWidth: 520, textAlign: "center", margin: "0 auto 1rem" }}>
         {t("serverErrorDescription")}

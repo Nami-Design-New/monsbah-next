@@ -16,6 +16,7 @@ function ChatRoomHeader({ chat, isBlocked, setIsBlocked }) {
   const [showReportModal, setShowReportModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [blockLoading, setBlockLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const queryClient = useQueryClient();
 
   const handleDelete = async () => {
@@ -64,10 +65,15 @@ function ChatRoomHeader({ chat, isBlocked, setIsBlocked }) {
           className="img"
         >
           <img
-            src={chat?.user_image}
+            src={imageError || !chat?.user_image ? "/icons/user_default.png" : chat?.user_image}
             alt="avatar"
             loading="lazy"
-            onError={(e) => (e.target.src = "/images/icons/user_default.png")}
+            onError={(e) => {
+              if (!imageError) {
+                e.target.onerror = null;
+                setImageError(true);
+              }
+            }}
           />
         </Link>
         <Link

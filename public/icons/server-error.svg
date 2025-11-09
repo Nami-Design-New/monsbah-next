@@ -1,0 +1,30 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Server Icon -->
+  <rect x="40" y="40" width="120" height="30" rx="4" fill="#E74C3C" opacity="0.2"/>
+  <rect x="40" y="40" width="120" height="30" rx="4" stroke="#E74C3C" stroke-width="3"/>
+  <circle cx="55" cy="55" r="4" fill="#E74C3C"/>
+  <circle cx="70" cy="55" r="4" fill="#E74C3C"/>
+  
+  <rect x="40" y="85" width="120" height="30" rx="4" fill="#E74C3C" opacity="0.2"/>
+  <rect x="40" y="85" width="120" height="30" rx="4" stroke="#E74C3C" stroke-width="3"/>
+  <circle cx="55" cy="100" r="4" fill="#E74C3C"/>
+  <circle cx="70" cy="100" r="4" fill="#E74C3C"/>
+  
+  <rect x="40" y="130" width="120" height="30" rx="4" fill="#E74C3C" opacity="0.2"/>
+  <rect x="40" y="130" width="120" height="30" rx="4" stroke="#E74C3C" stroke-width="3"/>
+  <circle cx="55" cy="145" r="4" fill="#E74C3C"/>
+  <circle cx="70" cy="145" r="4" fill="#E74C3C"/>
+  
+  <!-- Warning Triangle -->
+  <circle cx="150" cy="150" r="35" fill="white"/>
+  <path d="M150 120 L180 170 L120 170 Z" fill="#FFA500" stroke="#FF8C00" stroke-width="2"/>
+  <line x1="150" y1="140" x2="150" y2="155" stroke="white" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="150" cy="163" r="3" fill="white"/>
+  
+  <!-- Error X marks on server -->
+  <line x1="130" y1="50" x2="145" y2="60" stroke="#E74C3C" stroke-width="3" stroke-linecap="round"/>
+  <line x1="145" y1="50" x2="130" y2="60" stroke="#E74C3C" stroke-width="3" stroke-linecap="round"/>
+  
+  <line x1="130" y1="95" x2="145" y2="105" stroke="#E74C3C" stroke-width="3" stroke-linecap="round"/>
+  <line x1="145" y1="95" x2="130" y2="105" stroke="#E74C3C" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -10,6 +10,7 @@ import { generateHreflangAlternates } from "@/utils/hreflang";
 import Pagination from "@/components/shared/Pagination";
 import { getSeoOverride } from "@/utils/seo-overrides";
 import { resolveCanonicalUrl } from "@/utils/canonical";
+import { getSettings } from "@/services/settings/getSettings";
 
 // Mark as dynamic - uses searchParams
 export const dynamic = "force-dynamic";
@@ -126,6 +127,31 @@ export async function generateMetadata({ params, searchParams }) {
         follow: matchedCategory?.is_follow ?? true,
       },
     };
+  }
+
+  // Fetch settings for default companies metadata
+  try {
+    const settings = await getSettings();
+    if (settings?.meta?.companies) {
+      const companiesMeta = settings.meta.companies;
+      const companiesCanonicalUrl = resolveCanonicalUrl(
+        companiesMeta?.canonical_url,
+        companiesMeta?.canonicalUrl,
+        companiesMeta?.canonical
+      );
+      
+      if (companiesCanonicalUrl) {
+        alternates.canonical = companiesCanonicalUrl;
+      }
+      
+      return {
+        title: companiesMeta?.meta_title || t("companies.defaultTitle"),
+        description: companiesMeta?.meta_description || t("companies.defaultDescription"),
+        alternates,
+      };
+    }
+  } catch {
+    // Ignore errors and use fallback
   }
 
   return {
