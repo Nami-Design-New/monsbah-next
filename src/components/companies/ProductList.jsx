@@ -11,16 +11,24 @@ export default function ProductList({ initialProducts = [] }) {
 
   const {
     data: products,
-    isLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetching,
   } = useGetCompanyProducts();
 
   const allProducts =
     products?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  
+  // Deduplicate products by ID
+  const uniqueProducts = Array.from(
+    new Map(allProducts.map((product) => [product?.id, product])).values()
+  );
 
-  const productsToRender = allProducts.length > 0 ? allProducts : initialProducts;
+  const productsToRender = uniqueProducts.length > 0 ? uniqueProducts : initialProducts;
+
+  // Show skeleton loaders when filtering or on initial load (not during pagination)
+  const isFilteringOrLoading = isFetching && !isFetchingNextPage;
 
   useEffect(() => {
     setIsClient(true);
@@ -47,34 +55,36 @@ export default function ProductList({ initialProducts = [] }) {
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   return (
-    <section className="products_section" ref={sectionRef} suppressHydrationWarning>
-      <div className="container p-1">
-        <div className="row">
-          {productsToRender.map((product) => (
-            <div className="col-lg-4 col-md-6 col-12 p-2" key={product?.id || product?.slug}>
-              <ProductVerticalCompany product={product} isShowAction={false} />
-            </div>
-          ))}
+    <>
+      <section className="products_section" ref={sectionRef} suppressHydrationWarning>
+        <div className="container p-1">
+          <div className="row">
+            {!isFilteringOrLoading && productsToRender.map((product) => (
+              <div className="col-lg-4 col-md-6 col-12 p-2" key={product?.id || product?.slug}>
+                <ProductVerticalCompany product={product} isShowAction={false} />
+              </div>
+            ))}
 
-          {(isClient && isLoading && productsToRender.length === 0) &&
-            Array(3)
-              .fill(0)
-              .map((_, index) => (
-                <div
-                  className="col-lg-4 col-md-6 col-12 p-2"
-                  key={`loader-${index}`}
-                >
-                  <ProductLoader />
-                </div>
-              ))}
-        </div>
-        {isClient && isFetchingNextPage && productsToRender.length > 0 && (
-          <div className="text-center py-3" role="status" aria-live="polite">
-            <span className="spinner-border spinner-border-sm" aria-hidden="true" />
-            <span className="ms-2">Loading more companies…</span>
+            {isFilteringOrLoading &&
+              Array(6)
+                .fill(0)
+                .map((_, index) => (
+                  <div
+                    className="col-lg-4 col-md-6 col-12 p-2"
+                    key={`loader-${index}`}
+                  >
+                    <ProductLoader />
+                  </div>
+                ))}
           </div>
-        )}
-      </div>
-    </section>
+          {isClient && isFetchingNextPage && productsToRender.length > 0 && (
+            <div className="text-center py-3" role="status" aria-live="polite">
+              <span className="spinner-border spinner-border-sm" aria-hidden="true" />
+              <span className="ms-2">Loading more products…</span>
+            </div>
+          )}
+        </div>
+      </section>
+    </>
   );
 }

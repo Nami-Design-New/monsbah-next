@@ -4,6 +4,19 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useLocale } from "next-intl";
 import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
+import NProgress from "nprogress";
+
+// Configure NProgress to match NextTopLoader settings
+if (typeof window !== 'undefined') {
+  NProgress.configure({ 
+    showSpinner: false,
+    minimum: 0.08,
+    easing: 'ease',
+    speed: 300,
+    trickleSpeed: 200
+  });
+}
 
 function useGetCompanyProducts(isMyCompany) {
   const { id } = useParams();
@@ -25,6 +38,7 @@ function useGetCompanyProducts(isMyCompany) {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    isFetching,
   } = useInfiniteQuery({
     queryKey: [
       "company-products",
@@ -64,7 +78,34 @@ function useGetCompanyProducts(isMyCompany) {
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
     },
     retry: false,
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours - data stays fresh
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours - cache time (formerly cacheTime)
   });
+
+  const hasCompletedInitialLoad = useRef(false);
+
+  // Mark once initial load finishes so filters trigger progress
+  useEffect(() => {
+    if (!hasCompletedInitialLoad.current && !isLoading && !isFetching) {
+      hasCompletedInitialLoad.current = true;
+    }
+  }, [isLoading, isFetching]);
+
+  // Trigger loading bar when fetching (skip initial load and pagination)
+  useEffect(() => {
+    const shouldShowProgress =
+      isFetching && !isFetchingNextPage && hasCompletedInitialLoad.current;
+
+    if (shouldShowProgress) {
+      NProgress.start();
+    } else if (!isFetching) {
+      NProgress.done();
+    }
+
+    return () => {
+      NProgress.done();
+    };
+  }, [isFetching, isFetchingNextPage]);
 
   return {
     isLoading,
@@ -74,6 +115,7 @@ function useGetCompanyProducts(isMyCompany) {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
+    isFetching,
   };
 }
 

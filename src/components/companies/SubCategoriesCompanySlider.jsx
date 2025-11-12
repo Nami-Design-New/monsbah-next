@@ -1,55 +1,51 @@
 "use client";
 
-import { useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { Link } from "@/i18n/navigation";
 
 export default function SubCategoriesCompanySlider({ subCategories }) {
   const t = useTranslations();
-  const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handleSelectSubCategory = useCallback(
-    (slug) => {
-      const params = new URLSearchParams(window.location.search);
-      
-      if (!slug) {
-        // Remove sub_category param
-        params.delete("sub_category");
-      } else {
-        // Set new sub_category
-        params.set("sub_category", slug);
-      }
-      
-      const newUrl = `/companies${params.toString() ? `?${params.toString()}` : ""}`;
-      router.push(newUrl);
-    },
-    [router]
-  );
+  // Build URL for each subcategory
+  const buildSubCategoryUrl = (subCategorySlug) => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (!subCategorySlug) {
+      // "All" - remove sub_category but keep category
+      params.delete("sub_category");
+    } else {
+      // Set sub_category
+      params.set("sub_category", subCategorySlug);
+    }
+    
+    return `/companies${params.toString() ? `?${params.toString()}` : ""}`;
+  };
 
   return (
     <Swiper slidesPerView="auto" className="categories_slider">
       <SwiperSlide className="p-1">
-        <button
+        <Link
+          href={buildSubCategoryUrl("")}
           aria-label="Subcategory"
           className={`category sub ${!searchParams.get("sub_category") ? "active" : ""}`}
-          onClick={() => handleSelectSubCategory("")}
         >
           <h6>{t("all")}</h6>
-        </button>
+        </Link>
       </SwiperSlide>
 
       {subCategories?.map((sub) => (
         <SwiperSlide key={sub.id} className="p-1">
-          <button
+          <Link
+            href={buildSubCategoryUrl(sub?.slug)}
             className={`category sub ${
               searchParams.get("sub_category") === sub?.slug ? "active" : ""
             }`}
-            onClick={() => handleSelectSubCategory(sub?.slug)}
           >
             <h6>{sub?.name}</h6>
-          </button>
+          </Link>
         </SwiperSlide>
       ))}
     </Swiper>

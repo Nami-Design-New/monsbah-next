@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,9 +9,9 @@ import { useTranslations } from "use-intl";
 export default function CompanyCategoriesSlider({ categories }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
-  const router = useRouter();
 
-  const handleSearch = (categoryId) => {
+  // Build URL for each subcategory
+  const buildSubCategoryUrl = (categoryId) => {
     const params = new URLSearchParams(searchParams.toString());
 
     if (categoryId) {
@@ -20,34 +20,33 @@ export default function CompanyCategoriesSlider({ categories }) {
       params.delete("sub_category");
     }
 
-    router.push(`?${params.toString()}`);
+    return `?${params.toString()}`;
   };
+
   return (
     <div className="col-12 p-2">
       <Swiper slidesPerView="auto" spaceBetween={10} className="categories">
         <SwiperSlide>
-          <button
-            className={
-              Number(searchParams.get("sub_category")) === 0 ? "active" : ""
-            }
-            onClick={() => handleSearch(null)}
+          <Link
+            href={buildSubCategoryUrl(null)}
+            className={`${Number(searchParams.get("sub_category")) === 0 ? "active" : ""}`}
           >
             {t("all")}
-          </button>
+          </Link>
         </SwiperSlide>
 
         {categories?.map((category) => (
           <SwiperSlide key={category.id}>
-            <button
-              className={
+            <Link
+              href={buildSubCategoryUrl(category?.id)}
+              className={`${
                 Number(searchParams.get("sub_category")) === category?.id
                   ? "active"
                   : ""
-              }
-              onClick={() => handleSearch(category?.id)}
+              }`}
             >
               {category.name}
-            </button>
+            </Link>
           </SwiperSlide>
         ))}
       </Swiper>

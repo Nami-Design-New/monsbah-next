@@ -30,6 +30,11 @@ export async function getCompanyProducts({
         sub_category_slug,
         page: pageParam,
       },
+      // Enable Next.js cache for 24 hours
+      next: {
+        revalidate: 86400, // 24 hours in seconds
+        tags: ['company-products']
+      }
     });
 
     if (res.status === 200) {

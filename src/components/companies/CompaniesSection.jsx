@@ -11,16 +11,20 @@ export default function CompaniesSection() {
 
   const {
     data: companies,
-    isLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    isFetching,
     currentPage,
     lastPage,
   } = useGetCompanies();
 
-  const allCompanies =
-    companies?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  // Flatten and deduplicate companies by ID
+  const allCompanies = companies?.pages?.flatMap((page) => page?.data?.data) ?? [];
+  const uniqueCompanies = Array.from(
+    new Map(allCompanies.map((company) => [company?.id, company])).values()
+  );
+
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
@@ -38,32 +42,37 @@ export default function CompaniesSection() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  return (
-    <section className="companies_section" ref={sectionRef}>
-      <div className="container p-1">
-        <div className="row">
-          {allCompanies.map((company) => (
-            <div className="col-lg-4 col-md-6 col-12 p-2" key={company?.id}>
-              <CompanyCard company={company} />
-            </div>
-          ))}
+  // Show skeleton loaders when filtering or on initial load (not during pagination)
+  const isFilteringOrLoading = isFetching && !isFetchingNextPage;
 
-          {(isLoading || isFetchingNextPage) &&
-            Array(3)
-              .fill(0)
-              .map((_, index) => (
-                <div
-                  className="col-lg-4 col-md-6 col-12 p-2"
-                  key={`loader-${index}`}
-                >
-                  <CompanyLoader />
-                </div>
-              ))}
+  return (
+    <>
+      <section className="companies_section" ref={sectionRef}>
+        <div className="container p-1">
+          <div className="row">
+            {!isFilteringOrLoading && uniqueCompanies.map((company) => (
+              <div className="col-lg-4 col-md-6 col-12 p-2" key={company?.id}>
+                <CompanyCard company={company} />
+              </div>
+            ))}
+
+            {isFilteringOrLoading &&
+              Array(6)
+                .fill(0)
+                .map((_, index) => (
+                  <div
+                    className="col-lg-4 col-md-6 col-12 p-2"
+                    key={`loader-${index}`}
+                  >
+                    <CompanyLoader />
+                  </div>
+                ))}
+          </div>
+          {lastPage > 1 && (
+            <Pagination currentPage={currentPage} totalPages={lastPage} />
+          )}
         </div>
-        {lastPage > 1 && (
-          <Pagination currentPage={currentPage} totalPages={lastPage} />
-        )}
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

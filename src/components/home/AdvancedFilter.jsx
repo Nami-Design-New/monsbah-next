@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams, useRouter } from "next/navigation";
 import Select from "react-select";
@@ -27,6 +27,7 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
   const t = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const locale = useLocale();
   const countryUrl = locale.split("-")[0];
@@ -53,18 +54,20 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
 
   const updateURLParam = useCallback(
     (key, value, removeKeys = []) => {
-      const params = new URLSearchParams(searchParams.toString());
+      startTransition(() => {
+        const params = new URLSearchParams(searchParams.toString());
 
-      if (value === "") {
-        params.delete(key);
-      } else {
-        params.set(key, value);
-      }
+        if (value === "") {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
 
-      removeKeys.forEach((k) => params.delete(k));
+        removeKeys.forEach((k) => params.delete(k));
 
-      const newUrl = `?${params.toString()}`;
-      router.push(newUrl);
+        const newUrl = `?${params.toString()}`;
+        router.push(newUrl);
+      });
     },
     [searchParams, router]
   );
@@ -91,7 +94,12 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
 
       <div className="grid_view">
         <Dropdown>
-          <Dropdown.Toggle id="sort-filter-toggle" aria-label="Sort Filter">
+          <Dropdown.Toggle 
+            id="sort-filter-toggle" 
+            aria-label="Sort Filter"
+            disabled={isPending}
+            className={isPending ? "loading" : ""}
+          >
             <i className="fa-regular fa-arrow-up-wide-short"></i>
           </Dropdown.Toggle>
 
@@ -129,6 +137,8 @@ export default function AdvancedFilter({ countries, selectedCategory }) {
           <Dropdown.Toggle
             id="country-filter-toggle"
             aria-label="Filter Country"
+            disabled={isPending}
+            className={isPending ? "loading" : ""}
           >
             <i className="fa-sharp fa-light fa-filter"></i>
           </Dropdown.Toggle>

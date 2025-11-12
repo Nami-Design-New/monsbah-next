@@ -1,6 +1,8 @@
 import ProductList from "@/components/companies/ProductList";
+import CompaniesSection from "@/components/companies/CompaniesSection";
 import FilterCompanySection from "@/components/home/FilterCompanySection";
 import { getCompanyProducts } from "@/services/companies/getCompanyProducts";
+import getCompanies from "@/services/companies/getCompanies";
 import { getCategories } from "@/services/categories/getCategories";
 import { getSubCategories } from "@/services/categories/getSubCategories";
 import { getQueryClient } from "@/utils/queryCLient";
@@ -208,37 +210,46 @@ export default async function Companies({ searchParams, params }) {
 
   // Fetch first page to get meta for fallback pagination when JS disabled
   let firstPageData;
-  try {
-    firstPageData = await getCompanyProducts({
-      pageParam: pageParamUrl,
-      lang,
-      country_slug,
-      type,
-      sort,
-      city_id,
-      category_slug,
-      sub_category_slug,
-    });
-  } catch (error) {
-    console.error("[Companies Page] Failed to load initial data", error?.message);
-    firstPageData = { data: { data: [], meta: { last_page: 1 } } };
-  }
+  
+  if (category_slug) {
+    // Fetch companies when category is selected
+    try {
+      firstPageData = await getCompanies({
+        pageParam: pageParamUrl,
+        city_id,
+        country_slug,
+        category_slug,
+        sub_category_slug,
+        search,
+      });
+    } catch (error) {
+      console.error("[Companies Page] Failed to load companies", error?.message);
+      firstPageData = { data: { data: [], meta: { last_page: 1 } } };
+    }
 
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: [
-      "company-products",
-      country_slug,
-      type,
-      sort,
-      city_id,
-      category_slug,
-      sub_category_slug,
-      search,
-      lang,
-    ],
-    queryFn: ({ pageParam = pageParamUrl }) =>
-      getCompanyProducts({
-        pageParam,
+    // Prefetch companies data
+    await queryClient.prefetchInfiniteQuery({
+      queryKey: ["companies", country_slug, city_id, category_slug, sub_category_slug, lang, search],
+      queryFn: ({ pageParam = pageParamUrl }) =>
+        getCompanies({
+          pageParam,
+          city_id,
+          country_slug,
+          category_slug,
+          sub_category_slug,
+          search,
+        }),
+      initialPageParam: pageParamUrl,
+      getNextPageParam: (lastPage) => {
+        const nextUrl = lastPage?.data?.links?.next;
+        return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
+      },
+    });
+  } else {
+    // Fetch products when "All" is selected
+    try {
+      firstPageData = await getCompanyProducts({
+        pageParam: pageParamUrl,
         lang,
         country_slug,
         type,
@@ -246,13 +257,43 @@ export default async function Companies({ searchParams, params }) {
         city_id,
         category_slug,
         sub_category_slug,
-      }),
-    initialPageParam: pageParamUrl,
-    getNextPageParam: (lastPage) => {
-      const nextUrl = lastPage?.data?.links?.next;
-      return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
-    },
-  });
+      });
+    } catch (error) {
+      console.error("[Companies Page] Failed to load initial data", error?.message);
+      firstPageData = { data: { data: [], meta: { last_page: 1 } } };
+    }
+
+    // Prefetch products data
+    await queryClient.prefetchInfiniteQuery({
+      queryKey: [
+        "company-products",
+        country_slug,
+        type,
+        sort,
+        city_id,
+        category_slug,
+        sub_category_slug,
+        search,
+        lang,
+      ],
+      queryFn: ({ pageParam = pageParamUrl }) =>
+        getCompanyProducts({
+          pageParam,
+          lang,
+          country_slug,
+          type,
+          sort,
+          city_id,
+          category_slug,
+          sub_category_slug,
+        }),
+      initialPageParam: pageParamUrl,
+      getNextPageParam: (lastPage) => {
+        const nextUrl = lastPage?.data?.links?.next;
+        return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
+      },
+    });
+  }
 
   const initialProducts =
     firstPageData?.data?.data || firstPageData?.data || [];
@@ -319,7 +360,12 @@ export default async function Companies({ searchParams, params }) {
 
       <FilterCompanySection selectedCategory={category_slug} />
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ProductList initialProducts={initialProducts} />
+        {/* Show companies when category is selected, products when "All" */}
+        {category_slug ? (
+          <CompaniesSection />
+        ) : (
+          <ProductList initialProducts={initialProducts} />
+        )}
       </HydrationBoundary>
 
       {/* Fallback pagination for no-JS environments */}

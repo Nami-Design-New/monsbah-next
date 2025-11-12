@@ -9,7 +9,6 @@ export default async function SubCategoriesList({
   const subCategories = await getSubCategories({
     category_slug: selectedCategory,
   });
-  console.log("subCategories", subCategories);
   
 
   return (
