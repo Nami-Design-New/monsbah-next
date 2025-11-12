@@ -6,7 +6,18 @@ export default async function SideBar({ selectedCategory }) {
   const categoryList = await getCategories();
 
   return (
-    <div className="col-lg-2 col-md-3 col-4 p-lg-2 p-1">
+    <div
+      className="col-lg-2 col-md-3 col-4 p-lg-2 p-1 sidebar-sticky-wrapper"
+      style={{
+        position: "sticky",
+        top: "0px",
+        alignSelf: "flex-start",
+        maxHeight: "calc(100vh )",
+        overflowY: "auto",
+        zIndex: 5,
+        WebkitOverflowScrolling: "touch",
+      }}
+    >
       <div className="categories_sidebar">
         <Link
           aria-label="All Categories"
