@@ -52,7 +52,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
             aria-label={`Category ${category?.slug}`}
           >
             <div className="img">
-              <img src={category?.image} alt={category?.name || category?.slug || ""} />
+              <img src={category?.icon} alt={category?.name || category?.slug || ""} />
             </div>
             <h6>{category?.name}</h6>
           </Link>

@@ -61,7 +61,7 @@ function ProductCard({ product }) {
           <span className="type">{t(`${product?.type}`)}</span>
           {product?.is_popular ? (
             <span className="popular">
-              <img src="/icons/crown.svg" alt="" /> {t("popular")}
+             {t("popular")}
             </span>
           ) : (
             <></>

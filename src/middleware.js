@@ -26,6 +26,7 @@ export async function middleware(req) {
     pathname === "/mockServiceWorker.js" ||
     pathname.startsWith("/icons") ||
     pathname.startsWith("/branding") ||
+    pathname.startsWith("/.well-known") || // Skip .well-known paths (Chrome DevTools, etc.)
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();

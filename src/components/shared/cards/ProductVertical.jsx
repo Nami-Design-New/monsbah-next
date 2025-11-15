@@ -299,7 +299,7 @@ function ProductVertical({
             <span className="type">{t(`${product?.type}`)}</span>
             {product?.is_popular ? (
               <span className="popular position-relative">
-                <Image width={42} height={32} src="/icons/crown.svg" alt="" unoptimized />{" "}
+                {/* <Image width={42} height={32} src="/icons/crown.svg" alt="" unoptimized />{" "} */}
                 {t("popular")}
               </span>
             ) : null}

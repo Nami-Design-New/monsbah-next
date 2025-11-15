@@ -18,6 +18,11 @@ const nextConfig = {
         hostname: "backendv1.monsbah.com",
         pathname: "/**",
       },
+        {
+      protocol: "http", // add this
+      hostname: "backendv1.monsbah.com",
+      pathname: "/**",
+    },
       {
         protocol: "https",
         hostname: "monsbah-s3-shared-bucket.s3.me-south-1.amazonaws.com",
@@ -28,15 +33,18 @@ const nextConfig = {
         hostname: "*.amazonaws.com",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "monsba.sfo3.cdn.digitaloceanspaces.com",
+        pathname: "/**",
+      },
     ],
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 60,
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    // Disable image optimization errors in console
     unoptimized: false,
-    // Add loader for better error handling
     loader: 'default',
   },
   async rewrites() {
