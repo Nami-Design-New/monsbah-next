@@ -45,7 +45,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
       {categories.map((category) => (
         <SwiperSlide key={category?.slug} className="p-1">
           <Link
-            href={buildCategoryUrl(category?.slug)}
+             href={`/companies?category=${category.slug}`}
             className={`category ${
               selectedCategory === category.slug ? "active" : ""
             }`}

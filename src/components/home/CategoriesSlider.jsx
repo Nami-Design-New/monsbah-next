@@ -5,6 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { useRouter } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export default function CategoriesSlider({ categories }) {
   const t = useTranslations();
@@ -44,18 +45,18 @@ export default function CategoriesSlider({ categories }) {
 
       {categories.map((category) => (
         <SwiperSlide key={category?.slug} className="p-1">
-          <button
+          <Link
             className={`category ${
               decoudedCategory == category.slug ? "active" : ""
-            }`}
-            onClick={() => handleSelectCategory(category?.slug)}
+              }`}
+              href={`/${category.slug}`}
             aria-label={`Category ${category?.slug}`}
           >
             <div className="img">
               <img src={category?.icon} alt={category?.alt || category?.name || category?.slug} />
             </div>
             <h6>{category?.name}</h6>
-          </button>
+          </Link>
         </SwiperSlide>
       ))}
     </Swiper>

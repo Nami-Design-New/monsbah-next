@@ -18,10 +18,10 @@ export default async function getCompanies({
       search,
     },
     // Enable Next.js cache for 24 hours
-    next: {
-      revalidate: 86400, // 24 hours in seconds
-      tags: ['companies']
-    }
+    // next: {
+    //   revalidate: 86400, // 24 hours in seconds
+    //   tags: ['companies']
+    // }
   });
 
   if (res.status === 200) {

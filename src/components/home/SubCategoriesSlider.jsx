@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useRouter } from "@/i18n/navigation";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 
 export default function SubCategoriesSlider({ subCategories }) {
   const t = useTranslations();
@@ -50,14 +51,14 @@ export default function SubCategoriesSlider({ subCategories }) {
 
       {subCategories?.map((sub) => (
         <SwiperSlide key={sub.id} className="p-1">
-          <button
+          <Link
             className={`category sub ${
               decoudedSubCategory === sub?.slug ? "active" : ""
             }`}
-            onClick={() => handleSelectSubCategory(sub?.slug)}
+            href={`/${decoudedCategory}/${sub.slug}`}
           >
             <h6>{sub?.name}</h6>
-          </button>
+          </Link>
         </SwiperSlide>
       ))}
     </Swiper>

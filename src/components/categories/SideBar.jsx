@@ -1,9 +1,13 @@
 import { Link } from "@/i18n/navigation";
 import { getCategories } from "@/services/categories/getCategories";
+import { getCompaniesCategories } from "@/services/categories/getCompaniesCategories";
 import Image from "next/image";
 
 export default async function SideBar({ selectedCategory }) {
-  const categoryList = await getCategories();
+  const [categoryList, companiesCategories] = await Promise.all([
+    getCategories(),
+    getCompaniesCategories(),
+  ]);
 
   return (
     <div
@@ -12,7 +16,7 @@ export default async function SideBar({ selectedCategory }) {
         position: "sticky",
         top: "0px",
         alignSelf: "flex-start",
-        maxHeight: "calc(100vh )",
+        maxHeight: "calc(100vh)",
         overflowY: "auto",
         zIndex: 5,
         WebkitOverflowScrolling: "touch",
@@ -33,7 +37,7 @@ export default async function SideBar({ selectedCategory }) {
         {categoryList.map((category) => (
           <Link
             key={category.id}
-            href={`/categories?category=${category.slug}`}
+            href={`/${category.slug}`}
             className={`category ${
               category.slug === selectedCategory ? "active" : ""
             }`}
@@ -45,6 +49,39 @@ export default async function SideBar({ selectedCategory }) {
             <h6>{category.name}</h6>
           </Link>
         ))}
+
+        {/* Companies Categories Section */}
+        {companiesCategories && companiesCategories.length > 0 && (
+          <>
+            <div
+              className="companies-title"
+              style={{
+                backgroundColor: "#f5f5f5",
+                padding: "12px",
+                textAlign: "center",
+                borderRadius: "8px",
+                marginTop: "16px",
+                marginBottom: "8px",
+              }}
+            >
+              <h6 style={{ margin: 0, fontWeight: "600" }}>الشركات</h6>
+            </div>
+
+            {companiesCategories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/companies?category=${category.slug}`}
+                className="category"
+                aria-label={category.name}
+              >
+                <div className="img">
+                  <img src={category.icon} alt={category.alt || category.name} />
+                </div>
+                <h6>{category.name}</h6>
+              </Link>
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

@@ -39,6 +39,7 @@ export default function SubCategoriesCompanySlider({ subCategories }) {
       {subCategories?.map((sub) => (
         <SwiperSlide key={sub.id} className="p-1">
           <Link
+            
             href={buildSubCategoryUrl(sub?.slug)}
             className={`category sub ${
               searchParams.get("sub_category") === sub?.slug ? "active" : ""
