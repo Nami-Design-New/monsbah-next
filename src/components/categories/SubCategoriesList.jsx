@@ -19,16 +19,15 @@ export default async function SubCategoriesList({
         {/* Regular Categories */}
         {regularCategories?.map((category, index) => {
           const totalCategories = regularCategories.length;
-          
+
           // Determine if this category should take full width
           let shouldTakeFullWidth = false;
           if (totalCategories >= 5) {
-            // If 5 or more categories, last (totalCategories - 4) items take full width
             shouldTakeFullWidth = index >= 4;
           }
-          
+
           const colClass = shouldTakeFullWidth ? "col-12" : "col-xl-3 col-md-4 col-6";
-          
+
           return (
             <div className={`${colClass} p-1`} key={category.id}>
               <Link
@@ -36,8 +35,13 @@ export default async function SubCategoriesList({
                 href={`${category.slug}`}
                 className="category sub d-flex align-items-center flex-column gap-2"
               >
-                <div className="image-wrapper" style={{ height: "100px", width: "100%" , position: "relative" }}>
-                  <Image fill={true} src={category?.image || category?.icon} alt={category?.alt || category?.name} />
+                <div className="image-wrapper">
+                  <Image
+                    fill={true}
+                    src={category?.image || category?.icon}
+                    alt={category?.alt || category?.name}
+                
+                  />
                 </div>
                 <h6>{category?.name}</h6>
               </Link>
@@ -48,8 +52,6 @@ export default async function SubCategoriesList({
         {/* Companies Categories Section */}
         {companiesCategories && companiesCategories.length > 0 && (
           <>
-        
-            {/* Company Categories */}
             {companiesCategories.map((category) => {
               return (
                 <div className="col-xl-3 col-md-4 col-6 p-1" key={category.id}>
@@ -58,8 +60,13 @@ export default async function SubCategoriesList({
                     href={`/companies?category=${category.slug}`}
                     className="category sub d-flex align-items-center flex-column gap-2"
                   >
-                    <div className="image-wrapper" style={{ height: "100px", position: "relative" }}>
-                      <Image fill={true} src={category?.image || category?.icon} alt={category?.alt || category?.name} />
+                    <div className="image-wrapper">
+                      <Image
+                        fill={true}
+                        src={category?.image || category?.icon}
+                        alt={category?.alt || category?.name}
+                       
+                      />
                     </div>
                     <h6>{category?.name}</h6>
                   </Link>
@@ -69,6 +76,21 @@ export default async function SubCategoriesList({
           </>
         )}
       </div>
+
+      {/* Responsive CSS in same file */}
+      <style>{`
+        .image-wrapper {
+          position: relative;
+          width: 100%;
+          height: 200px; /* Default for desktop */
+        }
+
+        @media (max-width: 768px) {
+          .image-wrapper {
+            height: 100px; /* Mobile height */
+          }
+        }
+      `}</style>
     </div>
   );
 }
