@@ -36,7 +36,7 @@ export default async function SubCategoriesList({
                 href={`${category.slug}`}
                 className="category sub d-flex align-items-center flex-column gap-2"
               >
-                <div className="image-wrapper" style={{ height: "200px", width: "100%" , position: "relative" }}>
+                <div className="image-wrapper" style={{ height: "100px", width: "100%" , position: "relative" }}>
                   <Image fill={true} src={category?.image || category?.icon} alt={category?.alt || category?.name} />
                 </div>
                 <h6>{category?.name}</h6>
@@ -58,7 +58,7 @@ export default async function SubCategoriesList({
                     href={`/companies?category=${category.slug}`}
                     className="category sub d-flex align-items-center flex-column gap-2"
                   >
-                    <div className="image-wrapper" style={{ height: "200px", position: "relative" }}>
+                    <div className="image-wrapper" style={{ height: "100px", position: "relative" }}>
                       <Image fill={true} src={category?.image || category?.icon} alt={category?.alt || category?.name} />
                     </div>
                     <h6>{category?.name}</h6>
