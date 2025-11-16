@@ -1,6 +1,7 @@
 import FilterSection from "@/components/home/FilterSection";
 import HeroSection from "@/components/home/HeroSection";
 import ProductsSection from "@/components/home/ProductsSection";
+import { CategoryTabProvider } from "@/components/home/CategoryTabContext";
 import { getUserType } from "@/services/auth/getUserType";
 import getProducts from "@/services/products/getProducts";
 import { getQueryClient } from "@/utils/queryCLient";
@@ -176,7 +177,7 @@ export default async function page({ params, searchParams }) {
   });
 
   return (
-    <>
+    <CategoryTabProvider>
       <HeroSection h1Title={h1Title} />
       
       {/* Display subcategory description if available */}
@@ -190,6 +191,6 @@ export default async function page({ params, searchParams }) {
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />
       </HydrationBoundary>
-    </>
+    </CategoryTabProvider>
   );
 }

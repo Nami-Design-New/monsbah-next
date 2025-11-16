@@ -1,5 +1,6 @@
 import { getUserType } from "@/services/auth/getUserType";
 import { getCategories } from "@/services/categories/getCategories";
+import { getCompaniesCategories } from "@/services/categories/getCompaniesCategories";
 import { getSubCategories } from "@/services/categories/getSubCategories";
 import { getCountries } from "@/services/getCountries";
 import { getTranslations } from "next-intl/server";
@@ -15,7 +16,10 @@ export default async function FilterSection({
   const countries = await getCountries();
   const t = await getTranslations();
   const user = await getUserType();
-  const categories = await getCategories(`/${user}/categories`);
+  const [categories, companiesCategories] = await Promise.all([
+    getCategories(`/${user}/categories`),
+    getCompaniesCategories(),
+  ]);
   const locale = await getLocale();
   const [selectedCountrySlug, selectedLang] = locale.split("-");
 
@@ -38,7 +42,7 @@ export default async function FilterSection({
     <section className="explore_ads">
       <div className="container d-flex flex-column gap-2">
         <div className="js-only">
-          <CategoriesSlider categories={categories} />
+          <CategoriesSlider categories={categories} companiesCategories={companiesCategories} />
           {selectedCategory && (
             <SubCategoriesSlider subCategories={subCategories} />
           )}

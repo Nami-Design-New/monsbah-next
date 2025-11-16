@@ -54,6 +54,45 @@
   &.companies_filter {
     padding-top: 40px;
   }
+  
+  // Category tabs styling
+  .categories-wrapper {
+    .categories-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      justify-content: center;
+      
+      .tab-button {
+        padding: 10px 24px;
+        border-radius: 8px;
+        border: 2px solid #e0e0e0;
+        background-color: #fff;
+        color: #333;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        
+        &:hover {
+          border-color: #1abc9c;
+          transform: translateY(-2px);
+        }
+        
+        &.active {
+          border-color: #1abc9c;
+          background-color: #1abc9c;
+          color: #fff;
+        }
+        
+        @media screen and (max-width: 576px) {
+          padding: 8px 20px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+  
   .categories_slider {
     width: 100%;
     &.subcategories_slider {

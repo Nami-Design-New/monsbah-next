@@ -84,7 +84,7 @@ export default function Login() {
       </div>
 
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
-        <ChooseUserType setUserType={setUserType} />
+        {/* <ChooseUserType setUserType={setUserType} /> */}
         <Controller
           name="country_code"
           control={control}

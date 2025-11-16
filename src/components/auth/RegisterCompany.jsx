@@ -14,7 +14,7 @@ import useGetCountries from "@/hooks/queries/settings/useGetCountries";
 import useGetCities from "@/hooks/queries/settings/useGetCities";
 import useGetStates from "@/hooks/queries/settings/useGetStates";
 import { DevTool } from "@hookform/devtools";
-import useGetCategories from "@/hooks/queries/settings/useGetCategories";
+import useGetCompanyCategories from "@/hooks/queries/settings/useGetCompanyCategories";
 import clientAxios from "@/libs/axios/clientAxios";
 import { toast } from "sonner";
 
@@ -43,7 +43,7 @@ const RegisterCompany = () => {
     country_id ? true : false
   );
   const { data: categories, isLoading: isCategoriesLoading } =
-    useGetCategories();
+    useGetCompanyCategories();
   const { data: currentLocation } = useGetCurrentLocation();
   const { data: states, isLoading: areasLoading } = useGetStates(
     city_id,
@@ -70,7 +70,7 @@ const RegisterCompany = () => {
 
     const payload = { ...data, new_version: 1 };
     payload.phone = data.country_code + data.phone;
-    payload.whats_number = data.whats_country_code + data.whats_number;
+    payload.whats_number = data.country_code + data.phone; // Same as phone
 
     try {
       const res = await clientAxios.post("/company/auth/sign-up", payload, {
@@ -211,25 +211,6 @@ const RegisterCompany = () => {
                   field.onChange(country?.country_code)
                 }
                 error={errors?.phone?.message}
-              />
-            )}
-          />
-          <Controller
-            name="whats_country_code"
-            control={control}
-            render={({ field }) => (
-              <PhoneInput
-                label={t("auth.whatsapp")}
-                id="whats_number"
-                placeholder={t("auth.whatsapp")}
-                selectedCountry={selectedCountry}
-                setSelectedCountry={setSelectedCountry}
-                limit={selectedCountry?.number_limit}
-                {...register("whats_number")}
-                onCountryChange={(country) =>
-                  field.onChange(country?.country_code)
-                }
-                error={errors?.whats_number?.message}
               />
             )}
           />

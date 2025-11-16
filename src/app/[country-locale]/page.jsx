@@ -1,6 +1,7 @@
 import FilterSection from "@/components/home/FilterSection";
 import HeroSection from "@/components/home/HeroSection";
 import ProductsSection from "@/components/home/ProductsSection";
+import { CategoryTabProvider } from "@/components/home/CategoryTabContext";
 import { getUserType } from "@/services/auth/getUserType";
 import getProducts from "@/services/products/getProducts";
 import { getSettings } from "@/services/settings/getSettings";
@@ -105,12 +106,12 @@ export default async function Home({ searchParams }) {
   });
 
   return (
-    <>
+    <CategoryTabProvider>
       <HeroSection />
       <FilterSection selectedCategory={null} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />
       </HydrationBoundary>
-    </>
+    </CategoryTabProvider>
   );
 }

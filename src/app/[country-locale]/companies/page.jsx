@@ -352,11 +352,11 @@ export default async function Companies({ searchParams, params }) {
       <h1 style={visuallyHiddenStyle}>{resolvedPageTitle}</h1>
 
       {/* Display category description if available */}
-      {resolvedPageDescription && (
+      {/* {resolvedPageDescription && (
         <div className="container mb-3">
           <p className="text-muted">{resolvedPageDescription}</p>
         </div>
-      )}
+      )} */}
 
       <FilterCompanySection selectedCategory={category_slug} />
       <HydrationBoundary state={dehydrate(queryClient)}>

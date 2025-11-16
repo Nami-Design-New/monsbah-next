@@ -76,13 +76,16 @@ export default function ProductList({ initialProducts = [] }) {
                     <ProductLoader />
                   </div>
                 ))}
-          </div>
-          {isClient && isFetchingNextPage && productsToRender.length > 0 && (
-            <div className="text-center py-3" role="status" aria-live="polite">
-              <span className="spinner-border spinner-border-sm" aria-hidden="true" />
-              <span className="ms-2">Loading more products…</span>
-            </div>
+              {isClient && isFetchingNextPage && productsToRender.length > 0 && (
+          <div
+                    className="col-lg-4 col-md-6 col-12 p-2"
+                    key={`loader-${index}`}
+                  >
+                    <ProductLoader />
+                  </div>
           )}
+          </div>
+        
         </div>
       </section>
     </>
