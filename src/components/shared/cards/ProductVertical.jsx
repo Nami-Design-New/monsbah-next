@@ -306,7 +306,7 @@ function ProductVertical({
         </div>
 
         <div className="content">
-          <div aria-label="Product" className="title">
+          <div className="title">
             <h3>{product?.name}</h3>
             {user &&
               (user?.id !== product?.user?.id && removeItem ? (

@@ -9,6 +9,7 @@ export default function HeroSlider({ sliders = [] }) {
 
   return (
     <section className="hero_section">
+      <h2 className="visually-hidden">Hero Slider</h2>
       <div className="container">
         <div className="swiper_wrapper">
           {slidesCount > 1 && (
@@ -48,7 +49,7 @@ export default function HeroSlider({ sliders = [] }) {
           >
             {sliders.map((slider) => (
               <SwiperSlide key={slider?.id}>
-                <div className="slider_link" aria-label="Slide">
+                <div className="slider_link">
                   <img src={slider?.image} alt={slider?.alt || slider?.title || "Monsbah slide"} />
                 </div>
               </SwiperSlide>
