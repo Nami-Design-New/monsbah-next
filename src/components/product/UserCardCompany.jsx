@@ -162,6 +162,7 @@ export default function UserCardCompany({ product }) {
             <Link
               aria-label="Call"
               target="_blank"
+              rel="noopener noreferrer"
               href={`tel:${product?.phone}`}
               className="call"
             >
@@ -185,6 +186,7 @@ export default function UserCardCompany({ product }) {
             <Link
               aria-label="Whatsapp"
               target="_blank"
+              rel="noopener noreferrer nofollow"
               href={`https://wa.me/${optimisticUser?.phone}?text=${encodedWhatsappMessage}`}
             >
               <Image

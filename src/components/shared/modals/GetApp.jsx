@@ -23,15 +23,17 @@ export default function GetApp({ show, setShow }) {
             aria-label="Apple App"
             href="https://apps.apple.com/eg/app/%D9%85%D9%86%D8%A7%D8%B3%D8%A8%D8%A9/id1589937521"
             target="_blank"
+            rel="noopener noreferrer"
           >
-            <img src="/icons/appStore.svg" alt="" />
+            <img src="/icons/appStore.svg" alt="App Store" />
           </a>
           <a
-            aria-label="Andorid App"
+            aria-label="Android App"
             href="https://play.google.com/store/apps/details?id=com.app.monasba&pcampaignid=web_share"
             target="_blank"
+            rel="noopener noreferrer"
           >
-            <img src="/icons/playStore.svg" alt="" />
+            <img src="/icons/playStore.svg" alt="Google Play" />
           </a>
         </div>
       </Modal.Body>

@@ -16,10 +16,11 @@ export default async function UserProfileContent({ client }) {
             <Link
               aria-label="whatsapp"
               target="_blank"
+              rel="noopener noreferrer nofollow"
               href={`https://wa.me/${client?.whats_number}`}
               className=" follow_btn"
             >
-              <Image width={16} height={16} src="/icons/whats.svg" alt="" />
+              <Image width={16} height={16} src="/icons/whats.svg" alt="WhatsApp" />
             </Link>
 
             <Link

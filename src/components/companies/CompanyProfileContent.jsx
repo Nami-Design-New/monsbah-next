@@ -26,10 +26,11 @@ export default async function CompanyProfileContent({
               <Link
                 aria-label="whatsapp"
                 target="_blank"
+                rel="noopener noreferrer nofollow"
                 href={`https://wa.me/${client?.whats_number}`}
                 className=" follow_btn"
               >
-                <img src="/icons/whats.svg" alt="" />
+                <img src="/icons/whats.svg" alt="WhatsApp" />
               </Link>
             )}
             {isMyProfile ? (
