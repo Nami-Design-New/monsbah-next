@@ -57,12 +57,7 @@ export default function ProductInfo({ product }) {
   return (
     <>
       {/* Fallback for when JavaScript is disabled */}
-      <noscript>
-        <style>{`
-          .priceInfo .favorite, .priceInfo .dropdown { display: none !important; }
-          .priceInfo .no-js-login { display: inline-block !important; }
-        `}</style>
-      </noscript>
+    {/* Fallback for when JavaScript is disabled - styles are centralized in head */}
       
       <div className="priceInfo mt-3">
         <h4 className="price">
@@ -79,8 +74,9 @@ export default function ProductInfo({ product }) {
               <i className="fa-light fa-heart"></i>
             </button>
             {/* Fallback link when JS is disabled */}
+            {/* Fallback link when JS is disabled */}
             <noscript>
-              <a href="/login" className="favorite no-js-login" style={{ display: 'none' }}>
+              <a href="/login" className="favorite no-js-login">
                 <i className="fa-light fa-heart"></i>
               </a>
             </noscript>

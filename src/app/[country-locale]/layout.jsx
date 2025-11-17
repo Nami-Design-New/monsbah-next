@@ -117,6 +117,16 @@ export default async function RootLayout(props) {
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://monsba.sfo3.cdn.digitaloceanspaces.com" />
         <link rel="dns-prefetch" href="https://backendv1.monsbah.com" />
+        {/* Centralized noscript styles: allowed when placed in head */}
+        <noscript>
+          <style>{`
+            /* Hide JS-only UI when JS is disabled */
+            .js-only { display: none !important; }
+            /* Product favorite button adjustments for no-JS */
+            .priceInfo .favorite, .priceInfo .dropdown { display: none !important; }
+            .priceInfo .no-js-login { display: inline-block !important; }
+          `}</style>
+        </noscript>
       </head>
       <body>
         <Script 

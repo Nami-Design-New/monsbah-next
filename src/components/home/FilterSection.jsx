@@ -52,9 +52,8 @@ export default async function FilterSection({
           />
         </div>
 
-        {/* Fallback UI when JavaScript is disabled */}
-        <noscript>
-          <style>{`.js-only{display:none !important;}`}</style>
+  {/* Fallback UI when JavaScript is disabled */}
+  <noscript>
           <div className="no-js-filters">
             {/* Categories */}
             <div className="categories_slider no-js swiper">
