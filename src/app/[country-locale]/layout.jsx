@@ -144,7 +144,7 @@ export default async function RootLayout(props) {
         />
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXX"
+            src="https://www.googletagmanager.com/ns.html?id=GTM-M2Z82BND"
             height="0"
             width="0"
             style={{ display: "none", visibility: "hidden" }}

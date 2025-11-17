@@ -11,7 +11,28 @@ export default function LanguageSwitcher() {
   const locale = useLocale();
 
   function handleLanguageChange(lang) {
-    router.replace(pathname, {
+    // Category slugs are always in Arabic, so when switching to English
+    // we need to redirect to the home page or companies page instead of keeping the Arabic slug
+    let targetPath = pathname;
+    
+    // Check if current path contains Arabic characters (category/subcategory slug)
+    const hasArabicChars = /[\u0600-\u06FF]/.test(pathname);
+    
+    // If switching to English and path has Arabic, redirect to appropriate root
+    if (lang === "en" && hasArabicChars) {
+      // Determine if it's a company route or regular route
+      if (pathname.includes("/companies")) {
+        targetPath = "/companies";
+      } else if (pathname.includes("/blogs")) {
+        targetPath = "/blogs";
+      } else if (pathname.includes("/categories")) {
+        targetPath = "/categories";
+      } else {
+        targetPath = "/";
+      }
+    }
+    
+    router.replace(targetPath, {
       locale: locale.split("-")[0] + "-" + lang,
     });
   }
