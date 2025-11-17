@@ -207,7 +207,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 import ConfirmationModal from "../modals/ConfirmationModal";
-import { Link } from "@/i18n/navigation";
 
 function ProductVertical({
   product,
@@ -273,12 +272,12 @@ function ProductVertical({
   return (
     <>
       {/* Whole product wrapper as clickable div */}
-      <Link
-       
+      <div
         aria-label="Product"
-     
-        href={`/product/${product?.slug}-id=${product?.id}`}
+        role="link"
+        onClick={() => router.push(`/product/${product?.slug}-id=${product?.id}`)}
         className={`product_vertical ${className}`}
+        style={{ cursor: "pointer" }}
       >
         <div className="img">
           {isValidVideoExtension(product?.image) ? (
@@ -387,7 +386,7 @@ function ProductVertical({
             </li>
           </ul>
         </div>
-      </Link>
+      </div>
 
       {/* Delete confirmation modal */}
       <ConfirmationModal
