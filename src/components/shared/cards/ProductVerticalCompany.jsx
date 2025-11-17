@@ -267,7 +267,7 @@ function ProductVerticalCompany({
     <>
       {/* Product wrapper clickable */}
       <div
-        aria-label="Product"
+        aria-label={product?.name ? `View ${product.name}` : "View product"}
         onClick={() => router.push(`/company-product/${product?.slug}-id=${product?.id}`)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

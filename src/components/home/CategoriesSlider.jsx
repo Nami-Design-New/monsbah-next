@@ -121,7 +121,7 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
       <Swiper slidesPerView="auto" className="categories_slider">
         <SwiperSlide className="p-1">
           <button
-            aria-label="Category"
+            aria-label="Show all categories"
             className={`category ${!decoudedCategory ? "active" : ""}`}
             onClick={() => handleSelectCategory("")}
           >

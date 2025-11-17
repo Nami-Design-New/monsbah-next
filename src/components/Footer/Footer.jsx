@@ -68,7 +68,7 @@ export default async function Footer() {
                   <li key={category.id}>
                     <Link
                       href={`/?category=${category?.slug}`}
-                      aria-label="Category"
+                      aria-label={`Browse ${category?.name || category?.slug}`}
                     >
                       <span>
                         <i className="fa-sharp fa-light fa-arrow-right" />

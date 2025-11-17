@@ -274,7 +274,7 @@ function ProductVertical({
     <>
       {/* Whole product wrapper as clickable div */}
       <div
-        aria-label="Product"
+        aria-label={product?.name ? `View ${product.name}` : "View product"}
         onClick={() => router.push(`/product/${product?.slug}-id=${product?.id}`)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {

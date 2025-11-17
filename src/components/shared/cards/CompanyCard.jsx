@@ -12,7 +12,7 @@ export default function CompanyCard({ company }) {
 
   return (
     <Link
-      aria-label="Product"
+      aria-label={company?.name ? `View ${company.name} company profile` : "View company profile"}
       href={`${
         company?.id === user?.id
           ? "/company-profile"

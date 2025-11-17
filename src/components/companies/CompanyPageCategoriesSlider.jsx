@@ -32,7 +32,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
       <SwiperSlide className="p-1">
         <Link
           href={buildCategoryUrl("")}
-          aria-label="Category"
+          aria-label="Show all categories"
           className={`category ${!selectedCategory ? "active" : ""}`}
         >
           <div className="img">
