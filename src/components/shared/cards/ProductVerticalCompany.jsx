@@ -267,8 +267,14 @@ function ProductVerticalCompany({
       {/* Product wrapper clickable */}
       <div
         aria-label="Product"
-        role="link"
         onClick={() => router.push(`/company-product/${product?.slug}-id=${product?.id}`)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            router.push(`/company-product/${product?.slug}-id=${product?.id}`);
+          }
+        }}
+        tabIndex={0}
         className={`product_vertical ${className}`}
         style={{ cursor: "pointer" }}
       >

@@ -21,9 +21,9 @@ import "swiper/css/bundle";
 import "@/assets/styles/all.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/styles/main.css";
+import "@/assets/styles/nprogress-custom.css";
 import BackToTop from "@/components/shared/BackToTop";
 import DownloadApp from "@/components/shared/DownloadApp";
-import NextTopLoader from "nextjs-toploader";
 
 // Hreflang links for SEO (can be used in metadata if needed)
 const _hreflangs = [
@@ -138,7 +138,6 @@ export default async function RootLayout(props) {
           <Toaster expand={false} richColors position="bottom-right" />
           <Header />
           <main>
-            <NextTopLoader color="#1abc9c" showSpinner={false} height={6} />
             {props.children}
           </main>
           <Footer />
