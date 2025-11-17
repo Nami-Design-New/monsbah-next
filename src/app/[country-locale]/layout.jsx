@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 import AuthModal from "@/components/auth/AuthModal";
 import Footer from "@/components/Footer/Footer";
@@ -113,8 +114,9 @@ export default async function RootLayout(props) {
 
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
-      <head>
-        <script id="gtm" strategy="beforeInteractive">
+      <head></head>
+      <body>
+        <Script id="gtm" strategy="beforeInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -122,9 +124,7 @@ export default async function RootLayout(props) {
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-M2Z82BND');
           `}
-        </script>
-      </head>
-      <body>
+        </Script>
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXX"

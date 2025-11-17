@@ -320,12 +320,13 @@ function ProductVertical({
               ) : isShowAction ? (
                 <div className="d-flex align-items-center gap-2">
                   {/* Edit button */}
-                  <div
-                    role="button"
+                  <button
+                    type="button"
                     aria-label="Edit"
                     className={`favourite_btn dark`}
                     onClick={(e) => {
                       e.stopPropagation();
+                      e.preventDefault();
                       router.push(
                         user?.client?.user_type === "company"
                           ? `/add-company-product/${product?.slug}-id=${product?.id}`
@@ -334,7 +335,7 @@ function ProductVertical({
                     }}
                   >
                     <i className="fa-light fa-pen-to-square"></i>
-                  </div>
+                  </button>
                   {/* Delete button */}
                   <button
                     onClick={handleOpenDeleteModal}
@@ -358,12 +359,13 @@ function ProductVertical({
             </li>
 
             <li style={{ flex: 1 }}>
-              <div
+              <button
+                type="button"
                 className="d-flex align-items-center justify-content-center gap-1"
-                role="button"
                 aria-label="Profile"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   router.push(
                     userType === "client"
                       ? +product?.user?.id === +user?.id
@@ -374,9 +376,10 @@ function ProductVertical({
                       : `/companies/${product?.user?.id}`
                   );
                 }}
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer", width: "100%", textAlign: "center" }}
               >
                 <i className="fa-light fa-user"></i> {product?.user?.username}
-              </div>
+              </button>
             </li>
 
             <li>

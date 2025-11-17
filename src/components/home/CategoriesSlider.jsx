@@ -125,10 +125,10 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
             className={`category ${!decoudedCategory ? "active" : ""}`}
             onClick={() => handleSelectCategory("")}
           >
-            <div className="img">
+            <span className="img">
               <img src="/icons/all.svg" alt="All Categories" />
-            </div>
-            <h6>{t("all")}</h6>
+            </span>
+            <span className="category-name">{t("all")}</span>
           </button>
         </SwiperSlide>
 

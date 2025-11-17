@@ -4900,7 +4900,8 @@ body main .explore_ads .categories_slider.subcategories_slider .category.sub {
   width: 100%;
   padding: 10px 18px;
 }
-body main .explore_ads .categories_slider.subcategories_slider .category.sub h6 {
+body main .explore_ads .categories_slider.subcategories_slider .category.sub h6,
+body main .explore_ads .categories_slider.subcategories_slider .category.sub .category-name {
   color: #0d0d0d !important;
 }
 body main .explore_ads .categories_slider.subcategories_slider .category.skeleton {
@@ -4982,13 +4983,15 @@ body main .explore_ads .category > .img img {
   -o-object-fit: contain;
      object-fit: contain;
 }
-body main .explore_ads .category h6 {
+body main .explore_ads .category h6,
+body main .explore_ads .category .category-name {
   margin: 0;
 }
 body main .explore_ads .category.active {
   background: #1abc9c;
 }
-body main .explore_ads .category.active h6 {
+body main .explore_ads .category.active h6,
+body main .explore_ads .category.active .category-name {
   color: #fff;
 }
 body main .explore_ads .category.sub {
@@ -4997,7 +5000,8 @@ body main .explore_ads .category.sub {
 body main .explore_ads .category.skeleton {
   animation: pulse 1.5s ease-in-out infinite;
 }
-body main .explore_ads .category.skeleton h6 {
+body main .explore_ads .category.skeleton h6,
+body main .explore_ads .category.skeleton .category-name {
   min-width: 32px;
 }
 body main .explore_ads .filter {

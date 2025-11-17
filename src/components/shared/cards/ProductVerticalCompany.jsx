@@ -267,7 +267,6 @@ function ProductVerticalCompany({
     <>
       {/* Product wrapper clickable */}
       <Link
-        role="button"
         aria-label="Product"
         href={`/company-product/${product?.slug}-id=${product?.id}`}
         className={`product_vertical ${className}`}
@@ -313,12 +312,13 @@ function ProductVerticalCompany({
               ) : isShowAction ? (
                 <div className="d-flex align-items-center gap-2">
                   {/* Edit */}
-                  <div
-                    role="button"
+                  <button
+                    type="button"
                     aria-label="Edit"
                     className="favourite_btn dark"
                     onClick={(e) => {
                       e.stopPropagation();
+                      e.preventDefault();
                       router.push(
                         user?.client?.user_type === "company"
                           ? `/add-company-product/${product?.slug}`
@@ -327,7 +327,7 @@ function ProductVerticalCompany({
                     }}
                   >
                     <i className="fa-light fa-pen-to-square"></i>
-                  </div>
+                  </button>
                   {/* Delete */}
                   <button
                     onClick={handleOpenDeleteModal}
@@ -351,20 +351,22 @@ function ProductVerticalCompany({
             </li>
 
             <li style={{ flex: 1 }}>
-              <div
-                role="button"
+              <button
+                type="button"
                 aria-label="Profile"
                 onClick={(e) => {
                   e.stopPropagation();
+                  e.preventDefault();
                   router.push(
                     +product?.user?.id === +user?.client?.id
                       ? "company-profile"
                       : `/user-profile/${product?.user?.id}`
                   );
                 }}
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
               >
                 <i className="fa-light fa-user"></i> {product?.user?.username}
-              </div>
+              </button>
             </li>
 
             <li>
