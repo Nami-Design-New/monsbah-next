@@ -3,6 +3,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, EffectFade, Pagination, Autoplay } from "swiper/modules";
 import Image from "next/image";
+import { PRODUCT_CARD_SIZES, IMAGE_QUALITY } from "@/utils/imageConfig";
 
 export default function HeroSlider({ sliders = [] }) {
   const slidesCount = sliders.length;
@@ -54,9 +55,10 @@ export default function HeroSlider({ sliders = [] }) {
                     src={slider?.image}
                     alt={slider?.alt || slider?.title || "Monsbah slide"}
                     fill
-                    sizes="100vw"
+                    sizes={PRODUCT_CARD_SIZES.hero}
                     priority={index === 0}
-                    quality={85}
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                    quality={IMAGE_QUALITY.hero}
                     style={{ objectFit: "cover" }}
                   />
                 </div>

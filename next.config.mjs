@@ -153,8 +153,24 @@ const nextConfig = {
           },
         ],
       },
+      {
+        // Cache WebP and AVIF images
+        source: '/:path*.(webp|avif)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
   },
+  
+  // Optimize build output
+  swcMinify: true,
+  
+  // Production optimizations
+  reactStrictMode: true,
 };
 
 export default withNextIntl(nextConfig);

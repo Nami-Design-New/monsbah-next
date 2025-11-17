@@ -207,6 +207,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useLocale, useTranslations } from "use-intl";
 import ConfirmationModal from "../modals/ConfirmationModal";
+import { PRODUCT_CARD_SIZES, IMAGE_QUALITY } from "@/utils/imageConfig";
 
 function ProductVertical({
   product,
@@ -292,8 +293,9 @@ function ProductVertical({
             <div className="position-relative w-100" style={{ height: "100%" }}>
               <Image
                 fill
-                src={imageError ? "/banner.png" : (product?.image || "/banner.png")}
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                src={imageError ? "/banner.webp" : (product?.image || "/banner.webp")}
+                sizes={PRODUCT_CARD_SIZES.grid}
+                quality={IMAGE_QUALITY.card}
                 alt="product name"
                 onError={() => setImageError(true)}
                 unoptimized={imageError}
