@@ -16,10 +16,7 @@ import { getSettings } from "@/services/settings/getSettings";
 // Suppress S3 image errors
 import "@/utils/imageErrorHandler";
 
-import "swiper/css";
-import "swiper/css/effect-fade";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import "swiper/css/bundle";
 
 import "@/assets/styles/all.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -114,9 +111,13 @@ export default async function RootLayout(props) {
 
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
-      <head></head>
+      <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://monsba.sfo3.cdn.digitaloceanspaces.com" />
+        <link rel="dns-prefetch" href="https://backendv1.monsbah.com" />
+      </head>
       <body>
-        <Script id="gtm" strategy="beforeInteractive">
+        <Script id="gtm" strategy="afterInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
             new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

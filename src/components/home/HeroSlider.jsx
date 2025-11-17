@@ -2,7 +2,7 @@
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, EffectFade, Pagination, Autoplay } from "swiper/modules";
-import { Link } from "@/i18n/navigation";
+import Image from "next/image";
 
 export default function HeroSlider({ sliders = [] }) {
   const slidesCount = sliders.length;
@@ -47,10 +47,18 @@ export default function HeroSlider({ sliders = [] }) {
                 : false
             }
           >
-            {sliders.map((slider) => (
+            {sliders.map((slider, index) => (
               <SwiperSlide key={slider?.id}>
                 <div className="slider_link">
-                  <img src={slider?.image} alt={slider?.alt || slider?.title || "Monsbah slide"} />
+                  <Image
+                    src={slider?.image}
+                    alt={slider?.alt || slider?.title || "Monsbah slide"}
+                    fill
+                    sizes="100vw"
+                    priority={index === 0}
+                    quality={85}
+                    style={{ objectFit: "cover" }}
+                  />
                 </div>
               </SwiperSlide>
             ))}

@@ -10,6 +10,19 @@ const nextConfig = {
   
   // Power by header
   poweredByHeader: false,
+
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
+  
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['react-icons', '@tanstack/react-query'],
+  },
+
+  // Compiler optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   
   images: {
     remotePatterns: [
@@ -40,7 +53,9 @@ const nextConfig = {
       },
     ],
     formats: ["image/webp", "image/avif"],
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 31536000, // 1 year cache for optimized images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -91,6 +106,46 @@ const nextConfig = {
       {
         // Apply headers to all chunk files
         source: '/_next/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Cache images from Next.js image optimization
+        source: '/_next/image/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Cache public assets (images, fonts, etc.)
+        source: '/icons/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Cache public assets
+        source: '/branding/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        // Cache font files
+        source: '/:path*.(woff|woff2|eot|ttf|otf)',
         headers: [
           {
             key: 'Cache-Control',
