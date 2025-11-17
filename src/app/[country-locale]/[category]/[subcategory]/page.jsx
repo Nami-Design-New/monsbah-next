@@ -9,9 +9,11 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getSubCategories } from "@/services/categories/getSubCategories";
+import { getCategories } from "@/services/categories/getCategories";
 import { getSettings } from "@/services/settings/getSettings";
 import { META_DATA_CONTENT } from "@/utils/constants";
 import { resolveCanonicalUrl } from "@/utils/canonical";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }) {
   const { category, subcategory } = await params;
@@ -112,6 +114,20 @@ export default async function page({ params, searchParams }) {
   const selectedCategory = categoryDecoded;
   const [country_slug, lang] = locale.split("-");
 
+  // Validate category exists
+  if (categoryDecoded) {
+    try {
+      const categories = await getCategories();
+      const categoryExists = categories?.some(cat => cat.slug === categoryDecoded);
+      if (!categoryExists) {
+        notFound();
+      }
+    } catch (error) {
+      console.error("Error validating category:", error);
+      notFound();
+    }
+  }
+
   // Get subcategory data for H1 title and description
   let subCategoryData = null;
   if (categoryDecoded) {
@@ -121,8 +137,14 @@ export default async function page({ params, searchParams }) {
         `/${user}/sub-categories`
       );
       subCategoryData = subCategories?.find((item) => item.slug === subCategoryDecoded);
-    } catch {
-      // Use default if fetch fails
+      
+      // If subcategory is provided but not found, show 404
+      if (subCategoryDecoded && !subCategoryData) {
+        notFound();
+      }
+    } catch (error) {
+      console.error("Error fetching subcategory:", error);
+      notFound();
     }
   }
   const settings = await getSettings();

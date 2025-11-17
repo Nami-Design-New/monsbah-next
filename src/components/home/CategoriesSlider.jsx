@@ -73,7 +73,7 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
   return (
     <div className="categories-wrapper">
       {/* Tab Buttons - Only show on home page (no category selected) */}
-      {!selectedCategory && (
+      {!decoudedCategory && (
         <div className="categories-tabs" style={{ 
           display: "flex", 
           gap: "12px", 
@@ -126,7 +126,7 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
             onClick={() => handleSelectCategory("")}
           >
             <div className="img">
-              <img src="/icons/all.svg" alt="All Categories" loading="lazy" />
+              <img src="/icons/all.svg" alt="All Categories" />
             </div>
             <h6>{t("all")}</h6>
           </button>
@@ -143,8 +143,7 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
               <div className="img">
                 <img 
                   src={category?.icon} 
-                  alt={category?.alt || category?.name || category?.slug} 
-                  loading="lazy"
+                  alt={category?.alt || category?.name || category?.slug}
                 />
               </div>
               <h6>{category?.name}</h6>

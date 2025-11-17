@@ -15,6 +15,7 @@ import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getSettings } from "@/services/settings/getSettings";
 import { META_DATA_CONTENT } from "@/utils/constants";
 import { resolveCanonicalUrl } from "@/utils/canonical";
+import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }) {
   const { category } = await params;
@@ -88,6 +89,12 @@ export default async function page({ params, searchParams }) {
   // Get category data for H1 title and description
   const categories = await getCategories(`/${user}/categories`);
   const categoryData = categories?.find((item) => item.slug === categoryDecoded);
+  
+  // If category is provided but not found, show 404
+  if (categoryDecoded && !categoryData) {
+    notFound();
+  }
+  
   const settings = await getSettings();
   
   // Use meta_title for H1, fallback to name
