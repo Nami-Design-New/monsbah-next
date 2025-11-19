@@ -112,6 +112,7 @@ export default async function RootLayout(props) {
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
       <head>
+        <meta name="google-site-verification" content="e-AefwQFw80wb3obNRXpVfY1KGT-VmL7nMEuG5cxi3I" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://www.googletagmanager.com" />
