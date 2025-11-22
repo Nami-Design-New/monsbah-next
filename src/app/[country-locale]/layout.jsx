@@ -128,6 +128,18 @@ export default async function RootLayout(props) {
             .priceInfo .no-js-login { display: inline-block !important; }
           `}</style>
         </noscript>
+        {/* Microsoft Clarity tracking (placed in head) */}
+        <Script
+          id="clarity"
+          strategy="lazyOnload"
+          dangerouslySetInnerHTML={{
+            __html: ` (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/ua5hqbxzyw?ref=bwt";
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ua5hqbxzyw"); `
+          }}
+        />
       </head>
       <body>
         <Script 
