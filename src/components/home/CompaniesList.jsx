@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import CompanyLoader from "@/components/shared/loaders/CompanyLoader";
 import CompanyCard from "../shared/cards/CompanyCard";
 import useGetCompanies from "@/hooks/queries/companies/useGetCompanies";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 export default function CompaniesList() {
   const sectionRef = useRef(null);
@@ -19,24 +20,14 @@ export default function CompaniesList() {
   const allCompanies =
     companiesData?.pages?.flatMap((page) => page?.data?.data) ?? [];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const section = sectionRef.current;
-      if (!section) return;
-
-      const sectionBottom = section.getBoundingClientRect().bottom;
-      const viewportHeight = window.innerHeight;
-
-      if (sectionBottom <= viewportHeight + 200) {
-        if (hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  useInfiniteScroll({
+    ref: sectionRef,
+    hasMore: hasNextPage,
+    isLoading: isFetchingNextPage,
+    onLoadMore: fetchNextPage,
+    offset: 200,
+    debounceMs: 250,
+  });
 
   return (
     <section className="companies_section" ref={sectionRef}>

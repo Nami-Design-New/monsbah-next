@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import ProductVertical from "../shared/cards/ProductVertical";
 import useGetCompanyProducts from "@/hooks/queries/products/useGetCompanyProducts";
 import CompanyLoader from "../shared/loaders/CompanyLoader";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 export default function CompaniesAds() {
   const sectionRef = useRef(null);
@@ -18,26 +19,14 @@ export default function CompaniesAds() {
   const allProducts =
     products?.pages?.flatMap((page) => page?.data?.data) ?? [];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-
-      const section = sectionRef.current;
-      const sectionBottom = section.getBoundingClientRect().bottom;
-      const viewportHeight = window.innerHeight;
-
-      if (
-        sectionBottom <= viewportHeight + 200 &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        fetchNextPage();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  useInfiniteScroll({
+    ref: sectionRef,
+    hasMore: hasNextPage,
+    isLoading: isFetchingNextPage,
+    onLoadMore: fetchNextPage,
+    offset: 200,
+    debounceMs: 250,
+  });
 
   return (
     <section className="companies_section" ref={sectionRef}>

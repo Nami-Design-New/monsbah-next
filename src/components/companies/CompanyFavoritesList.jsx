@@ -2,7 +2,7 @@
 
 import useGetCompanyFavorites from "@/hooks/queries/favorite/useGetCompanyFavorites";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import ProductVertical from "../shared/cards/ProductVertical";
 import EmptyData from "../shared/EmptyData";
 import ProductLoader from "../shared/loaders/ProductLoader";
@@ -21,26 +21,14 @@ export default function CompanyFavoritesList() {
 
   const allFavs = favorites?.pages?.flatMap((page) => page?.data?.data) ?? [];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const section = sectionRef.current;
-      const sectionBottom = section.getBoundingClientRect().bottom;
-      const viewportHeight = window.innerHeight;
-
-      if (
-        sectionBottom <= viewportHeight + 200 &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        fetchNextPage();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  useInfiniteScroll({
+    ref: sectionRef,
+    hasMore: hasNextPage,
+    isLoading: isFetchingNextPage,
+    onLoadMore: fetchNextPage,
+    offset: 200,
+    debounceMs: 250,
+  });
 
   return (
     <section className="products_section w-100 my-5" ref={sectionRef}>

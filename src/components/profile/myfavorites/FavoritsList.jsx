@@ -5,7 +5,8 @@ import ProductLoader from "@/components/shared/loaders/ProductLoader";
 import useGetCompanyFavorites from "@/hooks/queries/favorite/useGetCompanyFavorites";
 import useGetFavorites from "@/hooks/queries/favorite/useGetFavorites";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 export default function FavoritsList() {
   const sectionRef = useRef();
@@ -21,26 +22,14 @@ export default function FavoritsList() {
 
   const allFavs = favorites?.pages?.flatMap((page) => page?.data?.data) ?? [];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const section = sectionRef.current;
-      const sectionBottom = section.getBoundingClientRect().bottom;
-      const viewportHeight = window.innerHeight;
-
-      if (
-        sectionBottom <= viewportHeight + 200 &&
-        hasNextPage &&
-        !isFetchingNextPage
-      ) {
-        fetchNextPage();
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  useInfiniteScroll({
+    ref: sectionRef,
+    hasMore: hasNextPage,
+    isLoading: isFetchingNextPage,
+    onLoadMore: fetchNextPage,
+    offset: 200,
+    debounceMs: 250,
+  });
 
   return (
     <>

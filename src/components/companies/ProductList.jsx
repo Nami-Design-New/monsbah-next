@@ -4,6 +4,7 @@ import { useRef, useEffect, useState } from "react";
 import ProductVerticalCompany from "../shared/cards/ProductVerticalCompany";
 import ProductLoader from "@/components/shared/loaders/ProductLoader";
 import useGetCompanyProducts from "@/hooks/queries/products/useGetCompanyProducts";
+import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 export default function ProductList({ initialProducts = [] }) {
   const sectionRef = useRef(null);
@@ -34,25 +35,15 @@ export default function ProductList({ initialProducts = [] }) {
     setIsClient(true);
   }, []);
 
-  useEffect(() => {
-    // Only run on client
-    if (typeof window === 'undefined') return;
-    
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const sectionBottom = sectionRef.current.getBoundingClientRect().bottom;
-      const viewportHeight = window.innerHeight;
-
-      if (sectionBottom <= viewportHeight + 200) {
-        if (hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  // Attach debounced infinite scroll that respects loading guard
+  useInfiniteScroll({
+    ref: sectionRef,
+    hasMore: hasNextPage,
+    isLoading: isFetchingNextPage,
+    onLoadMore: fetchNextPage,
+    offset: 200,
+    debounceMs: 250,
+  });
 
   return (
     <>
