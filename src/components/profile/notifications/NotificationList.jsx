@@ -2,11 +2,10 @@
 
 import EmptyData from "@/components/shared/EmptyData";
 import NotificationCard from "./NotificationCard";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import NotificationLoader from "@/components/shared/loaders/NotificationLoader";
 import useGetNotifications from "@/hooks/queries/notifications/useGetNotifications";
 import { useTranslations } from "use-intl";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
 export default function NotificationList() {
   const t = useTranslations();
@@ -21,14 +20,28 @@ export default function NotificationList() {
   const allNotifications =
     notifications?.pages?.flatMap((page) => page?.data?.data) ?? [];
 
-  useInfiniteScroll({
-    ref: sectionRef,
-    hasMore: hasNextPage,
-    isLoading: isFetchingNextPage,
-    onLoadMore: fetchNextPage,
-    offset: 200,
-    debounceMs: 250,
-  });
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+
+      const section = sectionRef.current;
+      const sectionBottom = section.getBoundingClientRect().bottom;
+      const viewportHeight = window.innerHeight;
+
+      if (
+        sectionBottom <= viewportHeight + 200 &&
+        hasNextPage &&
+        !isFetchingNextPage
+      ) {
+        fetchNextPage();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
 
   return (
     <div className="notifications_section" ref={sectionRef}>

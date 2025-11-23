@@ -6,7 +6,6 @@ import ProductVertical from "../shared/cards/ProductVertical";
 import ProductVerticalCompany from "../shared/cards/ProductVerticalCompany";
 import useGetProducts from "@/hooks/queries/products/useGetProducts";
 import useGetCompanyProducts from "@/hooks/queries/products/useGetCompanyProducts";
-import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import Pagination from "@/components/shared/Pagination";
 import { useCategoryTab } from "./CategoryTabContext";
 
@@ -47,15 +46,26 @@ export default function ProductsSection({ userType, initialProducts = [] }) {
     setIsClient(true);
   }, []);
 
-  // Debounced infinite scroll with loading guard
-  useInfiniteScroll({
-    ref: sectionRef,
-    hasMore: hasNextPage,
-    isLoading: isFetchingNextPage,
-    onLoadMore: fetchNextPage,
-    offset: 200,
-    debounceMs: 250,
-  });
+  useEffect(() => {
+    // Only run on client
+    if (typeof window === 'undefined') return;
+    
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const sectionBottom = sectionRef.current.getBoundingClientRect().bottom;
+      const viewportHeight = window.innerHeight;
+
+      if (sectionBottom <= viewportHeight + 200) {
+        if (hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
 
   return (
     <>
