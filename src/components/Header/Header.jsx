@@ -84,9 +84,6 @@ export default function Header() {
                           {t("favourites")}
                         </Dropdown.Item>
 
-                        <Dropdown.Item as={Link} href="/add-company-product">
-                          {t("addAd")}
-                        </Dropdown.Item>
 
                         <Dropdown.Item as={Link} href="/company-verification">
                           {t("tabs.verification")}

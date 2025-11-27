@@ -1,6 +1,7 @@
 import AboutSection from "@/components/about/AboutSection";
 import Countries from "@/components/about/Countries";
 import HowItWorks from "@/components/about/HowItWorks";
+import JoinNowSection from "@/components/about/JoinNowSection";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getTranslations } from "next-intl/server";
 
@@ -30,6 +31,7 @@ export default async function About() {
         <AboutSection />
         <HowItWorks />
         <Countries />
+        <JoinNowSection />
       </div>
     </section>
   );
