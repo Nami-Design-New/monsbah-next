@@ -146,6 +146,36 @@ export default async function RootLayout(props) {
         />
       </head>
       <body>
+        {/* Suppress console errors in production */}
+        {process.env.NODE_ENV === 'production' && (
+          <Script 
+            id="suppress-console-production"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  // Override console methods to suppress all output in production
+                  console.error = function() {};
+                  console.warn = function() {};
+                  console.log = function() {};
+                  console.info = function() {};
+                  console.debug = function() {};
+                  
+                  // Suppress unhandled promise rejections
+                  window.addEventListener('unhandledrejection', function(event) {
+                    event.preventDefault();
+                  });
+                  
+                  // Suppress all global errors including third-party scripts
+                  window.addEventListener('error', function(event) {
+                    event.preventDefault();
+                    return false;
+                  }, true);
+                })();
+              `
+            }}
+          />
+        )}
         <Script 
           id="gtm" 
           strategy="lazyOnload"
