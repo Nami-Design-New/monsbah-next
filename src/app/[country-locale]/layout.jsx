@@ -17,12 +17,15 @@ import { getSettings } from "@/services/settings/getSettings";
 // Suppress S3 image errors
 import "@/utils/imageErrorHandler";
 
-import "swiper/css/bundle";
+// Import only necessary Swiper CSS modules
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
+// Import styles in optimized order
 import "@/assets/styles/all.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/styles/main.css";
-import "@/assets/styles/nprogress-custom.css";
 import BackToTop from "@/components/shared/BackToTop";
 import DownloadApp from "@/components/shared/DownloadApp";
 

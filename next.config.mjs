@@ -16,13 +16,29 @@ const nextConfig = {
   
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['react-icons', '@tanstack/react-query'],
+    optimizePackageImports: [
+      'react-icons', 
+      '@tanstack/react-query',
+      'react-bootstrap',
+      'bootstrap',
+      'swiper',
+      'react-hook-form',
+      '@hookform/resolvers',
+      'zod',
+      'sonner'
+    ],
+    optimizeCss: true,
   },
 
   // Compiler optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
   },
+  
+  // Output standalone for smaller builds
+  output: 'standalone',
   
   images: {
     remotePatterns: [
@@ -165,9 +181,6 @@ const nextConfig = {
       },
     ];
   },
-  
-  // Optimize build output
-  swcMinify: true,
   
   // Production optimizations
   reactStrictMode: true,
