@@ -65,12 +65,12 @@ function buildHref(localeSlug, path) {
 
   if (!normalizedLocale) {
     return normalizedPath === "/"
-      ? `${SITE_URL}/`
+      ? `${SITE_URL}`
       : `${SITE_URL}${normalizedPath}`;
   }
 
   if (normalizedPath === "/") {
-    return `${SITE_URL}/${normalizedLocale}/`;
+    return `${SITE_URL}/${normalizedLocale}`;
   }
 
   return `${SITE_URL}/${normalizedLocale}${normalizedPath}`;

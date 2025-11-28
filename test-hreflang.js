@@ -88,7 +88,6 @@ console.log();
 console.log("TEST 1: Home Page (/)");
 console.log("-".repeat(80));
 const homeAlternates = testGenerateHreflangAlternates("/");
-console.log("Canonical:", homeAlternates.canonical);
 console.log("\nHreflang Tags:");
 Object.entries(homeAlternates.languages).forEach(([hreflang, url]) => {
   console.log(`  ${hreflang.padEnd(12)} -> ${url}`);
