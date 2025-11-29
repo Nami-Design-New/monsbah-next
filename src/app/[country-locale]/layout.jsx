@@ -21,6 +21,7 @@ import "@/utils/imageErrorHandler";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/css/effect-fade";
 
 // Import styles in optimized order
 import "@/assets/styles/all.min.css";

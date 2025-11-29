@@ -87,12 +87,25 @@ export default async function page({ params, searchParams }) {
   const [country_slug, lang] = locale.split("-");
 
   // Get category data for H1 title and description
-  const categories = await getCategories(`/${user}/categories`);
-  const categoryData = categories?.find((item) => item.slug === categoryDecoded);
-  
-  // If category is provided but not found, show 404
-  if (categoryDecoded && !categoryData) {
-    notFound();
+  let categoryData = null;
+  try {
+    const categories = await getCategories(`/${user}/categories`);
+    if (categories && Array.isArray(categories)) {
+      categoryData = categories.find((item) => item.slug === categoryDecoded);
+      
+      // If category is provided but not found, show 404
+      if (categoryDecoded && !categoryData) {
+        console.warn(`Category not found: ${categoryDecoded}`);
+        notFound();
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    // Only throw 404 if it's a genuine not found error
+    if (error?.message?.includes('404') || error?.status === 404) {
+      notFound();
+    }
+    // For other errors, continue without category data (graceful degradation)
   }
   
   const settings = await getSettings();

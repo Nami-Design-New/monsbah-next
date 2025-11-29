@@ -118,13 +118,20 @@ export default async function page({ params, searchParams }) {
   if (categoryDecoded) {
     try {
       const categories = await getCategories();
-      const categoryExists = categories?.some(cat => cat.slug === categoryDecoded);
-      if (!categoryExists) {
-        notFound();
+      if (categories && Array.isArray(categories)) {
+        const categoryExists = categories.some(cat => cat.slug === categoryDecoded);
+        if (!categoryExists) {
+          console.warn(`Category not found: ${categoryDecoded}`);
+          notFound();
+        }
       }
     } catch (error) {
       console.error("Error validating category:", error);
-      notFound();
+      // Only throw 404 if it's a genuine not found error, not a network/API error
+      if (error?.message?.includes('404') || error?.status === 404) {
+        notFound();
+      }
+      // For other errors, let the page load anyway (graceful degradation)
     }
   }
 
@@ -136,15 +143,22 @@ export default async function page({ params, searchParams }) {
         { category_slug: categoryDecoded },
         `/${user}/sub-categories`
       );
-      subCategoryData = subCategories?.find((item) => item.slug === subCategoryDecoded);
-      
-      // If subcategory is provided but not found, show 404
-      if (subCategoryDecoded && !subCategoryData) {
-        notFound();
+      if (subCategories && Array.isArray(subCategories)) {
+        subCategoryData = subCategories.find((item) => item.slug === subCategoryDecoded);
+        
+        // If subcategory is provided but not found, show 404
+        if (subCategoryDecoded && !subCategoryData) {
+          console.warn(`Subcategory not found: ${subCategoryDecoded} in category: ${categoryDecoded}`);
+          notFound();
+        }
       }
     } catch (error) {
       console.error("Error fetching subcategory:", error);
-      notFound();
+      // Only throw 404 if it's a genuine not found error
+      if (error?.message?.includes('404') || error?.status === 404) {
+        notFound();
+      }
+      // For other errors, continue without subcategory data (graceful degradation)
     }
   }
   const settings = await getSettings();

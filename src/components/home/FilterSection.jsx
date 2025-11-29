@@ -66,7 +66,7 @@ export default async function FilterSection({
                     <div className="img">
                       <img src="/icons/all.svg" alt="All Categories" />
                     </div>
-                    <h6>{t("all")}</h6>
+                    <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</p>
                   </a>
                 </div>
                 {categories.map((cat) => (
@@ -81,7 +81,7 @@ export default async function FilterSection({
                       <div className="img">
                         <img src={cat.image} alt={cat.alt || cat.name || cat.slug} />
                       </div>
-                      <h6>{cat.name}</h6>
+                      <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{cat.name}</p>
                     </a>
                   </div>
                 ))}
@@ -99,7 +99,7 @@ export default async function FilterSection({
                         !selectedSubCategory ? "active" : ""
                       }`}
                     >
-                      <h6>{t("all")}</h6>
+                      <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</p>
                     </a>
                   </div>
                   {subCategories.map((sub) => (
@@ -110,7 +110,7 @@ export default async function FilterSection({
                           selectedSubCategory === sub.slug ? "active" : ""
                         }`}
                       >
-                        <h6>{sub.name}</h6>
+                        <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{sub.name}</p>
                       </a>
                     </div>
                   ))}

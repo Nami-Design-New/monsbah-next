@@ -128,7 +128,7 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
             <span className="img">
               <img src="/icons/all.svg" alt="All Categories" />
             </span>
-            <span className="category-name">{t("all")}</span>
+            <span style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</span>
           </button>
         </SwiperSlide>
 
@@ -146,7 +146,7 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
                   alt={category?.alt || category?.name || category?.slug}
                 />
               </div>
-              <h6>{category?.name}</h6>
+              <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{category?.name}</p>
             </Link>
           </SwiperSlide>
         ))}

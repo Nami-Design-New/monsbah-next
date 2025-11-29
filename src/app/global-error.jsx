@@ -50,7 +50,13 @@ export default function GlobalError({ reset }) {
               flexWrap: 'wrap'
             }}>
               <button
-                onClick={() => reset()}
+                onClick={() => {
+                  if (typeof reset === 'function') {
+                    reset();
+                  } else {
+                    window.location.reload();
+                  }
+                }}
                 style={{
                   padding: '0.75rem 1.5rem',
                   borderRadius: '8px',

@@ -31,7 +31,7 @@ export default async function SideBar({ selectedCategory }) {
           <div className="img">
             <Image width={32} height={32} src="/icons/all.svg" alt="all" />
           </div>
-          <p className="category-name">All</p>
+          <p style={{  fontSize: "14px", fontWeight: "600" }}  className="category-name">All</p>
         </Link>
 
         {categoryList.map((category) => (
@@ -46,7 +46,7 @@ export default async function SideBar({ selectedCategory }) {
             <div className="img">
               <img src={category.icon} alt={category.alt || category.name} />
             </div>
-            <p className="category-name">{category.name}</p>
+            <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{category.name}</p>
           </Link>
         ))}
 
@@ -64,7 +64,7 @@ export default async function SideBar({ selectedCategory }) {
                 marginBottom: "8px",
               }}
             >
-              <p className="category-name" style={{ margin: 0, fontWeight: "600" }}>الشركات</p>
+              <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name" >الشركات</p>
             </div>
 
             {companiesCategories.map((category) => (
@@ -77,7 +77,7 @@ export default async function SideBar({ selectedCategory }) {
                 <div className="img">
                   <img src={category.icon} alt={category.alt || category.name} />
                 </div>
-                <p className="category-name">{category.name}</p>
+                <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{category.name}</p>
               </Link>
             ))}
           </>

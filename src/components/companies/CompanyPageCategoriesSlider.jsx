@@ -38,7 +38,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
           <div className="img">
             <img src="/icons/all.svg" alt="All Categories" />
           </div>
-          <p className="category-name">{t("all")}</p>
+          <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</p>
         </Link>
       </SwiperSlide>
 
@@ -54,7 +54,7 @@ export default function CompanyPageCategoriesSlider({ categories }) {
             <div className="img">
               <img src={category?.icon} alt={category?.name || category?.slug || ""} />
             </div>
-            <p className="category-name">{category?.name}</p>
+            <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{category?.name}</p>
           </Link>
         </SwiperSlide>
       ))}

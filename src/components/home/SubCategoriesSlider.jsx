@@ -45,7 +45,7 @@ export default function SubCategoriesSlider({ subCategories }) {
           className={`category sub ${!decoudedSubCategory ? "active" : ""}`}
           onClick={() => handleSelectSubCategory("")}
         >
-          <h6>{t("all")}</h6>
+          <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</p>
         </button>
       </SwiperSlide>
 
@@ -57,7 +57,7 @@ export default function SubCategoriesSlider({ subCategories }) {
             }`}
             href={`/${decoudedCategory}/${sub.slug}`}
           >
-            <h6>{sub?.name}</h6>
+            <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{sub?.name}</p>
           </Link>
         </SwiperSlide>
       ))}
