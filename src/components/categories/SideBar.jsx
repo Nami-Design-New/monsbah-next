@@ -31,7 +31,7 @@ export default async function SideBar({ selectedCategory }) {
           <div className="img">
             <Image width={32} height={32} src="/icons/all.svg" alt="all" />
           </div>
-          <h6>All</h6>
+          <p className="category-name">All</p>
         </Link>
 
         {categoryList.map((category) => (
@@ -46,7 +46,7 @@ export default async function SideBar({ selectedCategory }) {
             <div className="img">
               <img src={category.icon} alt={category.alt || category.name} />
             </div>
-            <h6>{category.name}</h6>
+            <p className="category-name">{category.name}</p>
           </Link>
         ))}
 
@@ -64,7 +64,7 @@ export default async function SideBar({ selectedCategory }) {
                 marginBottom: "8px",
               }}
             >
-              <h6 style={{ margin: 0, fontWeight: "600" }}>الشركات</h6>
+              <p className="category-name" style={{ margin: 0, fontWeight: "600" }}>الشركات</p>
             </div>
 
             {companiesCategories.map((category) => (
@@ -77,7 +77,7 @@ export default async function SideBar({ selectedCategory }) {
                 <div className="img">
                   <img src={category.icon} alt={category.alt || category.name} />
                 </div>
-                <h6>{category.name}</h6>
+                <p className="category-name">{category.name}</p>
               </Link>
             ))}
           </>

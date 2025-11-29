@@ -170,13 +170,15 @@ export default function CountrySelectorModal() {
         backdrop="static"
         keyboard={false}
         className="country-selector-modal"
+        aria-labelledby="country-selector-title"
+        aria-describedby="country-selector-description"
       >
       <Modal.Header className="border-0 pb-2">
         <Modal.Title className="w-100 text-center">
-          <h3 className="fw-bold mb-2" style={{ fontSize: '26px', color: '#0d0d0d' }}>
+          <h2 id="country-selector-title" className="fw-bold mb-2" style={{ fontSize: '26px', color: '#0d0d0d' }}>
             {isArabic ? "اختر دولتك" : "Select Your Country"}
-          </h3>
-          <p className="text-muted mb-0" style={{ fontSize: '16px', fontWeight: 'normal' }}>
+          </h2>
+          <p id="country-selector-description" className="text-muted mb-0" style={{ fontSize: '16px', fontWeight: 'normal' }}>
             {isArabic ? "لعرض الإعلانات المتاحة في منطقتك" : "To view available ads in your region"}
           </p>
         </Modal.Title>
@@ -198,7 +200,7 @@ export default function CountrySelectorModal() {
                   style={{ objectFit: 'cover', borderRadius: '8px', width: '100%' }}
                 />
               </div>
-              <h5 className="mb-0 mt-2">{isArabic ? country.name : country.nameEn}</h5>
+              <h3 className="mb-0 mt-2">{isArabic ? country.name : country.nameEn}</h3>
             </button>
           ))}
         </div>

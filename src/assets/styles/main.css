@@ -2830,10 +2830,12 @@ body .product_vertical .content .title h3 {
 }
 body .product_vertical .content .price {
   font-size: 18px;
-  color: #1abc9c;
+  color: #0f8a73;
+  /* Changed from #1abc9c to darker shade for better contrast (WCAG AA compliant) */
 }
 body .product_vertical .content .price span {
-  color: #1abc9c;
+  color: #0f8a73;
+  /* Changed from #1abc9c to darker shade for better contrast */
   font-weight: bold;
 }
 body .product_vertical .content ul {
@@ -3065,10 +3067,12 @@ body .company_product .content .company_img img {
 }
 body .company_product .content .price {
   font-size: 18px;
-  color: #1abc9c;
+  color: #0f8a73;
+  /* Changed from #1abc9c to darker shade for better contrast (WCAG AA compliant) */
 }
 body .company_product .content .price span {
-  color: #1abc9c;
+  color: #0f8a73;
+  /* Changed from #1abc9c to darker shade for better contrast */
   font-weight: bold;
 }
 body .company_product .content ul {

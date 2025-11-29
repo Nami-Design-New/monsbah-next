@@ -32,7 +32,7 @@ export default function SubCategoriesCompanySlider({ subCategories }) {
           aria-label="Subcategory"
           className={`category sub ${!searchParams.get("sub_category") ? "active" : ""}`}
         >
-          <h6>{t("all")}</h6>
+          <p className="category-name">{t("all")}</p>
         </Link>
       </SwiperSlide>
 
@@ -45,7 +45,7 @@ export default function SubCategoriesCompanySlider({ subCategories }) {
               searchParams.get("sub_category") === sub?.slug ? "active" : ""
             }`}
           >
-            <h6>{sub?.name}</h6>
+            <p className="category-name">{sub?.name}</p>
           </Link>
         </SwiperSlide>
       ))}

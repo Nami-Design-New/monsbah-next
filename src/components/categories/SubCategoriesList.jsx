@@ -43,7 +43,7 @@ export default async function SubCategoriesList({
                 
                   />
                 </div>
-                <h6>{category?.name}</h6>
+                <h2 className="category-name">{category?.name}</h2>
               </Link>
             </div>
           );
@@ -68,7 +68,7 @@ export default async function SubCategoriesList({
                        
                       />
                     </div>
-                    <h6>{category?.name}</h6>
+                    <h2 className="category-name">{category?.name}</h2>
                   </Link>
                 </div>
               );
