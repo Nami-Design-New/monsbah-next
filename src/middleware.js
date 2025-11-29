@@ -61,6 +61,13 @@ export async function middleware(req) {
   if (res && res.headers) {
     res.headers.delete('Link');
     res.headers.delete('link');
+    
+    // Add performance optimization hints
+    res.headers.set('X-DNS-Prefetch-Control', 'on');
+    res.headers.set('X-Content-Type-Options', 'nosniff');
+    res.headers.set('X-Frame-Options', 'SAMEORIGIN');
+    res.headers.set('X-XSS-Protection', '1; mode=block');
+    res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   }
 
   const token = req.cookies.get("token");
