@@ -1,6 +1,5 @@
 "use server";
 
-import { getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import serverAxios from "../axios/severAxios";
 import { FCM } from "@/utils/constants";
@@ -11,9 +10,7 @@ export async function loginAction({
   country_code,
   phone,
   password,
-  fcm_token = "",
 }) {
-  const t = await getTranslations();
   const cookieStore = cookies();
   const endPoint =
     userType === "company" ? "/company/auth/login" : "/client/auth/login";

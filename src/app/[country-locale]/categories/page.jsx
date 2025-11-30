@@ -1,7 +1,6 @@
 import SideBar from "@/components/categories/SideBar";
 import SubCategoriesList from "@/components/categories/SubCategoriesList";
 import { getCategories } from "@/services/categories/getCategories";
-import { getSubCategories } from "@/services/categories/getSubCategories";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 import { getTranslations } from "next-intl/server";
 import { resolveCanonicalUrl } from "@/utils/canonical";
@@ -16,11 +15,6 @@ export async function generateMetadata({ searchParams }) {
   const isValidSlug =
     typeof categorySlug === "string" && /^[a-z0-9-]+$/i.test(categorySlug);
   const safeSlug = isValidSlug ? categorySlug : null;
-
-  // Fetch sub-categories for metadata (future use)
-  const _subCategories = await getSubCategories({
-    category_slug: safeSlug,
-  });
 
   let canonicalUrl = null;
   if (safeSlug) {

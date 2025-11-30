@@ -39,7 +39,7 @@ export default function ReportModal({ id, type, showModal, setShowModal }) {
     setLoading(true);
     const reqBody = { comment_type: type, comment_id: id, ...data };
     try {
-      const res = await createReportAction(reqBody);
+      await createReportAction(reqBody);
 
       toast.success(t("successfullyReported"));
       setShowModal(false);

@@ -15,7 +15,7 @@ export const getUserProducts = async (pageParam = 1) => {
     if (res.status === 200) {
       return res?.data;
     }
-  } catch (erros) {
+  } catch {
     throw new Error("Failed to fetch products");
   }
 };

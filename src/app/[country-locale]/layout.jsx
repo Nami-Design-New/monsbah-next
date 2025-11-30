@@ -23,29 +23,13 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
-// Import styles in optimized order - Font Awesome CSS is large (~600KB)
-// Load it early but consider lazy loading in the future for better LCP
-import "@/assets/styles/all.min.css";
+// Import styles in optimized order - Font Awesome CSS optimized (~200KB)
+// Removed unused weights (thin, duotone, brands) - saved ~340KB CSS + ~920KB fonts
+import "@/assets/styles/fa-optimized.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/styles/main.css";
 import BackToTop from "@/components/shared/BackToTop";
 import DownloadApp from "@/components/shared/DownloadApp";
-
-// Hreflang links for SEO (can be used in metadata if needed)
-const _hreflangs = [
-  { href: "https://monsbah.com/sa-ar", hreflang: "ar-sa" },
-  { href: "https://monsbah.com/kw-ar", hreflang: "ar-kw" },
-  { href: "https://monsbah.com/ae-ar", hreflang: "ar-ae" },
-  { href: "https://monsbah.com/bh-ar", hreflang: "ar-bh" },
-  { href: "https://monsbah.com/om-ar", hreflang: "ar-om" },
-  { href: "https://monsbah.com/qa-ar", hreflang: "ar-qa" },
-  { href: "https://monsbah.com/sa-en", hreflang: "en-sa" },
-  { href: "https://monsbah.com/kw-en", hreflang: "en-kw" },
-  { href: "https://monsbah.com/ae-en", hreflang: "en-ae" },
-  { href: "https://monsbah.com/bh-en", hreflang: "en-bh" },
-  { href: "https://monsbah.com/om-en", hreflang: "en-om" },
-  { href: "https://monsbah.com/qa-en", hreflang: "en-qa" },
-];
 
 export async function generateMetadata({ params }) {
   const locale = await params;

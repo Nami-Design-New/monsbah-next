@@ -12,7 +12,7 @@ export async function getFollowers(profile_id, pageParam = 1) {
     if (res.status === 200) {
       return res.data;
     }
-  } catch (error) {
+  } catch {
     throw new Error("Failed to fetch persons");
   }
 }

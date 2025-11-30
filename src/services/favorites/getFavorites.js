@@ -1,6 +1,5 @@
 import serverAxios from "@/libs/axios/severAxios";
 import { getUserType } from "../auth/getUserType";
-import { error } from "console";
 
 export async function getFavorites(pageParam = 1) {
   const userType = await getUserType();
@@ -15,9 +14,7 @@ export async function getFavorites(pageParam = 1) {
     if (res.status === 200) {
       return res?.data;
     }
-  } catch (erros) {
-    console.log(error);
-
+  } catch {
     throw new Error("Failed to fetch favs");
   }
 }

@@ -9,7 +9,7 @@ export async function createReportAction(payload) {
     if (res === 200) {
       return res?.data;
     }
-  } catch (e) {
+  } catch (error) {
     throw new Error(error?.response?.data?.message);
   }
 }

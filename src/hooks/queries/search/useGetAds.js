@@ -35,7 +35,7 @@ function useGetAds() {
       }
     },
 
-    getNextPageParam: (lastPage, pages) => {
+    getNextPageParam: (lastPage) => {
       const nextUrl = lastPage?.data?.links?.next;
       return nextUrl ? new URL(nextUrl).searchParams.get("page") : undefined;
     },

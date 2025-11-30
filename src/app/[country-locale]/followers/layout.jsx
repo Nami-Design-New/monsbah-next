@@ -1,7 +1,6 @@
 import FollowersNav from "@/components/followers/FollowersNav";
-import { Link } from "@/i18n/navigation";
-import { getTranslations } from "next-intl/server";
 import React from "react";
+import { getTranslations } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 
 export async function generateMetadata() {
@@ -18,7 +17,6 @@ export async function generateMetadata() {
 }
 
 export default async function Layout({ children }) {
-  const t = await getTranslations();
   return (
     <section className="search_section">
       <div className="container">

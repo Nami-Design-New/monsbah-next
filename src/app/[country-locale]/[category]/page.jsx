@@ -114,9 +114,6 @@ export default async function page({ params, searchParams }) {
   const h1Title = categoryData?.meta_title || 
                   categoryData?.name || 
                   settings?.name;
-  
-  // Get description for display
-  const pageDescription = categoryData?.meta_description;
 
   // Extract all search parameters
   const type = paramsObj?.type || null;

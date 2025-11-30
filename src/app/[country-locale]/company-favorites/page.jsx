@@ -1,5 +1,4 @@
 import CompanyFavoritesList from "@/components/companies/CompanyFavoritesList";
-import { getUserType } from "@/services/auth/getUserType";
 import { getFavorites } from "@/services/favorites/getFavorites";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";

@@ -310,31 +310,23 @@ export default async function Companies({ searchParams, params }) {
     border: 0,
   };
 
-  // Generate page title and description from category data
+  // Generate page title from category data
   let pageTitle;
-  let pageDescription;
 
   if (matchedSubCategory) {
     pageTitle = matchedSubCategory.meta_title || 
                 matchedSubCategory.name || 
                 `${metaT("companies.titleByCategorySub")} ${sub_category_slug}`;
-    pageDescription = matchedSubCategory.meta_description || 
-                      `${metaT("companies.descriptionByCategorySub")} ${sub_category_slug}`;
   } else if (matchedCategory) {
     pageTitle = matchedCategory.meta_title || 
                 matchedCategory.name || 
                 `${metaT("companies.titleByCategory")} ${category_slug}`;
-    pageDescription = matchedCategory.meta_description || 
-                      `${metaT("companies.descriptionByCategory")} ${category_slug}`;
   } else if (category_slug && sub_category_slug) {
     pageTitle = `${metaT("companies.titleByCategorySub")} ${category_slug} - ${sub_category_slug}`;
-    pageDescription = `${metaT("companies.descriptionByCategorySub")} ${category_slug}, ${sub_category_slug}`;
   } else if (category_slug) {
     pageTitle = `${metaT("companies.titleByCategory")} ${category_slug}`;
-    pageDescription = `${metaT("companies.descriptionByCategory")} ${category_slug}`;
   } else {
     pageTitle = metaT("companies.defaultTitle");
-    pageDescription = metaT("companies.defaultDescription");
   }
 
   const seoOverride = getSeoOverride({
@@ -345,7 +337,6 @@ export default async function Companies({ searchParams, params }) {
   });
 
   const resolvedPageTitle = seoOverride?.h1 || seoOverride?.title || pageTitle;
-  const resolvedPageDescription = seoOverride?.description || pageDescription;
 
   return (
     <div className="pt-4 pb-4">

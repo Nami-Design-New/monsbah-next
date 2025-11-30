@@ -51,7 +51,6 @@ export default async function page({ searchParams }) {
   const lang = (await getLocale()).split("-")[1];
 
   const {
-    search: _search,
     country_id,
     city_id,
     category_id,

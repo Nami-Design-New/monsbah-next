@@ -3,13 +3,12 @@ import { getAuthedUser } from "@/services/auth/getAuthedUser";
 import { getFollowers } from "@/services/followers/getFollowers";
 import { getQueryClient } from "@/utils/queryCLient";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import React from "react";
 
 export const dynamic = 'force-dynamic';
 
 export default async function page() {
-  const t = await getTranslations();
   const lang = (await getLocale()).split("-")[1];
   const queryClient = getQueryClient();
   const user = await getAuthedUser();

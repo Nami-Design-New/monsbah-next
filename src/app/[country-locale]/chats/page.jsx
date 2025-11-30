@@ -27,8 +27,7 @@ export async function generateMetadata({ searchParams }) {
 export default async function Page({ searchParams }) {
   const { user_id } = searchParams;
 
-  const [_t, chats, chat] = await Promise.all([
-    getTranslations("meta"),
+  const [chats, chat] = await Promise.all([
     getChats(),
     user_id ? getChat(user_id) : Promise.resolve(null),
   ]);

@@ -1,7 +1,6 @@
 import Comments from "@/components/product/Comments";
 import MyProductSlider from "@/components/product/MyProductSlider";
 import ProductInfo from "@/components/product/ProductInfo";
-import UserCard from "@/components/product/UserCard";
 import UserCardCompany from "@/components/product/UserCardCompany";
 import { getProduct } from "@/services/products/getProduct";
 import { cache } from "react";
