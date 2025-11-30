@@ -658,5 +658,27 @@
       "title": "User Profile",
       "description": "Browse the user's profile and listed products."
     }
+  },
+  "mainCategories": "Main Categories",
+  "viewAll": "View All",
+  "companiesSection": "Companies Section",
+  "addAdCTA": {
+    "title": "Add Your Ad Now!",
+    "subtitle": "Post your ad for free and start reaching thousands of potential customers in your area",
+    "button": "Add Your Ad"
+  },
+  "features": {
+    "title": "Platform Features",
+    "easyToUse": "Easy to Use",
+    "easyToUseDesc": "Simple and easy interface for everyone",
+    "support247": "24/7 Support",
+    "support247Desc": "Support team available around the clock",
+    "fastPublish": "Fast Ad Publishing",
+    "fastPublishDesc": "Post your ad in minutes",
+    "mobileApp": "Mobile App Available",
+    "mobileAppDesc": "Download the app for Android and iOS"
+  },
+  "testimonials": {
+    "title": "Customer Reviews"
   }
 }

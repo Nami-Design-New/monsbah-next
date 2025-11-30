@@ -10979,8 +10979,6 @@
   white-space: nowrap;
   border-width: 0;
 }
-:host,
-:root
 
 .fa-42-group:before,
 .fa-innosoft:before {
@@ -12378,8 +12376,6 @@
 .fa-zhihu:before {
   content: "\f63f";
 }
-:host,
-:root
 
 :host,
 :root {
@@ -12432,8 +12428,6 @@
   font-family: "Font Awesome 6 Pro";
   font-weight: 900;
 }
-:host,
-:root
 
 @font-face {
   font-family: "Font Awesome 5 Pro";

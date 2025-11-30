@@ -13,6 +13,20 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getLocale } from "next-intl/server";
 import { generateHreflangAlternates } from "@/utils/hreflang";
 
+// New components for redesigned home
+import MainCategoriesGrid from "@/components/home/MainCategoriesGrid";
+import CategoryProductsSection from "@/components/home/CategoryProductsSection";
+import CompaniesSection from "@/components/home/CompaniesSection";
+import PromoBanner from "@/components/home/PromoBanner";
+import AddAdCTA from "@/components/home/AddAdCTA";
+import FeaturesSection from "@/components/home/FeaturesSection";
+import TestimonialsSection from "@/components/home/TestimonialsSection";
+
+// Services
+import { getCategories } from "@/services/categories/getCategories";
+import { getCompaniesCategories } from "@/services/categories/getCompaniesCategories";
+import { getProductsByCategory } from "@/services/products/getProductsByCategory";
+
 // Mark as dynamic - uses searchParams for filtering
 export const dynamic = "force-dynamic";
 
@@ -73,6 +87,27 @@ export default async function Home({ searchParams }) {
   const sub_category_slug = paramsObj?.sub_category || null;
   const search = paramsObj?.search || null;
 
+  // Fetch categories and products for new home sections
+  const [categories, companiesCategories] = await Promise.all([
+    getCategories(`/${user}/categories`),
+    getCompaniesCategories()
+  ]);
+
+  // Get products for first 2 categories (for category sections)
+  const firstTwoCategories = categories?.slice(0, 2) || [];
+  const categoryProducts = await Promise.all(
+    firstTwoCategories.map(async (cat) => ({
+      ...cat,
+      products: await getProductsByCategory({
+        category_slug: cat.slug,
+        lang,
+        country_slug,
+        limit: 10,
+        user
+      })
+    }))
+  );
+
   await queryClient.prefetchInfiniteQuery({
     queryKey: [
       "products",
@@ -109,11 +144,51 @@ export default async function Home({ searchParams }) {
   return (
     <CategoryTabProvider>
       <CountrySelectorModal />
+      
+      {/* Hero Slider */}
       <HeroSection />
-      <FilterSection selectedCategory={null} selectedSubCategory={null} />
+      
+      {/* الأقسام الأساسية - بطاقات كبيرة */}
+      <MainCategoriesGrid categories={categories} />
+      
+      {/* بوستر دعائي أول */}
+      <PromoBanner />
+      
+      {/* قسم المنتجات حسب الكاتيجوري الأول (مثل الفساتين) */}
+      {categoryProducts[0] && categoryProducts[0].products?.length > 0 && (
+        <CategoryProductsSection
+          title={categoryProducts[0].name}
+          categorySlug={categoryProducts[0].slug}
+          products={categoryProducts[0].products}
+        />
+      )}
+      
+      {/* قسم المنتجات حسب الكاتيجوري الثاني (مثل الشنط) */}
+      {categoryProducts[1] && categoryProducts[1].products?.length > 0 && (
+        <CategoryProductsSection
+          title={categoryProducts[1].name}
+          categorySlug={categoryProducts[1].slug}
+          products={categoryProducts[1].products}
+        />
+      )}
+      
+      {/* قسم الشركات */}
+      <CompaniesSection categories={companiesCategories} />
+      
+      {/* قسم أضف إعلانك */}
+      <AddAdCTA />
+      
+      {/* مميزات المنصة */}
+      <FeaturesSection />
+      
+      {/* آراء العملاء */}
+      <TestimonialsSection />
+      
+      {/* الفلاتر وقائمة المنتجات الأساسية */}
+      {/* <FilterSection selectedCategory={null} selectedSubCategory={null} />
       <HydrationBoundary state={dehydrate(queryClient)}>
         <ProductsSection userType={user} />
-      </HydrationBoundary>
+      </HydrationBoundary> */}
     </CategoryTabProvider>
   );
 }

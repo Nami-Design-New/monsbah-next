@@ -1,0 +1,143 @@
+"use client";
+
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+
+/**
+ * MainCategoriesGrid - الأقسام الأساسية
+ * عرض الكاتيجوريز بشكل بطاقات كبيرة (4 أعمدة ديسكتوب / 2 موبايل)
+ */
+export default function MainCategoriesGrid({ categories = [] }) {
+  const t = useTranslations();
+
+  if (!categories?.length) return null;
+
+  return (
+    <section className="main-categories-section">
+      <div className="container">
+        <div className="section-header">
+          <h2>{t("mainCategories") || "الأقسام الأساسية"}</h2>
+        </div>
+        <div className="categories-grid">
+          {categories.slice(0, 8).map((category) => (
+            <Link
+              key={category.id || category.slug}
+              href={`/${category.slug}`}
+              className="category-card"
+              aria-label={category.name}
+            >
+              <div className="card-icon">
+                <Image
+                  src={category.icon || category.image || "/icons/all.svg"}
+                  alt={category.alt || category.name}
+                  width={48}
+                  height={48}
+                  loading="lazy"
+                />
+              </div>
+              <span className="card-name">{category.name}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <style jsx>{`
+        .main-categories-section {
+          padding: 32px 0;
+          background: #fff;
+        }
+
+        .section-header {
+          text-align: center;
+          margin-bottom: 24px;
+        }
+
+        .section-header h2 {
+          font-size: 24px;
+          font-weight: 700;
+          color: #0d0d0d;
+          margin: 0;
+        }
+
+        .categories-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+        }
+
+        @media (max-width: 992px) {
+          .categories-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .categories-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+        }
+
+        .category-card {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 16px 20px;
+          background: #f8f8f8;
+          border-radius: 12px;
+          border: 1px solid #f2f2f2;
+          transition: all 0.3s ease;
+          text-decoration: none;
+          color: #0d0d0d;
+        }
+
+        .category-card:hover {
+          background: #1abc9c;
+          border-color: #1abc9c;
+          color: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+        }
+
+        .card-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .category-card:hover .card-icon {
+          background: rgba(255, 255, 255, 0.9);
+        }
+
+        .card-name {
+          font-size: 16px;
+          font-weight: 600;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        @media (max-width: 576px) {
+          .category-card {
+            padding: 12px 16px;
+          }
+
+          .card-icon {
+            width: 40px;
+            height: 40px;
+          }
+
+          .card-name {
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
