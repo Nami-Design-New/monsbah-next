@@ -25,7 +25,8 @@ const nextConfig = {
       'react-hook-form',
       '@hookform/resolvers',
       'zod',
-      'sonner'
+      'sonner',
+      'next-intl'
     ],
     optimizeCss: true,
   },

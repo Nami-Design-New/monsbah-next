@@ -28,9 +28,22 @@ export default async function HeroSection({ h1Title = null }) {
   }
   
   const sliders = await getSliders();
+  const firstSliderImage = sliders?.[0]?.image;
+  
   return (
     <>
       <h1 style={visuallyHiddenStyle}>{heading}</h1>
+      {/* Preload first slider image for better LCP */}
+      {firstSliderImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={firstSliderImage}
+          imageSrcSet={`${firstSliderImage}?w=640 640w, ${firstSliderImage}?w=1080 1080w, ${firstSliderImage}?w=1920 1920w`}
+          imageSizes="100vw"
+          fetchPriority="high"
+        />
+      )}
       <HeroSlider sliders={sliders} />
     </>
   );

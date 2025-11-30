@@ -34,6 +34,8 @@ function ProductCard({ product }) {
             loop
             muted
             playsInline
+            width={180}
+            height={180}
           />
         ) : (
           <>
@@ -42,6 +44,8 @@ function ProductCard({ product }) {
               src={product.image}
               alt={product.alt || product.name}
               fallbackSrc="/banner.png"
+              width={180}
+              height={180}
               style={{ 
                 width: '100%', 
                 height: '100%', 
@@ -51,6 +55,7 @@ function ProductCard({ product }) {
                 left: 0
               }}
               loading="lazy"
+              decoding="async"
             />
           </>
         )}

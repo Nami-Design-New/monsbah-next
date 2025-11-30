@@ -126,7 +126,13 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
             onClick={() => handleSelectCategory("")}
           >
             <span className="img">
-              <img src="/icons/all.svg" alt="All Categories" />
+              <img 
+                src="/icons/all.svg" 
+                alt="All Categories"
+                width={20}
+                height={20}
+                loading="eager"
+              />
             </span>
             <span style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</span>
           </button>
@@ -144,6 +150,10 @@ export default function CategoriesSlider({ categories, companiesCategories }) {
                 <img 
                   src={category?.icon} 
                   alt={category?.alt || category?.name || category?.slug}
+                  width={20}
+                  height={20}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
               <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{category?.name}</p>

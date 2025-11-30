@@ -23,7 +23,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
-// Import styles in optimized order
+// Import styles in optimized order - Font Awesome CSS is large (~600KB)
+// Load it early but consider lazy loading in the future for better LCP
 import "@/assets/styles/all.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/styles/main.css";

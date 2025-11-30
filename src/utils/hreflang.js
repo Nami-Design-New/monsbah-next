@@ -205,11 +205,16 @@ export async function generateHreflangAlternates(path = "/", options = {}) {
   const localeEntry =
     resolveLocaleEntry(requestedLocale) ?? DEFAULT_LOCALE_ENTRY;
 
+  // Next.js alternates.languages expects the key to be the locale used in the URL path
+  // and the value to be the full URL. It will generate <link rel="alternate" hreflang="{key}" href="{value}">
+  // So we use hreflang (ar-BH) as key and full URL as value
   const languages = {};
   for (const entry of SUPPORTED_LOCALES) {
+    // Use hreflang format (ar-BH) as the key - Next.js uses this directly in the hreflang attribute
     languages[entry.hreflang] = buildHref(entry.pathLocale, normalizedPath);
   }
 
+  // Add generic language alternates (ar, en) for broad language targeting
   addGenericLanguageAlternates(languages, normalizedPath, SUPPORTED_LOCALES);
 
   languages["x-default"] = buildHref(

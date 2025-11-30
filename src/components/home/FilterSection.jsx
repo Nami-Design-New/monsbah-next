@@ -64,7 +64,12 @@ export default async function FilterSection({
                     className={`category ${!selectedCategory ? "active" : ""}`}
                   >
                     <div className="img">
-                      <img src="/icons/all.svg" alt="All Categories" />
+                      <img 
+                        src="/icons/all.svg" 
+                        alt="All Categories"
+                        width={20}
+                        height={20}
+                      />
                     </div>
                     <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{t("all")}</p>
                   </a>
@@ -79,7 +84,14 @@ export default async function FilterSection({
                       aria-label={`Category ${cat.slug}`}
                     >
                       <div className="img">
-                        <img src={cat.image} alt={cat.alt || cat.name || cat.slug} />
+                        <img 
+                          src={cat.image} 
+                          alt={cat.alt || cat.name || cat.slug}
+                          width={20}
+                          height={20}
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </div>
                       <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{cat.name}</p>
                     </a>
