@@ -86,9 +86,19 @@ export async function generateMetadata({ params }) {
       images: ["/branding/storeicon.svg"],
     },
     icons: {
-      icon: "/branding/icon.svg",
-      apple: "/branding/icon.svg",
+      icon: [
+        { url: "/storeicon.svg", sizes: "any" },
+        { url: "/storeicon.svg", sizes: "192x192", type: "image/png" },
+        { url: "/storeicon.svg", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [
+        { url: "/storeicon.svg", sizes: "180x180", type: "image/png" },
+      ],
+      other: [
+        { rel: "mask-icon", url: "/branding/icon.svg", color: "#00CCBB" },
+      ],
     },
+    manifest: "/manifest.json",
   };
 }
 export const viewport = {
