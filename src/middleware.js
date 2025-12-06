@@ -16,6 +16,17 @@ const PUBLIC_FILE = /\.(?:js|mjs|css|map|json|png|jpg|jpeg|gif|svg|ico|webp|avif
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
+  // Force HTTPS in production (Cloudflare compatibility)
+  if (
+    process.env.NODE_ENV === 'production' &&
+    req.headers.get('x-forwarded-proto') !== 'https'
+  ) {
+    return NextResponse.redirect(
+      `https://${req.headers.get('host')}${pathname}`,
+      301
+    );
+  }
+
   // Skip middleware for static assets and Next.js internals
   if (
     pathname.startsWith("/_next") ||

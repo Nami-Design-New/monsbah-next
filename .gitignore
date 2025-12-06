@@ -41,3 +41,5 @@ next-env.d.ts
 
 # sitemap cache
 .sitemap-cache/
+# md
+*.md  

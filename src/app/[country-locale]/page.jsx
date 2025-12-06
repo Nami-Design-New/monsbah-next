@@ -21,6 +21,8 @@ import PromoBanner from "@/components/home/PromoBanner";
 import AddAdCTA from "@/components/home/AddAdCTA";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
+import SectionBanner from "@/components/home/SectionBanner";
+import MobileAppSection from "@/components/home/MobileAppSection";
 
 // Services
 import { getCategories } from "@/services/categories/getCategories";
@@ -93,10 +95,9 @@ export default async function Home({ searchParams }) {
     getCompaniesCategories()
   ]);
 
-  // Get products for first 2 categories (for category sections)
-  const firstTwoCategories = categories?.slice(0, 2) || [];
+  // Get products for all categories (for category sections)
   const categoryProducts = await Promise.all(
-    firstTwoCategories.map(async (cat) => ({
+    (categories || []).map(async (cat) => ({
       ...cat,
       products: await getProductsByCategory({
         category_slug: cat.slug,
@@ -152,25 +153,27 @@ export default async function Home({ searchParams }) {
       <MainCategoriesGrid categories={categories} />
       
       {/* بوستر دعائي أول */}
-      <PromoBanner />
+      {/* <PromoBanner /> */}
       
-      {/* قسم المنتجات حسب الكاتيجوري الأول (مثل الفساتين) */}
-      {categoryProducts[0] && categoryProducts[0].products?.length > 0 && (
-        <CategoryProductsSection
-          title={categoryProducts[0].name}
-          categorySlug={categoryProducts[0].slug}
-          products={categoryProducts[0].products}
-        />
-      )}
+      {/* عرض كل الكاتيجوريز مع منتجاتها + بانرات بينهم */}
+      {categoryProducts.map((category, index) => (
+        category?.products?.length > 0 && (
+          <div key={`category-wrapper-${category.id || index}`}>
+            <CategoryProductsSection
+              title={category.name}
+              categorySlug={category.slug}
+              products={category.products}
+            />
+            {/* بانر بعد كل اتنين كاتيجوري */}
+            {(index + 1) % 2 === 0 && index < categoryProducts.length - 1 && (
+              <SectionBanner index={Math.floor(index / 2)} />
+            )}
+          </div>
+        )
+      ))}
       
-      {/* قسم المنتجات حسب الكاتيجوري الثاني (مثل الشنط) */}
-      {categoryProducts[1] && categoryProducts[1].products?.length > 0 && (
-        <CategoryProductsSection
-          title={categoryProducts[1].name}
-          categorySlug={categoryProducts[1].slug}
-          products={categoryProducts[1].products}
-        />
-      )}
+      {/* سكشن تحميل التطبيق */}
+      <MobileAppSection />
       
       {/* قسم الشركات */}
       <CompaniesSection categories={companiesCategories} />

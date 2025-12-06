@@ -1,0 +1,154 @@
+.categoryProductsSection {
+  padding: 32px 0;
+  background: #fff;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sectionHeader h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0d0d0d;
+  margin: 0;
+}
+
+.viewAllBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1abc9c;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.viewAllBtn:hover {
+  color: #16a085;
+  gap: 12px;
+}
+
+.productsCarousel {
+  position: relative;
+}
+
+.productsCarousel :global(.products-swiper) {
+  padding: 8px 0;
+}
+
+.productsCarousel :global(.product-slide) {
+  width: 280px !important;
+}
+
+@media (max-width: 576px) {
+  .productsCarousel :global(.product-slide) {
+    width: 220px !important;
+  }
+}
+
+.productCardMini {
+  display: block;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.productCardMini:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.productImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #f8f8f8;
+}
+
+.popularBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #1abc9c;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.productInfo {
+  padding: 12px;
+}
+
+.productName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0d0d0d;
+  margin: 0 0 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productPrice {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1abc9c;
+  margin: 0 0 4px;
+}
+
+.productLocation {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.swiperNavBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.swiperNavBtn:hover {
+  background: #1abc9c;
+  color: #fff;
+  border-color: #1abc9c;
+}
+
+.prevBtn {
+  right: -20px;
+}
+
+.nextBtn {
+  left: -20px;
+}
+
+@media (max-width: 768px) {
+  .swiperNavBtn {
+    display: none;
+  }
+}

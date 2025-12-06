@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import Image from "next/image";
+import styles from "./TestimonialsSection.module.css";
 
 /**
  * TestimonialsSection - آراء العملاء
@@ -61,13 +62,13 @@ export default function TestimonialsSection({ testimonials = [] }) {
   };
 
   return (
-    <section className="testimonials-section">
+    <section className={styles.testimonialsSection}>
       <div className="container">
-        <div className="section-header">
+        <div className={styles.sectionHeader}>
           <h2>{t("testimonials.title") || "آراء العملاء"}</h2>
         </div>
 
-        <div className="testimonials-carousel">
+        <div className={styles.testimonialsCarousel}>
           <Swiper
             modules={[Navigation, Autoplay]}
             slidesPerView={1}
@@ -92,9 +93,9 @@ export default function TestimonialsSection({ testimonials = [] }) {
           >
             {displayTestimonials.map((testimonial) => (
               <SwiperSlide key={testimonial.id}>
-                <div className="testimonial-card">
-                  <div className="testimonial-header">
-                    <div className="user-image">
+                <div className={styles.testimonialCard}>
+                  <div className={styles.testimonialHeader}>
+                    <div className={styles.userImage}>
                       <Image
                         src={testimonial.image || "/icons/user_default.png"}
                         alt={testimonial.name}
@@ -103,170 +104,31 @@ export default function TestimonialsSection({ testimonials = [] }) {
                         style={{ objectFit: "cover", borderRadius: "50%" }}
                       />
                     </div>
-                    <div className="user-info">
-                      <h4 className="user-name">{testimonial.name}</h4>
+                    <div className={styles.userInfo}>
+                      <h4 className={styles.userName}>{testimonial.name}</h4>
                       {testimonial.company && (
-                        <span className="user-company">{testimonial.company}</span>
+                        <span className={styles.userCompany}>{testimonial.company}</span>
                       )}
                     </div>
                   </div>
-                  <div className="testimonial-rating">
+                  <div className={styles.testimonialRating}>
                     {renderStars(testimonial.rating)}
                   </div>
-                  <p className="testimonial-text">{testimonial.text}</p>
+                  <p className={styles.testimonialText}>{testimonial.text}</p>
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
 
           {/* Navigation Arrows */}
-          <button className="swiper-nav-btn testimonial-prev">
+          <button className={`${styles.swiperNavBtn} ${styles.testimonialPrev} testimonial-prev`}>
             <i className="fa-light fa-chevron-right"></i>
           </button>
-          <button className="swiper-nav-btn testimonial-next">
+          <button className={`${styles.swiperNavBtn} ${styles.testimonialNext} testimonial-next`}>
             <i className="fa-light fa-chevron-left"></i>
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        .testimonials-section {
-          padding: 48px 0;
-          background: #f8f8f8;
-        }
-
-        .section-header {
-          text-align: center;
-          margin-bottom: 32px;
-        }
-
-        .section-header h2 {
-          font-size: 24px;
-          font-weight: 700;
-          color: #0d0d0d;
-          margin: 0;
-        }
-
-        .testimonials-carousel {
-          position: relative;
-          padding: 0 48px;
-        }
-
-        @media (max-width: 768px) {
-          .testimonials-carousel {
-            padding: 0;
-          }
-        }
-
-        :global(.testimonials-swiper) {
-          padding: 8px;
-        }
-
-        .testimonial-card {
-          background: #fff;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-          height: 100%;
-          transition: all 0.3s ease;
-        }
-
-        .testimonial-card:hover {
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-          transform: translateY(-4px);
-        }
-
-        .testimonial-header {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin-bottom: 16px;
-        }
-
-        .user-image {
-          width: 56px;
-          height: 56px;
-          border-radius: 50%;
-          overflow: hidden;
-          flex-shrink: 0;
-          border: 2px solid #1abc9c;
-        }
-
-        .user-info {
-          flex: 1;
-        }
-
-        .user-name {
-          font-size: 16px;
-          font-weight: 700;
-          color: #0d0d0d;
-          margin: 0 0 4px;
-        }
-
-        .user-company {
-          font-size: 12px;
-          color: #1abc9c;
-        }
-
-        .testimonial-rating {
-          display: flex;
-          gap: 4px;
-          margin-bottom: 12px;
-        }
-
-        .testimonial-rating i {
-          font-size: 14px;
-        }
-
-        .testimonial-text {
-          font-size: 14px;
-          color: #666;
-          line-height: 1.7;
-          margin: 0;
-        }
-
-        .swiper-nav-btn {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-          background: #fff;
-          border: 1px solid #e0e0e0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          z-index: 10;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .swiper-nav-btn:hover {
-          background: #1abc9c;
-          color: #fff;
-          border-color: #1abc9c;
-        }
-
-        :global(.testimonial-prev) {
-          right: 0;
-        }
-
-        :global(.testimonial-next) {
-          left: 0;
-        }
-
-        @media (max-width: 768px) {
-          .swiper-nav-btn {
-            display: none;
-          }
-
-          .testimonial-card {
-            padding: 20px;
-          }
-        }
-      `}</style>
     </section>
   );
 }

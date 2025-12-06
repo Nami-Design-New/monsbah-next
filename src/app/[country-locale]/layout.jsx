@@ -117,28 +117,15 @@ export default async function RootLayout(props) {
       <head>
         <meta name="google-site-verification" content="e-AefwQFw80wb3obNRXpVfY1KGT-VmL7nMEuG5cxi3I" />
         
-        {/* Preload critical fonts */}
-        <link 
-          rel="preload" 
-          as="style" 
-          href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&display=swap"
-        />
-        <link 
-          rel="stylesheet" 
-          href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&display=swap" 
-          media="print" 
-          onLoad="this.media='all'"
-        />
-        <noscript>
-          <link 
-            rel="stylesheet" 
-            href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&display=swap"
-          />
-        </noscript>
-        
-        {/* Preconnect to external domains */}
+        {/* Google Fonts - using display=swap for async loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link 
+          rel="stylesheet" 
+          href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400..800&display=swap"
+        />
+        
+        {/* Preconnect to external domains */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
         <link rel="preconnect" href="https://monsba.sfo3.cdn.digitaloceanspaces.com" />
         <link rel="dns-prefetch" href="https://backendv1.monsbah.com" />

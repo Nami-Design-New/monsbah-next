@@ -9,6 +9,7 @@ import MoreActions from "./MoreActions";
 import NavLinks from "./NavLinks";
 import NotificationsDropDown from "./NotificationsDropDown";
 import LanguageSwitcher from "./LanguageSwitcher";
+import TopHeader from "./TopHeader";
 import { Dropdown } from "react-bootstrap";
 import LogoutComponent from "../profile/LogoutComponent";
 
@@ -19,10 +20,13 @@ export default function Header() {
   const { userType } = useAuthModal((state) => state);
 
   return (
-    <header>
-      <div className="container">
-        <div className="mainLinks">
-          <Link aria-label="Home" href="/" className="navbar-brand">
+    <>
+      <header>
+              <TopHeader />
+
+        <div className="container">
+          <div className="mainLinks">
+            <Link aria-label="Home" href="/" className="navbar-brand">
             <Image
               src="/branding/icon.svg"
               width={40}
@@ -118,5 +122,6 @@ export default function Header() {
         </div>
       </div>
     </header>
+    </>
   );
 }
