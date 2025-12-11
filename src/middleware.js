@@ -16,6 +16,11 @@ const PUBLIC_FILE = /\.(?:js|mjs|css|map|json|png|jpg|jpeg|gif|svg|ico|webp|avif
 export async function middleware(req) {
   const { pathname } = req.nextUrl;
 
+  // Skip .well-known paths immediately (before any processing)
+  if (pathname.includes("/.well-known/")) {
+    return new NextResponse(null, { status: 404 });
+  }
+
   // Force HTTPS in production (Cloudflare compatibility)
   if (
     process.env.NODE_ENV === 'production' &&
@@ -37,7 +42,7 @@ export async function middleware(req) {
     pathname === "/mockServiceWorker.js" ||
     pathname.startsWith("/icons") ||
     pathname.startsWith("/branding") ||
-    pathname.startsWith("/.well-known") || // Skip .well-known paths (Chrome DevTools, etc.)
+    pathname.includes("/.well-known/") || // Skip .well-known paths (Chrome DevTools, etc.)
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();
