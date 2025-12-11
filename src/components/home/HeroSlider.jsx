@@ -9,8 +9,7 @@ export default function HeroSlider({ sliders = [] }) {
   const slidesCount = sliders.length;
 
   return (
-    <section className="hero_section">
-      <h2 className="visually-hidden">Hero Slider</h2>
+    <section className="hero_section" aria-label="Hero Slider">
       <div className="container">
         <div className="swiper_wrapper">
           {slidesCount > 1 && (

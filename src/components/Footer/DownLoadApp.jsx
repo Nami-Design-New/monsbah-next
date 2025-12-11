@@ -6,7 +6,7 @@ const DownLoadApp = async () => {
   const t = await getTranslations();
   return (
     <>
-      <h3>{t("downloadApp")}</h3>
+      <strong className="footer-heading">{t("downloadApp")}</strong>
       <div className="btns">
         <a
           href="https://apps.apple.com/kw/app/%D9%85%D9%86%D8%A7%D8%B3%D8%A8%D8%A9/id1589937521?l=ar"

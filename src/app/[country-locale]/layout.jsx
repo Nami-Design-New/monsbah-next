@@ -4,7 +4,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Toaster } from "sonner";
 import Script from "next/script";
-import NextTopLoader from "nextjs-toploader";
+import NextTopLoaderClient from "@/components/NextTopLoaderClient";
 
 import AuthModal from "@/components/auth/AuthModal";
 import Footer from "@/components/Footer/Footer";
@@ -206,17 +206,7 @@ export default async function RootLayout(props) {
           ></iframe>
         </noscript>
         <Providers locale={fullLocale} messages={messages}>
-          <NextTopLoader 
-            color="#1abc9c"
-            initialPosition={0.08}
-            crawlSpeed={200}
-            height={3}
-            crawl={true}
-            showSpinner={false}
-            easing="ease"
-            speed={200}
-            shadow="0 0 10px #1abc9c,0 0 5px #1abc9c"
-          />
+          <NextTopLoaderClient />
           <Toaster expand={false} richColors position="bottom-right" />
           <Header />
           <main>

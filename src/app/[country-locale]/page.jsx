@@ -17,7 +17,6 @@ import { generateHreflangAlternates } from "@/utils/hreflang";
 import MainCategoriesGrid from "@/components/home/MainCategoriesGrid";
 import CategoryProductsSection from "@/components/home/CategoryProductsSection";
 import CompaniesSection from "@/components/home/CompaniesSection";
-import PromoBanner from "@/components/home/PromoBanner";
 import AddAdCTA from "@/components/home/AddAdCTA";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
@@ -152,8 +151,6 @@ export default async function Home({ searchParams }) {
       {/* الأقسام الأساسية - بطاقات كبيرة */}
       <MainCategoriesGrid categories={categories} />
       
-      {/* بوستر دعائي أول */}
-      {/* <PromoBanner /> */}
       
       {/* عرض كل الكاتيجوريز مع منتجاتها + بانرات بينهم */}
       {categoryProducts.map((category, index) => (
@@ -164,7 +161,7 @@ export default async function Home({ searchParams }) {
               categorySlug={category.slug}
               products={category.products}
             />
-            {/* بانر بعد كل اتنين كاتيجوري */}
+            {/* بانر بعد كل كاتيجوريتين */}
             {(index + 1) % 2 === 0 && index < categoryProducts.length - 1 && (
               <SectionBanner index={Math.floor(index / 2)} />
             )}

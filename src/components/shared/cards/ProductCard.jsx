@@ -76,12 +76,12 @@ function ProductCard({ product }) {
 
       <div className="content">
         <div className="title">
-          <h3>{product.name}</h3>
+          <p className="product-title">{product.name}</p>
         </div>
 
-        <h3 className="price">
+        <p className="price">
           <span>{product?.price}</span> {product?.currency?.name}
-        </h3>
+        </p>
 
         <ul>
           <li className="w-100">

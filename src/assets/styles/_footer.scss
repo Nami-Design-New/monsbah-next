@@ -46,11 +46,13 @@ footer {
     &:last-child {
       padding-left: 0;
     }
-    h3 {
+    h3,
+    .footer-heading {
       color: $dark;
       font-weight: 600;
       margin: 0;
       font-size: 18px !important;
+      display: block;
     }
     ul {
       display: flex;

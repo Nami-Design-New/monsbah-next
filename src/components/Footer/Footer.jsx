@@ -55,14 +55,14 @@ export default async function Footer() {
 
           <div className="col-lg-3 col-md-6 col-6 p-2">
             <div className="col">
-              <h3>{t("importantLinks")}</h3>
+              <strong className="footer-heading">{t("importantLinks")}</strong>
               <LinksList navLinks={importantLinks} />
             </div>
           </div>
 
           <div className="col-lg-3 col-md-6 col-6 p-2">
             <div className="col">
-              <h3>{t("popularCategories")}</h3>
+              <strong className="footer-heading">{t("popularCategories")}</strong>
               <ul>
                 {categories?.map((category) => (
                   <li key={category.id}>

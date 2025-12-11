@@ -105,7 +105,7 @@ export default function TestimonialsSection({ testimonials = [] }) {
                       />
                     </div>
                     <div className={styles.userInfo}>
-                      <h4 className={styles.userName}>{testimonial.name}</h4>
+                      <strong className={styles.userName}>{testimonial.name}</strong>
                       {testimonial.company && (
                         <span className={styles.userCompany}>{testimonial.company}</span>
                       )}

@@ -58,7 +58,7 @@ export default function CategoryProductsSection({ title, categorySlug, products 
                       )}
                     </div>
                     <div className={styles.productInfo}>
-                      <h3 className={styles.productName}>{product?.name}</h3>
+                      <p className={styles.productName}>{product?.name}</p>
                       <p className={styles.productPrice}>
                         <span>{product?.price}</span> {product?.currency?.name}
                       </p>
