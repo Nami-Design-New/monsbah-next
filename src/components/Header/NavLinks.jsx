@@ -4,8 +4,9 @@ import { useAuthModal } from "@/stores/useAuthModal";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React from "react";
+import NavDropdown from "./NavDropdown";
 
-const NavLinks = () => {
+const NavLinks = ({ categories = [], companyCategories = [] }) => {
   const t = useTranslations("header");
   const pathname = usePathname();
   const { userType } = useAuthModal((state) => state);
@@ -30,19 +31,23 @@ const NavLinks = () => {
           {t("home")}
         </Link>
         {userType === "client" && (
-          <Link
-            className={`navLink  ${pathname === "/categories" ? "active" : ""}`}
+          <NavDropdown
+            title={t("categories")}
             href="/categories"
-          >
-            {t("categories")}
-          </Link>
+            isActive={pathname === "/categories" || pathname.startsWith("/categories")}
+            items={categories}
+            isLoading={false}
+            linkPrefix="/"
+          />
         )}
-        <Link
-          className={`navLink  ${pathname === "/companies" ? "active" : ""}`}
+        <NavDropdown
+          title={t("companies")}
           href="/companies"
-        >
-          {t("companies")}
-        </Link>
+          isActive={pathname === "/companies" || pathname.startsWith("/companies")}
+          items={companyCategories}
+          isLoading={false}
+          linkPrefix="/companies?category="
+        />
         <Link
           className={`navLink  ${pathname === "/about" ? "active" : ""}`}
           href="/about"

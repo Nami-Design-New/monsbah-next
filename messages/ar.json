@@ -13,7 +13,10 @@
     "asks": "الاسئلة",
     "blogs": "الأخبار",
     "logout": "تسجيل الخروج",
-    "companies": "الشركات"
+    "companies": "الشركات",
+    "viewAll": "عرض الكل",
+    "noItems": "لا توجد عناصر",
+    "loading": "جاري التحميل..."
   },
   "validations": {
     "required": "هذا الحقل مطلوب",

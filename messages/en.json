@@ -13,7 +13,10 @@
     "blogs": "Blogs",
     "logout": "Logout",
     "aboutUs": "About Us",
-    "companies": "Companies"
+    "companies": "Companies",
+    "viewAll": "View All",
+    "noItems": "No items available",
+    "loading": "Loading..."
   },
   "validations": {
     "required": "This field is required",

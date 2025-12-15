@@ -13,6 +13,8 @@ import ResponsiveNav from "@/components/Header/ResponsiveNav";
 import Providers from "@/providers/Providers";
 import { META_DATA_CONTENT } from "@/utils/constants";
 import { getSettings } from "@/services/settings/getSettings";
+import { getCategories } from "@/services/categories/getCategories";
+import { getCompaniesCategories } from "@/services/categories/getCompaniesCategories";
 
 // Suppress S3 image errors
 import "@/utils/imageErrorHandler";
@@ -112,6 +114,19 @@ export default async function RootLayout(props) {
   const lang = fullLocale.split("-")[1];
   const messages = await getMessages(lang);
 
+  // Fetch categories for header dropdown
+  let categories = [];
+  let companyCategories = [];
+  
+  try {
+    [categories, companyCategories] = await Promise.all([
+      getCategories("/client/categories"),
+      getCompaniesCategories()
+    ]);
+  } catch (error) {
+    console.error("Error fetching categories for header:", error);
+  }
+
   return (
     <html lang={lang} dir={lang === "ar" ? "rtl" : "ltr"}>
       <head>
@@ -208,7 +223,7 @@ export default async function RootLayout(props) {
         <Providers locale={fullLocale} messages={messages}>
           <NextTopLoaderClient />
           <Toaster expand={false} richColors position="bottom-right" />
-          <Header />
+          <Header categories={categories} companyCategories={companyCategories} />
           <main>
             {props.children}
           </main>

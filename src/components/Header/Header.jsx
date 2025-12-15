@@ -13,7 +13,7 @@ import TopHeader from "./TopHeader";
 import { Dropdown } from "react-bootstrap";
 import LogoutComponent from "../profile/LogoutComponent";
 
-export default function Header() {
+export default function Header({ categories = [], companyCategories = [] }) {
   const t = useTranslations();
   const handleShowAuthModal = useAuthModal((state) => state.onOpen);
   const user = useAuthStore((state) => state.user);
@@ -36,7 +36,7 @@ export default function Header() {
             />
           </Link>
 
-          <NavLinks />
+          <NavLinks categories={categories} companyCategories={companyCategories} />
 
           <div className="moreActions">
             <MoreActions />
