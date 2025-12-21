@@ -38,9 +38,7 @@ export default function CompaniesSection({ categories = [] }) {
                 <div className={styles.cardOverlay}>
                   <div className={styles.cardContent}>
                     <span className={styles.cardName}>{category.name}</span>
-                    {/* {category.meta_description && ( */}
                       <p className={styles.cardDescription}>{category.meta_description}</p>
-                    {/* )} */}
                   </div>
                 </div>
               </div>

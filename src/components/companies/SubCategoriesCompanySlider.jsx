@@ -45,8 +45,9 @@ export default function SubCategoriesCompanySlider({ subCategories }) {
               searchParams.get("sub_category") === sub?.slug ? "active" : ""
             }`}
           >
-            <p className="category-name">{sub?.name}</p>
+            <p style={{  fontSize: "14px", fontWeight: "600" }} className="category-name">{sub?.name}</p>
           </Link>
+          
         </SwiperSlide>
       ))}
     </Swiper>

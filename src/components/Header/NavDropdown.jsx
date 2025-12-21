@@ -131,7 +131,7 @@ const NavDropdown = ({
                   ))}
                 </div>
                 
-                {itemsArray.length > 0 && (
+                {/* {itemsArray.length > 0 && (
                   <Link href={href} className={styles.viewAllLink} onClick={() => setIsOpen(false)}>
                     {t("viewAll")}
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -144,7 +144,7 @@ const NavDropdown = ({
                       />
                     </svg>
                   </Link>
-                )}
+                )} */}
               </>
             )}
           </div>

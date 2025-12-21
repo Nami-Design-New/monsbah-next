@@ -7,7 +7,7 @@ export default async function AboutSection() {
     <>
       <div className="heading-section">
         <div className="image-wrapper">
-          <img src="/auth-benner.png" alt="Monsbah" layout="responsive" />
+          <img src="/auth-benner.webp" alt="Monsbah" layout="responsive" />
         </div>
         <div className="info-wrapper">
           <h1 className="h3">
